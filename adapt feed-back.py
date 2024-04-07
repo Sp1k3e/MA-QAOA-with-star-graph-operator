@@ -71,8 +71,8 @@ def update_beta_mix(curr_dens_mat):
     """ find mix and beta for next layer
     """
     all_mixer_gradients = useful_methods.find_mixer_gradients(curr_dens_mat, gradient_ops_dict, pauli_ops_dict, graph, apply_ham_unitary=True) 
-    
     best_mixer = all_mixer_gradients[0][0]
+
     if 'standard' not in best_mixer:
         mix_hamiltonian = pauli_ops_dict[best_mixer]
     else:
@@ -86,9 +86,7 @@ def update_beta_mix(curr_dens_mat):
 while layer < max_layers:
     layer +=1
     curr_dens_mat = build_layer(curr_dens_mat, beta, mix_type)
-    update = update_beta_mix(curr_dens_mat)
-    beta = update[0]
-    mix_type = update[1]
+    [beta, mix_type] = update_beta_mix(curr_dens_mat)
 
     hamiltonian_expectation = (hamiltonian * curr_dens_mat).trace().real
     ham_approx_ratio = hamiltonian_expectation / max_ham_eigenvalue
