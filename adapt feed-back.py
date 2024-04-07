@@ -42,7 +42,7 @@ max_ham_eigenvalue = max_cut_solution[2]
 ham_offset = max_cut_value - max_ham_eigenvalue
 
 hamiltonian = build_operators.cut_hamiltonian(graph)
-mix_hamiltonian = build_operators.mix_hamiltonian(graph)
+#mix_hamiltonian = build_operators.mix_hamiltonian(graph)
 
 beta = 0
 delta_t = 0.1
