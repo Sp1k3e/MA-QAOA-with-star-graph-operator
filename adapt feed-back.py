@@ -86,16 +86,17 @@ def update_beta_mix(curr_dens_mat):
     expectation = A.trace().real
     return [expectation, best_mixer]
 
-def adapt_feed_back(curr_dens_mat):
-    while layer < max_layers:
-        layer +=1
-        curr_dens_mat = build_layer(curr_dens_mat, beta, mix_type)
-        [beta, mix_type] = update_beta_mix(curr_dens_mat)
+'''
+while layer < max_layers:
+    layer +=1
+    curr_dens_mat = build_layer(curr_dens_mat, beta, mix_type)
+    [beta, mix_type] = update_beta_mix(curr_dens_mat)
 
-        hamiltonian_expectation = (hamiltonian * curr_dens_mat).trace().real
-        cut_approx_ratios.append((hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value)
+    hamiltonian_expectation = (hamiltonian * curr_dens_mat).trace().real
+    cut_approx_ratios.append((hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value)
 
-        print("beta: ", beta, "  layer", layer, ": ", cut_approx_ratios[layer],sep='')
+    print("beta: ", beta, "  layer", layer, ": ", cut_approx_ratios[layer],sep='')
+'''
 
 while layer < max_layers:
     layer +=1
@@ -114,14 +115,14 @@ while layer < max_layers:
     [beta, mix_type] = update_beta_mix(curr_dens_mat)
     hamiltonian_expectation_t = 0
 
-    print("delta_t: ", best_t,"  mix_type: " ,mix_type,"  layer", layer, ": ", cut_approx_ratios[layer],sep='')
+    print("delta_t: ", best_t,"  mix_type: " ,mix_type,"  layer", layer, ": ", cut_approx_ratios[layer],"  beta: ", beta,sep='')
 
-plt.plot(cut_approx_ratios)
+'''
+plt.plot(cut_approx_ratios[1:])
 
-# 添加标题和标签
-plt.title('Simple Line Plot')
+plt.title('node= ', no_vertices)
 plt.xlabel('layer')
 plt.ylabel('Approximate ratio')
 
-# 显示图形
 plt.show()
+'''
