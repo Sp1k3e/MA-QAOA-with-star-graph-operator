@@ -48,7 +48,7 @@ hamiltonian = build_operators.cut_hamiltonian(graph)
 mix_hamiltonian = build_operators.mix_hamiltonian(graph)
 
 beta = 1
-delta_t = 0.1
+delta_ts =[0.5,0.2,0.15,0.1,0.08,0.04,0.02]
 mix_type = 'standard_x'
 ham_approx_ratios = []
 hamiltonian_expectation_t = 0
@@ -60,8 +60,6 @@ layer = 0
 curr_dens_mat = build_operators.initial_density_matrix(no_vertices)
 
 def build_layer(curr_dens_mat,beta, mix_type):
-    """ one layer 
-    """
     cut_unit = build_operators.cut_unitary(graph,delta_t,pauli_ops_dict)
     curr_dens_mat = (cut_unit * curr_dens_mat) * (cut_unit.transpose().conj())
 
@@ -77,7 +75,6 @@ def update_beta(curr_dens_mat):
 
     return expectation
 
-'''
 while layer < max_layers:
     layer +=1
     for delta_t in delta_ts:
@@ -89,40 +86,12 @@ while layer < max_layers:
             best_t = delta_t
             best_mat = curr_dens_mat_t
 
-    cut_approx_ratios.append((hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value)
+    cut_approx_ratios.append((hamiltonian_expectation_t + max_cut_value - max_ham_eigenvalue) / max_cut_value)
 
     curr_dens_mat = best_mat
-    beta = update_beta(curr_dens_mat)
     hamiltonian_expectation_t = 0
 
     print("delta_t: ", best_t, "  beta: ", beta, "  layer", layer, ": ", cut_approx_ratios[layer],sep='')
-'''
-
-#with open("/results/" + no_vertices + "nodes-" + delta_t + "t-" + "seed" + seed, 'a'):
-
-while layer < max_layers:
-    layer +=1
-    curr_dens_mat = build_layer(curr_dens_mat, beta, mix_type)
-
-    hamiltonian_expectation = (hamiltonian * curr_dens_mat).trace().real
-    cut_approx_ratios.append((hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value)
-
-    print("layer", layer, ': ', format(cut_approx_ratios[layer],'.10f'), "  beta: ", beta, sep='')
 
     beta = update_beta(curr_dens_mat)
-    '''
-    with open("feed_back_result.txt",'a') as f:   
-        print("layer", layer, ': ', format(cut_approx_ratios[layer],'.10f'), "  beta: ", beta, sep='', file = f)
-    '''    
 
-
-
-'''
-plt.plot(cut_approx_ratios[1:])
-
-plt.title('node= ', no_vertices)
-plt.xlabel('layer')
-plt.ylabel('Approximate ratio')
-
-plt.show()
-'''
