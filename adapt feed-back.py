@@ -47,7 +47,7 @@ hamiltonian = build_operators.cut_hamiltonian(graph)
 #mix_hamiltonian = build_operators.mix_hamiltonian(graph)
 
 beta = 1
-delta_t = 0.2
+delta_t = 0.08
 delta_ts =[0.2,0.15,0.1,0.08,0.06,0.04,0.02]
 mix_type = 'standard_x'
 ham_approx_ratios = []
@@ -100,6 +100,14 @@ while layer < max_layers:
 
 while layer < max_layers:
     layer +=1
+    curr_dens_mat = build_layer(curr_dens_mat, beta, mix_type, delta_t)
+    hamiltonian_expectation = (hamiltonian * curr_dens_mat).trace().real
+    cut_approx_ratios.append((hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value)
+
+    print("layer", layer, ": ", format(cut_approx_ratios[layer],'.10f'), "  beta: ", beta, "  mix_type: " ,mix_type,sep='')
+    [beta, mix_type] = update_beta_mix(curr_dens_mat)
+
+'''
     for delta_t in delta_ts:
         curr_dens_mat_t = build_layer(curr_dens_mat, beta, mix_type,delta_t)
 
@@ -116,6 +124,8 @@ while layer < max_layers:
     hamiltonian_expectation_t = 0
 
     print("delta_t: ", best_t,"  mix_type: " ,mix_type,"  layer", layer, ": ", cut_approx_ratios[layer],"  beta: ", beta,sep='')
+'''
+
 
 '''
 plt.plot(cut_approx_ratios[1:])
