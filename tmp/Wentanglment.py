@@ -1,6 +1,5 @@
 from pyqpanda import *
 import numpy as np
-from pyvqnet.qnn.template import BasicEntanglerTemplate
 from scipy.optimize import minimize
 
 def question1(n_qubits_):
@@ -40,7 +39,7 @@ def question1(n_qubits_):
         tar = 1/3
         loss = 0
         j = 1
-        for i in range(8):
+        for i in range(2 ** n_qubits_):
             if i == j:
                 loss += abs(prob[i] - tar)
                 j *= 2
