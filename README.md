@@ -1,2 +1,7 @@
-固定t,beta越大越好 或 固定beta,t越大越好
-- 确定beta和t的关系
+
+$\beta = \frac{-2\dot{\lambda}\overline{\alpha}}{\lambda}$  
+$\lambda = \frac{\gamma}{\gamma+\beta}$  
+$\dot{\lambda} = \frac{\lambda-\lambda^{'}}{\tau}$  
+$\tau = \gamma + \beta$
+
+![alt text](/figures/image.png)
