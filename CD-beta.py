@@ -2,6 +2,7 @@ import networkx
 import random
 from src_code import build_operators
 from src_code import useful_methods
+from sympy import symbols, Eq, solve, diff
 import math
 import matplotlib.pyplot as plt
 
@@ -26,6 +27,7 @@ no_vertices = 8
 graph = generate_graph(no_vertices)[0]
 
 hamiltonian = build_operators.cut_hamiltonian(graph=graph)
+mix_hamiltonian = build_operators.mix_hamiltonian(graph)
 gradient_ops_dict = build_operators.build_all_mixers(graph=graph)
 pauli_ops_dict = build_operators.build_all_paulis(no_vertices)
 pauli_mixers_split_ops_dict = build_operators.split_all_mixers(graph)
@@ -34,9 +36,6 @@ max_cut_solution = useful_methods.find_optimal_cut(graph)
 max_cut_value = max_cut_solution[1]
 max_ham_eigenvalue = max_cut_solution[2]
 ham_offset = max_cut_value - max_ham_eigenvalue
-
-hamiltonian = build_operators.cut_hamiltonian(graph)
-#mix_hamiltonian = build_operators.mix_hamiltonian(graph)
 
 beta = 1
 beta_last = 0
@@ -47,15 +46,26 @@ ham_approx_ratios = []
 hamiltonian_expectation_t = 0
 cut_approx_ratios = [0]
 
-max_layers = 100
+max_layers = 20
 layer = 0
 
 curr_dens_mat = build_operators.initial_density_matrix(no_vertices)
 
-def get_alpha():
+def get_alpha(beta,beta_last):
+    """get alpha for a layer to compute beta
     """
-    """
+    alpha = symbols("alpha")
+    H_deri_lambda = (beta - beta_last) * mix_hamiltonian / (delta_t + beta)
+    H_lambda = delta_t * hamiltonian + beta * mix_hamiltonian
+    A_alpha = 1j * alpha *(H_lambda*H_deri_lambda - H_deri_lambda * H_lambda)
 
+    S = H_deri_lambda - 1j*(A_alpha*H_lambda - H_lambda * A_alpha)
+    S = (S * S).trace()
+    dS = diff(S, alpha)
+    alpha = solve(Eq(dS, 0), alpha)
+    print(alpha)
+
+    return alpha
 
 
 def build_layer(curr_dens_mat,beta, mix_type, delta_t):
@@ -70,11 +80,17 @@ def build_layer(curr_dens_mat,beta, mix_type, delta_t):
     return curr_dens_mat
 
 
-def update_beta(curr_dens_mat):
+def update_beta(beta_last):
     """retrive beta directly 
     without measurement
     """
+    gamma = delta_t
+    lambda_last = gamma / (gamma + beta_last)
 
+    beta = -2 * gamma * get_alpha() + 2 * lambda_last * gamma
+    beta = beta / (gamma - 2 * lambda_last)
+
+    return beta
 
 
 #with open("adapt_feed_back_result.txt",'a') as f:   
@@ -86,9 +102,9 @@ while layer < max_layers:
     hamiltonian_expectation = (hamiltonian * curr_dens_mat).trace().real
     cut_approx_ratios.append((hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value)
 
-    print("layer", layer, ": ", format(cut_approx_ratios[layer],'.10f'), "  beta: ", format(beta, '.8f'), "  mix_type: " ,mix_type,sep='')
+    print("layer", layer, ": ", format(cut_approx_ratios[layer],'.10f'), "  beta: ", format(beta, '.8f'),sep='')
     beta_last = beta
-    beta = update_beta(curr_dens_mat)
+    beta = update_beta(beta_last)
 
 
 
