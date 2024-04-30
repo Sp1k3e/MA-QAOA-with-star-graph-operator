@@ -28,6 +28,7 @@ graph = generate_graph(no_vertices)[0]
 
 hamiltonian = build_operators.cut_hamiltonian(graph=graph)
 mix_hamiltonian = build_operators.mix_hamiltonian(graph)
+
 gradient_ops_dict = build_operators.build_all_mixers(graph=graph)
 pauli_ops_dict = build_operators.build_all_paulis(no_vertices)
 pauli_mixers_split_ops_dict = build_operators.split_all_mixers(graph)
@@ -40,7 +41,7 @@ ham_offset = max_cut_value - max_ham_eigenvalue
 beta = 1
 beta_last = 0
 delta_t = 0.08
-delta_ts =[0.2,0.15,0.1,0.08,0.06,0.04,0.02]
+#delta_ts =[0.2,0.15,0.1,0.08,0.06,0.04,0.02]
 mix_type = 'standard_x'
 ham_approx_ratios = []
 hamiltonian_expectation_t = 0
@@ -51,13 +52,13 @@ layer = 0
 
 curr_dens_mat = build_operators.initial_density_matrix(no_vertices)
 
-def get_alpha(beta,beta_last):
+def get_alpha():
     """get alpha for a layer to compute beta
     """
     alpha = symbols("alpha")
-    H_deri_lambda = (beta - beta_last) * mix_hamiltonian / (delta_t + beta)
+    H_deri_lambda = delta_t * mix_hamiltonian / (delta_t + beta)
     H_lambda = delta_t * hamiltonian + beta * mix_hamiltonian
-    A_alpha = 1j * alpha *(H_lambda*H_deri_lambda - H_deri_lambda * H_lambda)
+    A_alpha = 1j * alpha *(H_lambda * H_deri_lambda - H_deri_lambda * H_lambda)
 
     S = H_deri_lambda - 1j*(A_alpha*H_lambda - H_lambda * A_alpha)
     S = (S * S).trace()
