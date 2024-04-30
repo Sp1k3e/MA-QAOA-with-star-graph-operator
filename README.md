@@ -11,3 +11,4 @@ $\beta = \frac{-2\gamma\alpha+2\lambda^{'}\gamma}{\gamma-2\lambda^{'}}$
 ![alt text](/figures/image.png)
 ![alt text](/figures/image-1.png)
 ![alt text](/figures/image-2.png)
+![alt text](image.png)
