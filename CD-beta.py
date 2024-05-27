@@ -52,12 +52,12 @@ layer = 0
 
 curr_dens_mat = build_operators.initial_density_matrix(no_vertices)
 
-def get_alpha():
+def get_alpha(beta_last):
     """get alpha for a layer to compute beta
     need to know beta?
     """
-    H_deri_lambda = delta_t * mix_hamiltonian / (delta_t + beta)
-    H_lambda = delta_t * hamiltonian + beta * mix_hamiltonian
+    H_deri_lambda = delta_t * mix_hamiltonian / (delta_t + beta_last)
+    H_lambda = delta_t * hamiltonian + beta_last * mix_hamiltonian
     '''
     A_alpha = 1j * alpha *(H_lambda * H_deri_lambda - H_deri_lambda * H_lambda)
 
@@ -68,9 +68,11 @@ def get_alpha():
     print(alpha)
     '''
     commutor = H_lambda * H_deri_lambda - H_deri_lambda * H_lambda
-    alpha = (commutor * commutor).trace()
-    
+    alpha = (commutor * commutor).trace().real
+    commutor2 = commutor * H_lambda - H_lambda * commutor
+    alpha = alpha / (commutor2 * commutor2).trace().real
 
+    print(alpha)
     return alpha
 
 
@@ -93,7 +95,7 @@ def update_beta(beta_last):
     gamma = delta_t
     lambda_last = gamma / (gamma + beta_last)
 
-    beta = -2 * gamma * get_alpha() + 2 * lambda_last * gamma
+    beta = -2 * gamma * get_alpha(beta_last) + 2 * lambda_last * gamma
     beta = beta / (gamma - 2 * lambda_last)
 
     return beta

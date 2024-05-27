@@ -5,7 +5,7 @@ $\lambda^{'} = \frac{\gamma}{\gamma+\beta^{'}}$
 $\dot{\lambda} = \frac{\lambda-\lambda^{'}}{\tau}$  
 $\tau = \gamma + \beta$  
 化简后  
-$\beta = \frac{-2\gamma\alpha+2\lambda^{'}\gamma}{\gamma-2\lambda^{'}}$
+$\beta = $
 
 ## alpha
 ![alt text](/figures/image.png)
