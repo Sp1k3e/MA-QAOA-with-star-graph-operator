@@ -5,7 +5,6 @@ from src_code import useful_methods
 import math
 import matplotlib.pyplot as plt
 
-
 def generate_graph(n, seed):
     graph = networkx.Graph()
     edge_list = []
