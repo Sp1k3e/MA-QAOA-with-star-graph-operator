@@ -524,5 +524,22 @@ def build_MA_qaoa_ansatz(graph, parameter_list, no_layers, pauli_dict, mode):
             dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
 
     #! 都改
+    elif(mode == "All"):
+        ham_parameters = parameter_list[:no_layers * no_edges]
+        mixer_parameters = parameter_list[no_layers * no_edges:]
+
+        for layer in range(no_layers):
+            cut_unit = MA_cut_unitary(graph, ham_parameters[layer * no_edges: (layer + 1) * no_edges], pauli_dict)
+            dens_mat = (cut_unit * dens_mat) * (cut_unit.transpose().conj())
+
+            first = True
+            for i in range(no_qubits):
+                if first:
+                    mix_unit = mixer_unitary('X' + str(i), mixer_parameters[i + no_qubits * layer], pauli_dict, no_qubits)
+                    first = False
+                else:
+                    mix_unit = mix_unit * mixer_unitary('X' + str(i), mixer_parameters[i + no_qubits * layer], pauli_dict, no_qubits)
+
+            dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
 
     return dens_mat

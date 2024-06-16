@@ -27,7 +27,7 @@ hamiltonian = build_operators.cut_hamiltonian(graph)
 depth = 1
 
 def obj_func(parameter_values):
-    dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_values, depth, pauli_ops_dict)
+    dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_values, depth, pauli_ops_dict, 'All')
     expectation_value = (hamiltonian * dens_mat).trace().real
     return expectation_value * (-1.0)
 
@@ -44,7 +44,7 @@ result = minimize(obj_func, initial_parameter_guesses, method="BFGS")
 
 #! 输出结果
 parameter_list = list(result.x)
-dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_list, depth, pauli_ops_dict)
+dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_list, depth, pauli_ops_dict, 'All')
 hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
 cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
 

@@ -24,7 +24,7 @@ max_ham_eigenvalue = max_cut_solution[2]
 hamiltonian = build_operators.cut_hamiltonian(graph)
 #! 初始化完成
 
-depth = 1
+depth = 2
 
 def obj_func(parameter_values):
     dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_values, depth, pauli_ops_dict, 'M')
