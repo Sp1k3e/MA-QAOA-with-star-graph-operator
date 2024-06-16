@@ -104,7 +104,7 @@ def cut_unitary(graph, parameter, dict_paulis):
         if key not in dict_paulis:
             key = 'Z' + str(edge[1]) + 'Z' + str(edge[0])
         if key not in dict_paulis:
-            raise Exception
+            raise Exception(key)
         
         tmp_matrix = dict_paulis['I'] * math.cos(total_param) + dict_paulis[key] * math.sin(total_param) * 1j
 
@@ -116,7 +116,39 @@ def cut_unitary(graph, parameter, dict_paulis):
 
     return result
 
-def mixer_unitary(mixer_type, parameter_value, dict_paulis, no_nodes, parameter_value2):
+def MA_cut_unitary(graph, parameter, dict_paulis):
+    """
+    Returns unitary operator corresponding to exponential of cut Hamiltonian.
+    """
+
+    if not isinstance(graph, nx.Graph):
+        raise Exception
+
+    i = 0
+    first = True
+    for edge in graph.edges:
+
+        weight = graph.get_edge_data(*edge)['weight']
+        total_param = 0.5 * parameter[i] * weight
+        key = 'Z' + str(edge[0]) + 'Z' + str(edge[1])
+
+        if key not in dict_paulis:
+            key = 'Z' + str(edge[1]) + 'Z' + str(edge[0])
+        if key not in dict_paulis:
+            raise Exception
+        
+        tmp_matrix = dict_paulis['I'] * math.cos(total_param) + dict_paulis[key] * math.sin(total_param) * 1j
+
+        if first:
+            result = tmp_matrix
+            first = False
+        else:
+            result = tmp_matrix * result
+        i += 1
+
+    return result
+
+def mixer_unitary(mixer_type, parameter_value, dict_paulis, no_nodes):
     """
     Returns unitary operator corresponding to expontential of mixer of specified type.
     """
@@ -134,31 +166,31 @@ def mixer_unitary(mixer_type, parameter_value, dict_paulis, no_nodes, parameter_
 
                 result = result * (math.cos(parameter_value) * dict_paulis['I'] - 1j * math.sin(parameter_value) * dict_paulis[mixer_type[-1].upper()  + str(i)])
 
-    elif mixer_type == "XinY":
-        first = True
-        for i in range(no_nodes):
-            if first:
-                result = math.cos(parameter_value) * dict_paulis['I'] - 1j * math.sin(parameter_value) * dict_paulis['X' + str(i)]
-                first = False
+    # elif mixer_type == "XinY":
+    #     first = True
+    #     for i in range(no_nodes):
+    #         if first:
+    #             result = math.cos(parameter_value) * dict_paulis['I'] - 1j * math.sin(parameter_value) * dict_paulis['X' + str(i)]
+    #             first = False
 
-            elif i % 2 == 1:
-                result = result * (math.cos(parameter_value2) * dict_paulis['I'] - 1j * math.sin(parameter_value2) * dict_paulis['Y' + str(i)])
+    #         elif i % 2 == 1:
+    #             result = result * (math.cos(parameter_value2) * dict_paulis['I'] - 1j * math.sin(parameter_value2) * dict_paulis['Y' + str(i)])
             
-            else:
-                result = result * (math.cos(parameter_value) * dict_paulis['I'] - 1j * math.sin(parameter_value) * dict_paulis['X' + str(i)])
+    #         else:
+    #             result = result * (math.cos(parameter_value) * dict_paulis['I'] - 1j * math.sin(parameter_value) * dict_paulis['X' + str(i)])
 
-    elif mixer_type == "YinX":
-        first = True
-        for i in range(no_nodes):
-            if first:
-                result = math.cos(parameter_value) * dict_paulis['I'] - 1j * math.sin(parameter_value) * dict_paulis['Y' + str(i)]
-                first = False
+    # elif mixer_type == "YinX":
+    #     first = True
+    #     for i in range(no_nodes):
+    #         if first:
+    #             result = math.cos(parameter_value) * dict_paulis['I'] - 1j * math.sin(parameter_value) * dict_paulis['Y' + str(i)]
+    #             first = False
 
-            elif i % 2 == 1:
-                result = result * (math.cos(parameter_value2) * dict_paulis['I'] - 1j * math.sin(parameter_value2) * dict_paulis['X' + str(i)])
+    #         elif i % 2 == 1:
+    #             result = result * (math.cos(parameter_value2) * dict_paulis['I'] - 1j * math.sin(parameter_value2) * dict_paulis['X' + str(i)])
             
-            else:
-                result = result * (math.cos(parameter_value) * dict_paulis['I'] - 1j * math.sin(parameter_value) * dict_paulis['Y' + str(i)])
+    #         else:
+    #             result = result * (math.cos(parameter_value) * dict_paulis['I'] - 1j * math.sin(parameter_value) * dict_paulis['Y' + str(i)])
 
     else:
         result = math.cos(parameter_value) * dict_paulis['I'] - 1j * math.sin(parameter_value) * dict_paulis[mixer_type]
@@ -452,5 +484,45 @@ def build_XinY_qaoa_ansatz(graph, parameter_list, pauli_dict):
         else:
             mix_unit = mixer_unitary('YinX', mixer_parameters[layer], pauli_dict, no_qubits, mixer_parameters1[layer])
             dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
+
+    return dens_mat
+
+def build_MA_qaoa_ansatz(graph, parameter_list, no_layers, pauli_dict, mode):
+    no_edges = graph.number_of_edges() # Problem
+    no_qubits = graph.number_of_nodes() # Mixer
+    dens_mat = initial_density_matrix(no_qubits)
+
+    #! 只改Mixer
+    if(mode == 'M'):
+        ham_parameters = parameter_list[:no_layers]
+        mixer_parameters = parameter_list[no_layers:]
+
+        for layer in range(no_layers):
+            cut_unit = cut_unitary(graph, ham_parameters[layer], pauli_dict)
+            dens_mat = (cut_unit * dens_mat) * (cut_unit.transpose().conj())
+
+            first = True
+            for i in range(no_qubits):
+                if first:
+                    mix_unit = mixer_unitary('X' + str(i), mixer_parameters[i + no_qubits * layer], pauli_dict, no_qubits)
+                    first = False
+                else:
+                    mix_unit = mix_unit * mixer_unitary('X' + str(i), mixer_parameters[i + no_qubits * layer], pauli_dict, no_qubits)
+
+            dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
+
+    #! 只改Phaser
+    elif(mode == "P"):
+        ham_parameters = parameter_list[:no_layers * no_edges]
+        mixer_parameters = parameter_list[no_layers * no_edges:]
+
+        for layer in range(no_layers):
+            cut_unit = MA_cut_unitary(graph, ham_parameters[layer * no_edges: (layer + 1) * no_edges], pauli_dict)
+            dens_mat = (cut_unit * dens_mat) * (cut_unit.transpose().conj())
+
+            mix_unit = mixer_unitary('standard_x', mixer_parameters[layer], pauli_dict, no_qubits)
+            dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
+
+    #! 都改
 
     return dens_mat
