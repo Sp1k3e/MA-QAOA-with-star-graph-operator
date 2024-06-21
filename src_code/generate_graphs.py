@@ -25,17 +25,18 @@ def generate_complete_graph(n, seed, weights = False):
     return graph, weights
 
 
-def generate_connected_graph(n, seed, weights = False):
+def generate_connected_graph(n, seed, p=0.2, weights = False):
     """
 
     """
+    # print(f'graph type:random graph  no_v:{n} seed:{seed} p:{p}' )
 
     graph = networkx.Graph()
     random.seed(seed)
     edge_list = []
     for n1 in range(n):
         for n2 in range(n1+1,n):
-            if(random.random() > 0.2):
+            if(random.random() > p):
                 edge_list.append((n1,n2))
         # edge_list.append((n1,n1+1))
     

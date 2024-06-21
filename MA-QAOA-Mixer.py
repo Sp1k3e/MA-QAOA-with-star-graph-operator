@@ -5,26 +5,29 @@ from scipy.optimize import minimize
 import math
 import matplotlib.pyplot as plt
 
-no_vertices = 6
+depth = 3
+no_vertices = 8
 seed = 1
-graph = generate_graphs.generate_connected_graph(no_vertices, seed)[0]
+p = 0.4
+graph = generate_graphs.generate_connected_graph(no_vertices, seed, p)[0]
 no_edges = graph.number_of_edges()
 # networkx.draw_networkx(graph)
 # plt.show()
+print(f'no_v:{no_vertices} seed:{seed} p:{p}  layers:{depth} MA-Mixer')
 
 pauli_ops_dict = build_operators.build_all_paulis(no_vertices)
 # print(pauli_ops_dict)
-gamma_0 = 0.01
+gamma_0 = 0.5
 beta_0 = 0.0
 
 max_cut_solution = useful_methods.find_optimal_cut(graph)
 max_cut_value = max_cut_solution[1]
 max_ham_eigenvalue = max_cut_solution[2]
+# print(f'solution: {max_cut_solution[0]}')
 
 hamiltonian = build_operators.cut_hamiltonian(graph)
 #! 初始化完成
 
-depth = 2
 
 def obj_func(parameter_values):
     dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_values, depth, pauli_ops_dict, 'M')
@@ -42,8 +45,9 @@ dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_list, depth, pa
 hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
 cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
 
+#? Rounding
 
-print(f'no_v:{no_vertices} seed:{seed}')
+
 print(f'cut_approx_ratio: {cut_approx_ratio}')
 
 # for edge in graph.edges:
@@ -56,4 +60,4 @@ for layer in range(depth):
     print('-------------------------------------------------')
     print(f'layer {layer + 1:}')
     print(f'gamma: {parameter_list[layer]}')
-    print(f'beta: {parameter_list[depth + layer * no_vertices: depth + (layer + 1) * no_vertices]}')
+    print(f'beta: {[round(num, 4) for num in parameter_list[depth + layer * no_vertices: depth + (layer + 1) * no_vertices]]}')

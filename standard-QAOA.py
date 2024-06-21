@@ -7,11 +7,14 @@ from scipy.optimize import minimize
 import math
 import matplotlib.pyplot as plt
 
-no_vertices = 6
+no_vertices = 8
+depth = 3
 seed = 1
-graph = generate_graphs.generate_connected_graph(no_vertices, seed)[0]
+p = 0.4
+graph = generate_graphs.generate_connected_graph(no_vertices, seed, p)[0]
 # networkx.draw_networkx(graph)
 # plt.show()
+print(f'no_v:{no_vertices} seed:{seed} p:{p}  layers:{depth} standard-QAOA')
 
 pauli_ops_dict = build_operators.build_all_paulis(no_vertices)
 # print(pauli_ops_dict)
@@ -24,8 +27,6 @@ max_ham_eigenvalue = max_cut_solution[2]
 
 hamiltonian = build_operators.cut_hamiltonian(graph)
 #! 初始化完成
-
-depth = 2
 
 def obj_func(parameter_values):
     
@@ -49,6 +50,7 @@ data = {
     'optimised_Hamiltonian_unitary_parameters' : parameter_list[:depth],
     'optimised_mixer_unitary_parameters' : parameter_list[depth:],
 }
+
 print(f'cut_approx_ratio: {cut_approx_ratio}')
 print(f'gamma: {parameter_list[:depth]}')
-print(f'beta: {parameter_list[depth]}')
+print(f'beta: {parameter_list[depth:]}')
