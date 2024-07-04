@@ -1,20 +1,15 @@
-import networkx
-import random
 from src_code import build_operators
 from src_code import useful_methods
 from src_code import generate_graphs
 from scipy.optimize import minimize
-import math
 import matplotlib.pyplot as plt
 
-no_vertices = 10
-depth = 1
+no_vertices = 8
+depth = 3
 seed = 1
 p = 0.4
 # graph = generate_graphs.generate_connected_graph(no_vertices, seed, p)[0]
 graph = generate_graphs.generate_regular_graph(no_vertices,3,seed)[0]
-# networkx.draw_networkx(graph)
-# plt.show()
 print(f'layers:{depth} standard-QAOA')
 
 pauli_ops_dict = build_operators.build_all_paulis(no_vertices)
@@ -56,6 +51,7 @@ print(f'gamma: {parameter_list[:depth]}')
 print(f'beta: {parameter_list[depth:]}')
 
 
+#! fix gammas to update multi-angle betas
 # gammas = parameter_list[:depth]
 # # optimize beta again
 # def obj_func2(parameter_values):

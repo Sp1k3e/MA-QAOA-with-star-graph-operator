@@ -29,7 +29,7 @@ def generate_connected_graph(n, seed, p=0.2, weights = False):
     """
 
     """
-    print(f'graph type:random graph  no_v:{n} seed:{seed} p:{p}' )
+    print(f'random graph  no_v:{n} seed:{seed} p:{p}' )
 
     graph = nx.Graph()
     random.seed(seed)
@@ -52,8 +52,11 @@ def generate_connected_graph(n, seed, p=0.2, weights = False):
     return graph, weights
 
 def generate_regular_graph(n, d, seed , weights = False):
+    '''
+    generate regular graph
+    '''
     
-    print(f'graph type:{d}-regular graph  no_v:{n} seed:{seed}')
+    print(f'{d}-regular graph  no_v:{n} seed:{seed}')
 
     graph = nx.random_regular_graph(d,n,seed)
     edge_list = list(graph.edges())

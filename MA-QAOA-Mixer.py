@@ -3,7 +3,6 @@ from src_code import useful_methods
 from src_code import generate_graphs
 from scipy.optimize import minimize
 import networkx
-import math
 import matplotlib.pyplot as plt
 
 no_vertices = 10
