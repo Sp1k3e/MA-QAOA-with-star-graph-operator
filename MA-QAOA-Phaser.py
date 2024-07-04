@@ -14,7 +14,7 @@ graph = generate_graphs.generate_connected_graph(no_vertices, seed)[0]
 no_edges = graph.number_of_edges()
 # networkx.draw_networkx(graph)
 # plt.show()
-print(f'no_v:{no_vertices} seed:{seed} p:{p}  layer:{depth} MA_Phaser')
+print(f'layer:{depth} MA_Phaser')
 
 pauli_ops_dict = build_operators.build_all_paulis(no_vertices)
 # print(pauli_ops_dict)

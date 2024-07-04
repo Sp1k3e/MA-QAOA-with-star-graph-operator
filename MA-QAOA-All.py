@@ -13,7 +13,7 @@ graph = generate_graphs.generate_connected_graph(no_vertices, seed, p)[0]
 no_edges = graph.number_of_edges()
 # networkx.draw_networkx(graph)
 # plt.show()
-print(f'no_v:{no_vertices} seed:{seed} p:{p}  layers:{depth} MA-All')
+print(f'layers:{depth} MA-All')
 
 pauli_ops_dict = build_operators.build_all_paulis(no_vertices)
 # print(pauli_ops_dict)

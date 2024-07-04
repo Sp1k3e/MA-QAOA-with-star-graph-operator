@@ -2,21 +2,21 @@ from src_code import build_operators
 from src_code import useful_methods
 from src_code import generate_graphs
 from scipy.optimize import minimize
+import networkx
 import math
 import matplotlib.pyplot as plt
 
-depth = 3
-no_vertices = 8
+no_vertices = 10
+depth = 5
 seed = 1
 p = 0.4
-graph = generate_graphs.generate_connected_graph(no_vertices, seed, p)[0]
+# graph = generate_graphs.generate_connected_graph(no_vertices, seed, p)[0]
+graph = generate_graphs.generate_regular_graph(no_vertices, 3, seed)[0]
 no_edges = graph.number_of_edges()
-# networkx.draw_networkx(graph)
-# plt.show()
-print(f'no_v:{no_vertices} seed:{seed} p:{p}  layers:{depth} MA-Mixer')
+
+print(f'layers:{depth} MA-Mixer')
 
 pauli_ops_dict = build_operators.build_all_paulis(no_vertices)
-# print(pauli_ops_dict)
 gamma_0 = 0.5
 beta_0 = 0.0
 

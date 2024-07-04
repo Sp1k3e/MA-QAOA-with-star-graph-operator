@@ -1,8 +1,8 @@
-import numpy
-# list = [1.11,2.22,3.33,4.44,5.58]
+import networkx
 
-p = round(numpy.pi, 4)
+G = networkx.random_regular_graph(3,8)
+G.number_of_edges()
 
-print(p/4)
-print(2 * p/4)
-print(3 * p/4)
+import matplotlib.pyplot as plt
+networkx.draw_networkx(G)
+plt.show()

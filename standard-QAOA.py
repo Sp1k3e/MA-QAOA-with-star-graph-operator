@@ -7,17 +7,17 @@ from scipy.optimize import minimize
 import math
 import matplotlib.pyplot as plt
 
-no_vertices = 8
-depth = 3
+no_vertices = 10
+depth = 1
 seed = 1
 p = 0.4
-graph = generate_graphs.generate_connected_graph(no_vertices, seed, p)[0]
+# graph = generate_graphs.generate_connected_graph(no_vertices, seed, p)[0]
+graph = generate_graphs.generate_regular_graph(no_vertices,3,seed)[0]
 # networkx.draw_networkx(graph)
 # plt.show()
-print(f'no_v:{no_vertices} seed:{seed} p:{p}  layers:{depth} standard-QAOA')
+print(f'layers:{depth} standard-QAOA')
 
 pauli_ops_dict = build_operators.build_all_paulis(no_vertices)
-# print(pauli_ops_dict)
 gamma_0 = 0.01
 beta_0 = 0.0
 
@@ -54,3 +54,31 @@ data = {
 print(f'cut_approx_ratio: {cut_approx_ratio}')
 print(f'gamma: {parameter_list[:depth]}')
 print(f'beta: {parameter_list[depth:]}')
+
+
+# gammas = parameter_list[:depth]
+# # optimize beta again
+# def obj_func2(parameter_values):
+#     parameter_values = gammas + parameter_values.tolist()
+#     dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_values, depth, pauli_ops_dict, 'M')
+#     expectation_value = (hamiltonian * dens_mat).trace().real
+#     return expectation_value * (-1.0)
+
+# initial_parameter_guesses = [beta_0] * (depth * no_vertices)
+# result = minimize(obj_func2, initial_parameter_guesses, method="BFGS")
+
+# parameter_list = list(result.x)
+# parameter_list = gammas + parameter_list
+
+# dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_list, depth, pauli_ops_dict, 'M')
+# hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
+# ham_approx_ratio = hamiltonian_expectation / max_ham_eigenvalue
+# cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
+
+# print('-----------------------')
+# print(f'cut_approx_ratio: {cut_approx_ratio}')
+# for layer in range(depth):
+#     print('-------------------------------------------------')
+#     print(f'layer {layer + 1:}')
+#     print(f'gamma: {parameter_list[layer]}')
+#     print(f'beta: {[round(num, 4) for num in parameter_list[depth + layer * no_vertices: depth + (layer + 1) * no_vertices]]}')
