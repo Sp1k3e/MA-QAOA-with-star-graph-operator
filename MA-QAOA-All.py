@@ -5,14 +5,15 @@ from scipy.optimize import minimize
 import math
 import matplotlib.pyplot as plt
 
-depth = 3
+depth = 2
 no_vertices = 8
 seed = 1
 p = 0.4
-graph = generate_graphs.generate_connected_graph(no_vertices, seed, p)[0]
+# graph = generate_graphs.generate_connected_graph(no_vertices, seed, p)[0]
+graph = generate_graphs.generate_regular_graph(no_vertices, 3, seed)[0]
+
 no_edges = graph.number_of_edges()
-# networkx.draw_networkx(graph)
-# plt.show()
+
 print(f'layers:{depth} MA-All')
 
 pauli_ops_dict = build_operators.build_all_paulis(no_vertices)
@@ -52,11 +53,6 @@ cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue
 
 
 print(f'cut_approx_ratio: {cut_approx_ratio}')
-
-# for edge in graph.edges:
-#     print(edge, end='')
-# print(f'gamma: {parameter_list[:depth * graph.number_of_edges()]}')
-# print(f'beta: {parameter_list[depth * graph.number_of_edges():]}')
 
 # todo 可视化每条边的gamma和每个点的beta
 for layer in range(depth):

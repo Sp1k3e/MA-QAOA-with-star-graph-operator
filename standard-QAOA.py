@@ -3,13 +3,14 @@ from src_code import useful_methods
 from src_code import generate_graphs
 from scipy.optimize import minimize
 import matplotlib.pyplot as plt
+import random
 
-no_vertices = 8
-depth = 7
+no_vertices = 2
+depth = 1
 seed = 1
-p = 0.4
-# graph = generate_graphs.generate_connected_graph(no_vertices, seed, p)[0]
-graph = generate_graphs.generate_regular_graph(no_vertices,3,seed)[0]
+p = 0
+graph = generate_graphs.generate_connected_graph(no_vertices, seed, p)[0]
+# graph = generate_graphs.generate_regular_graph(no_vertices,3,seed)[0]
 print(f'layers:{depth} standard-QAOA')
 
 pauli_ops_dict = build_operators.build_all_paulis(no_vertices)
@@ -29,6 +30,7 @@ def obj_func(parameter_values):
     return expectation_value * (-1.0)
 
 initial_parameter_guesses = [gamma_0] * (depth) + [beta_0] * (depth)
+# initial_parameter_guesses = [gamma_0] * (depth) + [beta_0] * (depth)
 result = minimize(obj_func, initial_parameter_guesses, method="BFGS")
 
 parameter_list = list(result.x)
@@ -51,26 +53,27 @@ print(f'beta: {parameter_list[depth:]}')
 
 
 #! fix gammas to update multi-angle betas
-# gammas = parameter_list[:depth]
+# gammas = parameter_list[:-1]
 # # optimize beta again
 # def obj_func2(parameter_values):
 #     parameter_values = gammas + parameter_values.tolist()
-#     dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_values, depth, pauli_ops_dict, 'M')
+#     dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_values, depth, pauli_ops_dict, 'SM')
 #     expectation_value = (hamiltonian * dens_mat).trace().real
 #     return expectation_value * (-1.0)
 
-# initial_parameter_guesses = [beta_0] * (depth * no_vertices)
+# # initial_parameter_guesses = [beta_0] * (depth * no_vertices)
+# initial_parameter_guesses = [beta_0] * (no_vertices)
 # result = minimize(obj_func2, initial_parameter_guesses, method="BFGS")
 
 # parameter_list = list(result.x)
 # parameter_list = gammas + parameter_list
 
-# dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_list, depth, pauli_ops_dict, 'M')
+# dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_list, depth, pauli_ops_dict, 'SM')
 # hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
 # ham_approx_ratio = hamiltonian_expectation / max_ham_eigenvalue
 # cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
 
-# print('-----------------------')
+# print('-------------------------------')
 # print(f'cut_approx_ratio: {cut_approx_ratio}')
 # for layer in range(depth):
 #     print('-------------------------------------------------')

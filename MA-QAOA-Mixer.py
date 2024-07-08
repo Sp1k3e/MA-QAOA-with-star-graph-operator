@@ -2,11 +2,11 @@ from src_code import build_operators
 from src_code import useful_methods
 from src_code import generate_graphs
 from scipy.optimize import minimize
-import networkx
+import networkx as nx
 import matplotlib.pyplot as plt
 
+depth = 1
 no_vertices = 8
-depth = 5
 seed = 1
 p = 0.4
 # graph = generate_graphs.generate_connected_graph(no_vertices, seed, p)[0]
@@ -22,11 +22,9 @@ beta_0 = 0.0
 max_cut_solution = useful_methods.find_optimal_cut(graph)
 max_cut_value = max_cut_solution[1]
 max_ham_eigenvalue = max_cut_solution[2]
-# print(f'solution: {max_cut_solution[0]}')
 
 hamiltonian = build_operators.cut_hamiltonian(graph)
 #! 初始化完成
-
 
 def obj_func(parameter_values):
     dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_values, depth, pauli_ops_dict, 'M')
@@ -44,19 +42,41 @@ dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_list, depth, pa
 hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
 cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
 
-#? Rounding
-
-
 print(f'cut_approx_ratio: {cut_approx_ratio}')
 
-# for edge in graph.edges:
-#     print(edge, end='')
-# print(f'gamma: {parameter_list[:depth * graph.number_of_edges()]}')
-# print(f'beta: {parameter_list[depth * graph.number_of_edges():]}')
-
-# todo 可视化每条边的gamma
 for layer in range(depth):
     print('-------------------------------------------------')
     print(f'layer {layer + 1:}')
     print(f'gamma: {parameter_list[layer]}')
     print(f'beta: {[round(num, 4) for num in parameter_list[depth + layer * no_vertices: depth + (layer + 1) * no_vertices]]}')
+
+    #! 输出每个点的角度
+    # l_dict = {}
+    # for n in range(no_vertices):
+    #     l_dict[n] = round(parameter_list[depth + layer * no_vertices + n] ,4)
+    # pos = nx.circular_layout(graph)
+    # nx.draw_networkx_nodes(graph, pos)
+    # nx.draw_networkx_edges(graph, pos)
+    # nx.draw_networkx_labels(graph, pos, l_dict)
+    # plt.show()
+
+
+# before = parameter_list
+# def obj_func2(parameter_values):
+#     parameter_values = before + parameter_values.tolist()
+#     dens_mat = build_operators.build_Y_qaoa_ansatz(graph, parameter_values, depth,pauli_ops_dict)
+#     expectation_value = (hamiltonian * dens_mat).trace().real
+#     return expectation_value * (-1.0)
+
+# initial_parameter_guesses = [0.1] * 3
+# result = minimize(obj_func2, initial_parameter_guesses, method="BFGS")
+
+# parameter_list = before + list(result.x)
+
+# dens_mat = build_operators.build_Y_qaoa_ansatz(graph, parameter_list, depth, pauli_ops_dict)
+# hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
+# ham_approx_ratio = hamiltonian_expectation / max_ham_eigenvalue
+# cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
+
+# print(f'cut_approx_ratio: {cut_approx_ratio}')
+# print(result.x)

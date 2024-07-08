@@ -7,13 +7,12 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 depth = 2
-no_vertices = 8
+no_vertices = 6
 seed = 1
 p = 0.4
-graph = generate_graphs.generate_connected_graph(no_vertices, seed)[0]
+# graph = generate_graphs.generate_connected_graph(no_vertices, seed)[0]
+graph = generate_graphs.generate_regular_graph(no_vertices, 3, seed)[0]
 no_edges = graph.number_of_edges()
-# networkx.draw_networkx(graph)
-# plt.show()
 print(f'layer:{depth} MA_Phaser')
 
 pauli_ops_dict = build_operators.build_all_paulis(no_vertices)

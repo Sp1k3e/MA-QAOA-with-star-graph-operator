@@ -53,7 +53,7 @@ def generate_connected_graph(n, seed, p=0.2, weights = False):
 
 def generate_regular_graph(n, d, seed , weights = False):
     '''
-    generate regular graph
+    generate regular graph(no_vertices, degree, seed, if_weights)
     '''
     
     print(f'{d}-regular graph  no_v:{n} seed:{seed}')
