@@ -50,6 +50,8 @@ def question1(n_qubits):
         prog << CNOT(qubits[n_qubits-2-i],qubits[n_qubits-1-i])
     prog << X(qubits[0])
 
+    print(prog)
+
     prob = qvm.prob_run_dict(prog, qubits, -1)
     result = {key: value for key, value in prob.items() if key.count('1') == 1}
 

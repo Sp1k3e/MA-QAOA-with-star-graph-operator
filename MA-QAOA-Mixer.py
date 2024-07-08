@@ -5,7 +5,7 @@ from scipy.optimize import minimize
 import networkx
 import matplotlib.pyplot as plt
 
-no_vertices = 10
+no_vertices = 8
 depth = 5
 seed = 1
 p = 0.4

@@ -5,7 +5,7 @@ from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 
 no_vertices = 8
-depth = 3
+depth = 7
 seed = 1
 p = 0.4
 # graph = generate_graphs.generate_connected_graph(no_vertices, seed, p)[0]
@@ -13,7 +13,7 @@ graph = generate_graphs.generate_regular_graph(no_vertices,3,seed)[0]
 print(f'layers:{depth} standard-QAOA')
 
 pauli_ops_dict = build_operators.build_all_paulis(no_vertices)
-gamma_0 = 0.01
+gamma_0 = 0.1
 beta_0 = 0.0
 
 max_cut_solution = useful_methods.find_optimal_cut(graph)
@@ -24,7 +24,6 @@ hamiltonian = build_operators.cut_hamiltonian(graph)
 #! 初始化完成
 
 def obj_func(parameter_values):
-    
     dens_mat = build_operators.build_standard_qaoa_ansatz(graph, parameter_values, pauli_ops_dict)
     expectation_value = (hamiltonian * dens_mat).trace().real
     return expectation_value * (-1.0)
