@@ -8,7 +8,7 @@ import random
 no_vertices = 2
 depth = 1
 seed = 1
-p = 0.4
+p = 0.3
 graph = generate_graphs.generate_connected_graph(no_vertices, seed, p)[0]
 # graph = generate_graphs.generate_regular_graph(no_vertices,3,seed)[0]
 print(f'layers:{depth} standard-QAOA')
