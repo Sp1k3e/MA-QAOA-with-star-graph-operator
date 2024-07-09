@@ -5,8 +5,8 @@ from scipy.optimize import minimize
 import networkx as nx
 import matplotlib.pyplot as plt
 
-depth = 1
-no_vertices = 8
+depth = 3
+no_vertices = 10
 seed = 1
 p = 0.4
 # graph = generate_graphs.generate_connected_graph(no_vertices, seed, p)[0]
@@ -50,7 +50,7 @@ for layer in range(depth):
     print(f'gamma: {parameter_list[layer]}')
     print(f'beta: {[round(num, 4) for num in parameter_list[depth + layer * no_vertices: depth + (layer + 1) * no_vertices]]}')
 
-    #! 输出每个点的角度
+    #! 输出每个点的beta
     # l_dict = {}
     # for n in range(no_vertices):
     #     l_dict[n] = round(parameter_list[depth + layer * no_vertices + n] ,4)
