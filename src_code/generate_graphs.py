@@ -71,7 +71,9 @@ def generate_regular_graph(n, d, seed , weights = False):
 
     return graph, weights
 
-# import matplotlib.pyplot as plt
-# graph = generate_connected_graph(6, 1)[0]
-# nx.draw_networkx(graph)
-# plt.show()
+
+def generate_graph_type(n, d, seed, type, weights = False):
+    if type == "regular":
+        generate_regular_graph(n, d, seed, weights)
+    if type == 'random':
+        generate_connected_graph(n, seed, )

@@ -5,9 +5,9 @@ from scipy.optimize import minimize
 import networkx as nx
 import matplotlib.pyplot as plt
 
-depth = 3
-no_vertices = 10
-seed = 1
+depth = 2
+no_vertices = 8
+seed = 4
 p = 0.4
 # graph = generate_graphs.generate_connected_graph(no_vertices, seed, p)[0]
 graph = generate_graphs.generate_regular_graph(no_vertices, 3, seed)[0]
@@ -20,6 +20,7 @@ gamma_0 = 0.5
 beta_0 = 0.0
 
 max_cut_solution = useful_methods.find_optimal_cut(graph)
+print(f"max cut: {max_cut_solution[0]}")
 max_cut_value = max_cut_solution[1]
 max_ham_eigenvalue = max_cut_solution[2]
 
