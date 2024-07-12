@@ -4,9 +4,9 @@ from src_code import generate_graphs
 from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 
-no_vertices = 2
+no_vertices = 10
 depth = 1
-seed = 1
+seed = 0
 p = 0.4
 # graph = generate_graphs.generate_connected_graph(no_vertices, seed, p)[0]
 graph = generate_graphs.generate_regular_graph(no_vertices,3,seed)[0]

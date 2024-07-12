@@ -1,2 +1,5 @@
-node:5 depth=5
-'cut_approx_ratio': 0.9383231593725551
+3-regular graph  no_v:10 seed:0
+layers:1 standard-QAOA
+cut_approx_ratio: 0.7647523404469388
+gamma: [0.5747583226112875]
+beta: [0.3522826051732647]

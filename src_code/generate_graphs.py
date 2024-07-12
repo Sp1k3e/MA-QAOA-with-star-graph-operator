@@ -34,11 +34,17 @@ def generate_connected_graph(n, seed, p=0.2, weights = False):
     graph = nx.Graph()
     random.seed(seed)
     edge_list = []
+    has_edge = [False] * n
     for n1 in range(n):
         for n2 in range(n1+1,n):
             if(random.random() > p):
                 edge_list.append((n1,n2))
-        # edge_list.append((n1,n1+1))
+                has_edge[n1] = True
+                has_edge[n2] = True
+    
+    for i in range(n):
+        if(has_edge[i] == False):
+            edge_list.append((i, (i+1)%n))
     
     graph.add_edges_from(edge_list)
     if weights:
@@ -76,4 +82,4 @@ def generate_graph_type(n, d, seed, type, weights = False):
     if type == "regular":
         generate_regular_graph(n, d, seed, weights)
     if type == 'random':
-        generate_connected_graph(n, seed, )
+        generate_connected_graph(n, seed, p)
