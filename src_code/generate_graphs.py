@@ -25,11 +25,11 @@ def generate_complete_graph(n, seed, weights = False):
     return graph, weights
 
 
-def generate_connected_graph(n, seed, p=0.2, weights = False):
+def generate_connected_graph(n, p, seed, weights = False):
     """
 
     """
-    print(f'random graph  no_v:{n} seed:{seed} p:{p}' )
+    print(f'random graph  no_v:{n} p:{p} seed:{seed} ' )
 
     graph = nx.Graph()
     random.seed(seed)
@@ -77,9 +77,8 @@ def generate_regular_graph(n, d, seed , weights = False):
 
     return graph, weights
 
-
-def generate_graph_type(n, d, seed, type, weights = False):
-    if type == "regular":
-        generate_regular_graph(n, d, seed, weights)
-    if type == 'random':
-        generate_connected_graph(n, seed, p)
+def generate_graph_type(n, type, seed, weights = False):
+    if type[0] == "regular":
+        return generate_regular_graph(n, type[1], seed, weights)
+    if type[0] == 'random':
+        return generate_connected_graph(n,type[1], seed, weights)

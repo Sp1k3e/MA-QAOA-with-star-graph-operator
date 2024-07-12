@@ -6,13 +6,14 @@ from scipy.optimize import minimize
 import math
 import matplotlib.pyplot as plt
     
-def MA_All(no_vertices, depth, seed, graph_type = 'regular', save = True):
+def MA_All(no_vertices, depth, seed, graph_type, save = True):
     # no_vertices = 8
     # depth = 1
     # seed = 4
-    p = 0.4
-    graph = generate_graphs.generate_connected_graph(no_vertices, seed, p)[0]
+    # p = 0.4
+    # graph = generate_graphs.generate_connected_graph(no_vertices, seed, p)[0]
     # graph = generate_graphs.generate_regular_graph(no_vertices, 3, seed)[0]
+    graph = generate_graphs.generate_graph_type(no_vertices, graph_type, seed)[0]
 
     no_edges = graph.number_of_edges()
 
@@ -35,9 +36,7 @@ def MA_All(no_vertices, depth, seed, graph_type = 'regular', save = True):
         expectation_value = (hamiltonian * dens_mat).trace().real
         return expectation_value * (-1.0)
 
-    # 全改
     initial_parameter_guesses = [gamma_0] * (depth * no_edges) + [beta_0] * (depth * no_vertices)
-
     result = minimize(obj_func, initial_parameter_guesses, method="BFGS")
 
     #! 输出结果
@@ -58,18 +57,28 @@ def MA_All(no_vertices, depth, seed, graph_type = 'regular', save = True):
             my_dict[key] = format(my_dict[key], '.3f')
         print(f'beta: {[round(num, 4) for num in parameter_list[depth * no_edges + layer * no_vertices:depth * no_edges + (layer + 1) * no_vertices]]}')
 
-        #todo 存数据
+        #todo layer大于1时不对
         if(save):
-            plt.clf()
-            l_dict = {}
-            for n in range(no_vertices):
-                l_dict[n] = round(parameter_list[depth * no_edges + layer * no_vertices + n] ,3)
-            pos = nx.spring_layout(graph)
-            nx.draw_networkx_nodes(graph, pos)
-            nx.draw_networkx_edges(graph, pos)
-            nx.draw_networkx_edge_labels(graph, pos, my_dict)
-            nx.draw_networkx_labels(graph, pos, l_dict)
-            # plt.show()
-            plt.savefig(f"./results/figures/MA{no_vertices}{graph_type}_seed{seed}.png")
+            for p in range(depth):
+                plt.clf()
+                l_dict = {}
+                for n in range(no_vertices):
+                    l_dict[n] = round(parameter_list[depth * no_edges + layer * no_vertices + n] ,3)
+                pos = nx.spring_layout(graph)
+                nx.draw_networkx_nodes(graph, pos)
+                nx.draw_networkx_edges(graph, pos)
+                nx.draw_networkx_edge_labels(graph, pos, my_dict)
+                nx.draw_networkx_labels(graph, pos, l_dict)
+                plt.savefig(f"./results/figures/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_seed{seed}.png")
+
+            with open(f"./results/parameters/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_seed{seed}", 'w') as f:
+                f.write(f"max cut: {max_cut_solution[0]}\n")
+                f.write(f'r {cut_approx_ratio}\n')
+                for layer in range(depth):
+                    f.write(f'layer {layer + 1:}\n')
+                    my_dict = {key: value for key, value in zip(graph.edges, parameter_list[layer * no_edges : (layer + 1) * no_edges])}
+                    for key, value in my_dict.items():
+                        f.write(f"{key}: {value:.4f}\n")
+                    f.write(f'beta: {[round(num, 4) for num in parameter_list[depth * no_edges + layer * no_vertices:depth * no_edges + (layer + 1) * no_vertices]]}\n')
 
 print('-----------------------------------------------')
