@@ -1,6 +1,6 @@
 import MA_QAOA_All
 
-n = 6
+n = 8
 layer = 1
 seed = 0
 graph_type = ['random', 0.4]

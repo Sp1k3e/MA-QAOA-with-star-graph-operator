@@ -18,7 +18,7 @@ def MA_All(no_vertices, depth, seed, graph_type, save = True):
     graph = generate_graphs.generate_graph_type(no_vertices, graph_type, seed)[0]
 
     no_edges = graph.number_of_edges()
-    pauli_ops_dict = build_operators.build_my_paulis(no_vertices) #改了pauli dict
+    pauli_ops_dict = build_operators.build_my_paulis(no_vertices) #!改了pauli dict
     # pauli_ops_dict = build_operators.build_all_paulis(no_vertices)
     hamiltonian = build_operators.cut_hamiltonian(graph)
 
@@ -73,13 +73,13 @@ def MA_All(no_vertices, depth, seed, graph_type, save = True):
             nx.draw_networkx_nodes(graph, pos)
             nx.draw_networkx_edges(graph, pos)
             nx.draw_networkx_edge_labels(graph, pos, my_dict, font_size=8) #每条边的gamma
-            nx.draw_networkx_labels(graph, pos, l_dict) #每个点的beta
+            nx.draw_networkx_labels(graph, pos, l_dict, font_size=10) #每个点的beta
             for i in range(no_vertices):
-                pos[i] += np.array([-0.05, 0.05]) 
-            nx.draw_networkx_labels(graph, pos, {key:value for key, value in zip(range(no_vertices), max_cut_solution[0])}, font_color= "r", font_size=10)
+                pos[i] += np.array([-0.06, 0.06]) 
+            nx.draw_networkx_labels(graph, pos, {key:value for key, value in zip(range(no_vertices), max_cut_solution[0])}, font_color= "r", alpha=0.8,font_size=10)
             for i in range(no_vertices):
-                pos[i] += np.array([0.0, -0.1]) 
-            nx.draw_networkx_labels(graph, pos, font_color="b", font_size=10)
+                pos[i] += np.array([0.0, -0.12]) 
+            nx.draw_networkx_labels(graph, pos, font_color="g", font_size=10)
 
             plt.savefig(f"./results/figures/{graph_type[1]}{graph_type[0]}/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}.png")
 

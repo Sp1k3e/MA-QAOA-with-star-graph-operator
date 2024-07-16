@@ -118,7 +118,6 @@ def cut_unitary(graph, parameter, dict_paulis):
 
 def MA_cut_unitary(graph, parameter, dict_paulis):
     """
-    Returns unitary operator corresponding to exponential of cut Hamiltonian.
     """
 
     if not isinstance(graph, nx.Graph):
