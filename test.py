@@ -1,21 +1,16 @@
-from qiskit.algorithms.minimum_eigensolvers import QAOA
-from qiskit.algorithms.optimizers import COBYLA
-from qiskit.quantum_info import SparsePauliOp
-from qiskit.primitives import Sampler
-from qiskit_aer.primitives import Sampler as AerSampler
- 
-# exact statevector simulation
-sampler = Sampler()
- 
-# another option
-sampler = AerSampler(backend_options={"method": "statevector"},
-                        run_options={"shots": None, "seed": 42})
- 
-optimizer = COBYLA()
-qaoa = QAOA(sampler, optimizer, reps=2)
- 
-# diagonal operator
-qubit_op = SparsePauliOp.from_list([("ZIII", 1),("IZII", 1), ("IIIZ", 1), ("IIZI", 1)])
-result = qaoa.compute_minimum_eigenvalue(qubit_op)
- 
-print(result.eigenvalue)
+from src_code import generate_graphs
+import matplotlib.pyplot as plt
+import networkx as nx
+
+# graph = generate_graphs.generate_graph_type(3,['random',0.4], 7)[0]
+
+graph = nx.Graph()
+edge_list = [(0,1), (1,2), (2,3)]
+
+graph.add_edges_from(edge_list)
+for index, edge in enumerate(graph.edges()):
+    graph.get_edge_data(*edge)['weight'] = 1
+
+nx.draw_networkx(graph)
+
+plt.show()
