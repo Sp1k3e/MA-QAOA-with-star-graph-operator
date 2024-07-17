@@ -14,3 +14,4 @@ for index, edge in enumerate(graph.edges()):
 nx.draw_networkx(graph)
 
 plt.show()
+

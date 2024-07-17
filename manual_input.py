@@ -77,6 +77,6 @@ for layer in range(depth):
         nx.draw_networkx_labels(graph, pos, font_color="g", font_size=10)
 
         plt.title(f'MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}  r:{cut_approx_ratio}')
-        plt.savefig(f"./results/manual_input{time.time()}.png")
+        plt.savefig(f"./results/manual_input{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}.png")
 
 print('-----------------------------------------------')
