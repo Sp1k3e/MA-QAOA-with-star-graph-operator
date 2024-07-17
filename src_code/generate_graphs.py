@@ -24,7 +24,6 @@ def generate_complete_graph(n, seed, weights = False):
 
     return graph, weights
 
-
 def generate_connected_graph(n, p, seed, weights = False):
     """
 

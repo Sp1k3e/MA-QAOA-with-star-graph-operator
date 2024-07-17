@@ -10,11 +10,11 @@ seed = 0
 p = 0.4
 graph = generate_graphs.generate_connected_graph(no_vertices, p, seed)[0]
 # graph = generate_graphs.generate_regular_graph(no_vertices,3,seed)[0]
-# graph = generate_graphs.generate_graph_type(no_vertices, )
+# graph = generate_graphs.generate_graph_type(no_vertices, graph_type, )
 print(f'layers:{depth} standard-QAOA')
 
 gamma_0 = 0.2
-beta_0 = 0.1
+beta_0 = 1
 
 max_cut_solution = useful_methods.find_optimal_cut(graph)
 max_cut_value = max_cut_solution[1]
@@ -38,7 +38,6 @@ dens_mat = build_operators.build_standard_qaoa_ansatz(graph, parameter_list, pau
 hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
 ham_approx_ratio = hamiltonian_expectation / max_ham_eigenvalue
 cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
-
 
 print(f'cut_approx_ratio: {cut_approx_ratio}')
 print(f'gamma: {parameter_list[:depth]}')

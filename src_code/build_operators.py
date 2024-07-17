@@ -98,7 +98,9 @@ def cut_unitary(graph, parameter, dict_paulis):
     for edge in graph.edges:
 
         weight = graph.get_edge_data(*edge)['weight']
-        total_param = 0.5 * parameter * weight
+        #原代码*0.5
+        # total_param = 0.5 * parameter * weight
+        total_param = parameter * weight
         key = 'Z' + str(edge[0]) + 'Z' + str(edge[1])
 
         if key not in dict_paulis:
@@ -106,7 +108,9 @@ def cut_unitary(graph, parameter, dict_paulis):
         if key not in dict_paulis:
             raise Exception(key)
         
-        tmp_matrix = dict_paulis['I'] * math.cos(total_param) + dict_paulis[key] * math.sin(total_param) * 1j
+        # 原代码为+
+        # tmp_matrix = dict_paulis['I'] * math.cos(total_param) + dict_paulis[key] * math.sin(total_param) * 1j
+        tmp_matrix = dict_paulis['I'] * math.cos(total_param) - dict_paulis[key] * math.sin(total_param) * 1j
 
         if first:
             result = tmp_matrix
@@ -128,15 +132,20 @@ def MA_cut_unitary(graph, parameter, dict_paulis):
     for edge in graph.edges:
 
         weight = graph.get_edge_data(*edge)['weight']
-        total_param = 0.5 * parameter[i] * weight
-        key = 'Z' + str(edge[0]) + 'Z' + str(edge[1])
-
-        if key not in dict_paulis:
+        # total_param = 0.5 * parameter[i] * weight
+        total_param = parameter[i] * weight
+        if(edge[0] < edge[1]):
+            key = 'Z' + str(edge[0]) + 'Z' + str(edge[1])
+        else:
             key = 'Z' + str(edge[1]) + 'Z' + str(edge[0])
-        if key not in dict_paulis:
-            raise Exception
+
+        # if key not in dict_paulis:
+        #     key = 'Z' + str(edge[1]) + 'Z' + str(edge[0])
+        # if key not in dict_paulis:
+        #     raise Exception
         
-        tmp_matrix = dict_paulis['I'] * math.cos(total_param) + dict_paulis[key] * math.sin(total_param) * 1j
+        # tmp_matrix = dict_paulis['I'] * math.cos(total_param) + dict_paulis[key] * math.sin(total_param) * 1j
+        tmp_matrix = dict_paulis['I'] * math.cos(total_param) - dict_paulis[key] * math.sin(total_param) * 1j
 
         if first:
             result = tmp_matrix
@@ -527,8 +536,8 @@ def build_XinY_qaoa_ansatz(graph, parameter_list, pauli_dict):
     return dens_mat
 
 def build_MA_qaoa_ansatz(graph, parameter_list, no_layers, pauli_dict, mode):
-    no_edges = graph.number_of_edges() # Problem
-    no_qubits = graph.number_of_nodes() # Mixer
+    no_edges = graph.number_of_edges() 
+    no_qubits = graph.number_of_nodes() 
     dens_mat = initial_density_matrix(no_qubits)
 
     #! 只改Mixer

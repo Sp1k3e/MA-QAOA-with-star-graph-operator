@@ -13,8 +13,8 @@ def MA_All(no_vertices, depth, seed, graph_type, save = True):
     # p = 0.4
     # graph = generate_graphs.generate_connected_graph(no_vertices, seed, p)[0]
     # graph = generate_graphs.generate_regular_graph(no_vertices, 3, seed)[0]
-    gamma_0 = 0.7
-    beta_0 = 0.0
+    gamma_0 = 0
+    beta_0 = 0.785
     graph = generate_graphs.generate_graph_type(no_vertices, graph_type, seed)[0]
 
     no_edges = graph.number_of_edges()
@@ -27,7 +27,6 @@ def MA_All(no_vertices, depth, seed, graph_type, save = True):
     max_cut_value = max_cut_solution[1]
     max_ham_eigenvalue = max_cut_solution[2]
     #! 初始化完成
-    print(f'layers:{depth} MA-All')
 
     def obj_func(parameter_values):
         dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_values, depth, pauli_ops_dict, 'All')
@@ -43,6 +42,8 @@ def MA_All(no_vertices, depth, seed, graph_type, save = True):
     hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
     cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
 
+    print(f'layers:{depth} MA-All')
+    print('***************')
     print(f'cut_approx_ratio: {cut_approx_ratio}')
     if(save):
         with open(f"./results/parameters/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}", 'w') as f:
@@ -81,6 +82,7 @@ def MA_All(no_vertices, depth, seed, graph_type, save = True):
                 pos[i] += np.array([0.0, -0.12]) 
             nx.draw_networkx_labels(graph, pos, font_color="g", font_size=10)
 
+            plt.title(f'MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}  r:{cut_approx_ratio}')
             plt.savefig(f"./results/figures/{graph_type[1]}{graph_type[0]}/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}.png")
 
     print('-----------------------------------------------')
