@@ -2,16 +2,23 @@ from src_code import build_operators
 from src_code import useful_methods
 from src_code import generate_graphs
 from scipy.optimize import minimize
+import networkx as nx
 import matplotlib.pyplot as plt
 
-no_vertices = 2
-depth = 1
-seed = 0
-p = 0.4
-save = False
-graph = generate_graphs.generate_connected_graph(no_vertices, p, seed)[0]
-print(f'layers:{depth} standard-QAOA')
+depth = 3
+save = True
 
+edge_list = [(0,1),(1,2),(1,3),(3,4),(4,5)]
+
+graph = nx.Graph()
+graph.add_edges_from(edge_list)
+
+no_vertices = graph.number_of_nodes()
+for index, edge in enumerate(graph.edges()):
+    graph.get_edge_data(*edge)['weight'] = 1
+
+
+print(f'layers:{depth} standard-QAOA specific graph')
 gamma_0 = 0.2
 beta_0 = 1
 
@@ -41,10 +48,3 @@ cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue
 print(f'cut_approx_ratio: {cut_approx_ratio}')
 print(f'gamma: {parameter_list[:depth]}')
 print(f'beta: {parameter_list[depth:]}')
-
-if(save):
-    #only save parameters for standard QAOA
-    with open(f"./results/parameters/standard/standard{no_vertices}", 'a') as f:
-        f.write(f"layers:{depth} standard-QAOA")
-        f.write(f'gamma: {parameter_list[:depth]}')
-        f.write(f'beta: {parameter_list[depth:]}')

@@ -5,29 +5,21 @@ from src_code import generate_graphs
 from scipy.optimize import minimize
 import numpy as np
 import matplotlib.pyplot as plt
-import time
-
-a = 0.7854
-b = -0.7854
     
-# no_vertices = 6
-# depth = 1
-# seed = 7
-# graph_type = ['random', 0.4]
-# save = True
-# graph = generate_graphs.generate_graph_type(no_vertices, graph_type, seed)[0]
-# parameter_list = [a,0,b,b,b,b] + [0,a,0,a,0,0]
+gamma_0 = -0.7854
+beta_0 = 0.7854
+depth = 2
+save = False
 
-no_vertices = 3
-depth = 1
-seed = 7
-graph_type = ['random', 0]
-save = True
-graph = generate_graphs.generate_graph_type(no_vertices, graph_type, seed)[0]
-parameter_list = [b,0,b] + [a,0,a]
+# edge_list = [(0,1), (1,2), (1,3), (3,4), (4,5), (5,6)]
+edge_list = [(0,1), (1,2), (2,3)]
 
-
-#! input parameters manually
+graph = nx.Graph();
+graph.add_edges_from(edge_list)
+no_vertices = graph.number_of_nodes()
+for index, edge in enumerate(graph.edges()):
+    graph.get_edge_data(*edge)['weight'] = 1
+graph_type = ['manual', no_vertices]
 
 no_edges = graph.number_of_edges()
 pauli_ops_dict = build_operators.build_my_paulis(no_vertices) 
@@ -39,7 +31,18 @@ max_cut_value = max_cut_solution[1]
 max_ham_eigenvalue = max_cut_solution[2]
 #! 初始化完成
 
+def obj_func(parameter_values):
+    dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_values, depth, pauli_ops_dict, 'All')
+    expectation_value = (hamiltonian * dens_mat).trace().real
+    return expectation_value * (-1.0)
+
+initial_parameter_guesses = [gamma_0] * (depth * no_edges) + [beta_0] * (depth * no_vertices)
+bounds = [(-3.1416, 3.1416)] * (depth * no_edges) + [(0, 6.2832)] * (depth * no_vertices)
+# result = minimize(obj_func, initial_parameter_guesses,  method="BFGS")
+result = minimize(obj_func, initial_parameter_guesses, bounds=bounds, method="L-BFGS-B")
+
 #! 输出结果
+parameter_list = list(result.x)
 dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_list, depth, pauli_ops_dict, 'All')
 hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
 cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
@@ -47,6 +50,10 @@ cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue
 print(f'layers:{depth} MA-All')
 print('***************')
 print(f'cut_approx_ratio: {cut_approx_ratio}')
+# if(save):
+#     with open(f"./results/parameters/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}", 'w') as f:
+#         f.write(f"max cut: {max_cut_solution[0]}\n")
+#         f.write(f'r: {cut_approx_ratio}\n')
 
 for layer in range(depth):
     print('-----------------------------------------------')
@@ -57,8 +64,12 @@ for layer in range(depth):
     print(f'beta: {[round(num, 4) for num in parameter_list[depth * no_edges + layer * no_vertices:depth * no_edges + (layer + 1) * no_vertices]]}')
 
     if(save):
+        # with open(f"./results/parameters/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}", 'a') as f:
+            # f.write(f'layer {layer + 1:}\n')
         for key, value in my_dict.items():
+                # f.write(f"{key}: {value:.4f}\n")
             my_dict[key] = format(my_dict[key], '.2f')
+            # f.write(f'beta: {[round(num, 4) for num in parameter_list[depth * no_edges + layer * no_vertices:depth * no_edges + (layer + 1) * no_vertices]]}\n')
 
         plt.clf()
         l_dict = {}
@@ -76,7 +87,7 @@ for layer in range(depth):
             pos[i] += np.array([0.0, -0.12]) 
         nx.draw_networkx_labels(graph, pos, font_color="g", font_size=10)
 
-        plt.title(f'MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}  r:{cut_approx_ratio}')
-        plt.savefig(f"./results/manual_input{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}.png")
+        plt.title(f'MA{no_vertices}layer{depth} r:{cut_approx_ratio}')
+        plt.savefig(f"./results/specific_graph/MA{no_vertices}_layer{depth}.png")
 
 print('-----------------------------------------------')
