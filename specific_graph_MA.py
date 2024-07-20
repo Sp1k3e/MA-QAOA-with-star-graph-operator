@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
     
 gamma_0 = -0.7854
 beta_0 = 0.7854
-depth = 2
+depth = 1
 save = False
 
 # edge_list = [(0,1), (1,2), (1,3), (3,4), (4,5), (5,6)]
