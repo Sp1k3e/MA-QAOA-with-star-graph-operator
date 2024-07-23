@@ -5,10 +5,10 @@ from scipy.optimize import minimize
 import networkx as nx
 import matplotlib.pyplot as plt
 
-depth = 3
+depth = 4
 save = True
 
-edge_list = [(0,1),(1,2),(1,3),(3,4),(4,5)]
+edge_list = [(0,1),(1,2),(2,3)]
 
 graph = nx.Graph()
 graph.add_edges_from(edge_list)

@@ -46,7 +46,7 @@ def MA_All(no_vertices, depth, seed, graph_type, save = True):
     print('***************')
     print(f'cut_approx_ratio: {cut_approx_ratio}')
     if(save):
-        with open(f"./results/parameters/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}", 'w') as f:
+        with open(f"./results/parameters/{no_vertices}vertex/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}", 'w') as f:
             f.write(f"max cut: {max_cut_solution[0]}\n")
             f.write(f'r: {cut_approx_ratio}\n')
 
@@ -59,13 +59,14 @@ def MA_All(no_vertices, depth, seed, graph_type, save = True):
         print(f'beta: {[round(num, 4) for num in parameter_list[depth * no_edges + layer * no_vertices:depth * no_edges + (layer + 1) * no_vertices]]}')
 
         if(save):
-            with open(f"./results/parameters/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}", 'a') as f:
+            with open(f"./results/parameters/{no_vertices}vertex/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}", 'a') as f:
                 f.write(f'layer {layer + 1:}\n')
                 for key, value in my_dict.items():
                     f.write(f"{key}: {value:.4f}\n")
                     my_dict[key] = format(my_dict[key], '.2f')
                 f.write(f'beta: {[round(num, 4) for num in parameter_list[depth * no_edges + layer * no_vertices:depth * no_edges + (layer + 1) * no_vertices]]}\n')
 
+            # draw parameter graph
             plt.clf()
             l_dict = {}
             for n in range(no_vertices):
@@ -83,6 +84,7 @@ def MA_All(no_vertices, depth, seed, graph_type, save = True):
             nx.draw_networkx_labels(graph, pos, font_color="g", font_size=10)
 
             plt.title(f'MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}  r:{cut_approx_ratio}')
-            plt.savefig(f"./results/figures/{graph_type[1]}{graph_type[0]}/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}.png")
+            plt.savefig(f"./results/figures/{no_vertices}vertex/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}.png")
+            # plt.savefig(f"./results/figures/{no_vertices}vertex/{graph_type[1]}{graph_type[0]}/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}.png")
 
     print('-----------------------------------------------')

@@ -2,7 +2,6 @@ import networkx as nx
 from src_code import build_operators
 from src_code import useful_methods
 from src_code import generate_graphs
-from scipy.optimize import minimize
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -105,6 +104,6 @@ for layer in range(depth):
 
         plt.title(f'MA manual_input r:{cut_approx_ratio}')
         # plt.savefig(f"./results/manual_input{time.time()}.png")
-        plt.savefig(f"./results/manual/manual_input{no_vertices}{save_name}.png")
+        plt.savefig(f"./results/specific_graph/manual/manual_input{no_vertices}{save_name}.png")
 
 print('-----------------------------------------------')

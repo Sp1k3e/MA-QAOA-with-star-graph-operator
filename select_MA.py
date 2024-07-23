@@ -9,7 +9,7 @@ from matplotlib.backends.backend_pdf import PdfPages
     
 gamma_0 = -0.7854
 beta_0 = 0.7854
-depth = 2
+depth = 1
 save = True
 
 # edge_list = [(0,1), (1,2), (1,3), (3,4), (4,5), (5,6)]
@@ -32,19 +32,14 @@ max_cut_value = max_cut_solution[1]
 max_ham_eigenvalue = max_cut_solution[2]
 #! 初始化完成
 
-def obj_func(parameter_values):
-    dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_values, depth, pauli_ops_dict, 'All')
-    expectation_value = (hamiltonian * dens_mat).trace().real
-    return expectation_value * (-1.0)
+select_parameters = [0, ]
 
-initial_parameter_guesses = [gamma_0] * (depth * no_edges) + [beta_0] * (depth * no_vertices)
-bounds = [(-3.1416, 3.1416)] * (depth * no_edges) + [(0, 6.2832)] * (depth * no_vertices)
-# result = minimize(obj_func, initial_parameter_guesses,  method="BFGS")
-result = minimize(obj_func, initial_parameter_guesses, bounds=bounds, method="L-BFGS-B")
+for edge in edge_list:
+    for para in 
+    parameter_list += []
+        dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_list, depth, pauli_ops_dict, 'All')
+        hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
 
-#! 输出结果
-parameter_list = list(result.x)
-#todo 单独计算每层ap
 dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_list, depth, pauli_ops_dict, 'All')
 hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
 cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value

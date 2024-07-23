@@ -30,22 +30,26 @@ def generate_connected_graph(n, p, seed, weights = False):
     """
     print(f'random graph  no_v:{n} p:{p} seed:{seed} ' )
 
-    graph = nx.Graph()
-    random.seed(seed)
-    edge_list = []
-    has_edge = [False] * n
-    for n1 in range(n):
-        for n2 in range(n1+1,n):
-            if(random.random() > p):
-                edge_list.append((n1,n2))
-                has_edge[n1] = True
-                has_edge[n2] = True
+    # graph = nx.Graph()
+    # random.seed(seed)
+    # edge_list = []
+    # has_edge = [False] * n
+    # for n1 in range(n):
+    #     for n2 in range(n1+1,n):
+    #         if(random.random() > p):
+    #             edge_list.append((n1,n2))
+    #             has_edge[n1] = True
+    #             has_edge[n2] = True
     
-    for i in range(n):
-        if(has_edge[i] == False):
-            edge_list.append((i, (i+1)%n))
+    # for i in range(n):
+    #     if(has_edge[i] == False):
+    #         edge_list.append((i, (i+1)%n))
     
-    graph.add_edges_from(edge_list)
+    # graph.add_edges_from(edge_list)
+
+    graph = nx.erdos_renyi_graph(n, p, seed = seed)
+    edge_list = list(graph.edges())
+
     if weights:
         weights = [random.random() for i in range(len(edge_list))]
     else:
