@@ -7,10 +7,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
     
+def generate_combinations(options, length, current_combination, index, result):
+    if index == length:
+        result.append(current_combination.copy())
+        return
+
+    for choice in options:
+        current_combination[index] = choice
+        generate_combinations(options, length, current_combination, index + 1, result)
+
 gamma_0 = -0.7854
 beta_0 = 0.7854
-depth = 1
-save = True
+depth = 2
+save = False
 
 # edge_list = [(0,1), (1,2), (1,3), (3,4), (4,5), (5,6)]
 edge_list = [(0,1), (1,2), (2,3)]
@@ -32,19 +41,29 @@ max_cut_value = max_cut_solution[1]
 max_ham_eigenvalue = max_cut_solution[2]
 #! 初始化完成
 
-select_parameters = [0, ]
+best_hamiltonian_expectation = 0
+best_parameters = []
 
-for edge in edge_list:
-    for para in 
-    parameter_list += []
-        dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_list, depth, pauli_ops_dict, 'All')
-        hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
+select_parameters = [0, -0.7853, 0.7854]
+length = depth * (no_edges + no_vertices)
+result = []
+co = [None] * length
 
-dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_list, depth, pauli_ops_dict, 'All')
-hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
-cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
+generate_combinations(select_parameters, length, co, 0, result)
 
-print(f'layers:{depth} MA-All')
+for parameter_list in result:
+    dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_list, depth, pauli_ops_dict, 'All')
+    hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
+    if(hamiltonian_expectation > best_hamiltonian_expectation):
+        best_hamiltonian_expectation = hamiltonian_expectation
+        best_parameters = parameter_list
+
+# dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_list, depth, pauli_ops_dict, 'All')
+# hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
+cut_approx_ratio = (best_hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
+parameter_list = best_parameters
+
+print(f'layers:{depth} select_MA')
 print('***************')
 print(f'cut_approx_ratio: {cut_approx_ratio}')
 # if(save):
@@ -53,7 +72,7 @@ print(f'cut_approx_ratio: {cut_approx_ratio}')
 #         f.write(f'r: {cut_approx_ratio}\n')
 
 if(save):
-    pdf_pages = PdfPages(f"./results/specific_graph/MA{no_vertices}_layer{depth}.pdf")
+    pdf_pages = PdfPages(f"./results/specific_graph/select_parameters/MA{no_vertices}_layer{depth}.pdf")
 
 for layer in range(depth):
     print('-----------------------------------------------')
@@ -96,3 +115,4 @@ if(save):
     pdf_pages.close()
 
 print('-----------------------------------------------')
+
