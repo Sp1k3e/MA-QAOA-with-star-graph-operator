@@ -4,10 +4,10 @@ from src_code import generate_graphs
 from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 
-no_vertices = 2
-depth = 1
-seed = 0
-p = 0.4
+no_vertices = 10
+depth = 2
+seed = 1
+p = 0.7
 save = False
 graph = generate_graphs.generate_connected_graph(no_vertices, p, seed)[0]
 print(f'layers:{depth} standard-QAOA')

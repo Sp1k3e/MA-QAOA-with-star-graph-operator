@@ -7,12 +7,6 @@ import numpy as np
 import matplotlib.pyplot as plt
     
 def MA_All(no_vertices, depth, seed, graph_type, save = True):
-    # no_vertices = 8
-    # depth = 1
-    # seed = 4
-    # p = 0.4
-    # graph = generate_graphs.generate_connected_graph(no_vertices, seed, p)[0]
-    # graph = generate_graphs.generate_regular_graph(no_vertices, 3, seed)[0]
     gamma_0 = 0
     beta_0 = 0.785
     graph = generate_graphs.generate_graph_type(no_vertices, graph_type, seed)[0]
@@ -85,6 +79,5 @@ def MA_All(no_vertices, depth, seed, graph_type, save = True):
 
             plt.title(f'MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}  r:{cut_approx_ratio}')
             plt.savefig(f"./results/figures/{no_vertices}vertex/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}.png")
-            # plt.savefig(f"./results/figures/{no_vertices}vertex/{graph_type[1]}{graph_type[0]}/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}.png")
 
     print('-----------------------------------------------')
