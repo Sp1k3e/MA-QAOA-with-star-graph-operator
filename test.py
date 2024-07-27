@@ -2,27 +2,40 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from src_code import generate_graphs
 
-G = generate_graphs.generate_connected_graph(6, 0.8, 0)[0]
+graph = generate_graphs.generate_connected_graph(8, 0.5, 4)[0]
 
-# 计算最小生成树
-mst = nx.minimum_spanning_tree(G)
-print(mst.edges())
 
-# 可视化图和最小生成树
-pos = nx.spring_layout(G)  # 布局图形位置
+connected_v = [False] * graph.number_of_nodes()
+edges = graph.edges()
+degrees = dict(graph.degree())
+sorted_nodes = sorted(degrees.items(), key=lambda x: x[1], reverse=True)
+selected_v = []
+selected_e = []
 
-plt.figure(figsize=(10, 5))
+for n in sorted_nodes:
+    selected_v += [n[0]]
+    connected_v[n[0]] = True
+    for edge in edges:
+        if n[0] in edge:
+            if not connected_v[edge[1]]:
+                connected_v[edge[1]] = True
+                selected_e += [(edge)]
 
-# 绘制原始图
-plt.subplot(121)
-nx.draw(G, pos, with_labels=True, node_color='lightblue', node_size=500, font_size=15)
-nx.draw_networkx_edge_labels(G, pos, edge_labels={(u, v): d['weight'] for u, v, d in G.edges(data=True)})
-plt.title("Original Graph")
+    print(connected_v)
+    if all(x == True for x in connected_v):
+        break
 
-# 绘制最小生成树
-plt.subplot(122)
-nx.draw(mst, pos, with_labels=True, node_color='lightgreen', node_size=500, font_size=15)
-nx.draw_networkx_edge_labels(mst, pos, edge_labels={(u, v): d['weight'] for u, v, d in mst.edges(data=True)})
-plt.title("Minimum Spanning Tree")
+parameter_list = [1,2,3]
 
-plt.show()
+tmp_list = []
+i = 0
+#! 填充parameter_list
+for edge in graph.edges():
+    print(edge)
+    if edge not in selected_e:
+        tmp_list += [0]
+    else: 
+        tmp_list += [parameter_list[i]]
+        i += 1
+tmp_list += parameter_list[i:]
+parameter_list = tmp_list

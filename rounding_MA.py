@@ -22,8 +22,8 @@ def read_parameters(file_path):
 
     return gammas + betas
 
-no_vertices = 8
-seed = 4
+no_vertices = 10
+seed = 3
 graph_type = ['random', 0.5]
 depth = 1
 save = True
