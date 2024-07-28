@@ -30,12 +30,12 @@ parameter_list = [1,2,3]
 tmp_list = []
 i = 0
 #! 填充parameter_list
-for edge in graph.edges():
+for edge in graph.nodes():
     print(edge)
-    if edge not in selected_e:
+    if edge not in selected_v:
         tmp_list += [0]
     else: 
         tmp_list += [parameter_list[i]]
         i += 1
-tmp_list += parameter_list[i:]
-parameter_list = tmp_list
+
+print(tmp_list)

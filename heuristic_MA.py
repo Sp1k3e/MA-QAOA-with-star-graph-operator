@@ -109,19 +109,24 @@ def select_MA(no_vertices, depth, seed, graph_type, save = True):
     selected_v = []
     selected_e = []
 
+    #! 从度数较大的点找0点
     for n in sorted_nodes:
         selected_v += [n[0]]
         connected_v[n[0]] = True
         for edge in edges:
-            if n[0] in edge:
+            # if n[0] in edge:
+            if n[0] == edge[0]:
                 if not connected_v[edge[1]]:
                     connected_v[edge[1]] = True
+                    selected_e += [(edge)]
+                else:
+                    selected_e = [x for x in selected_e if edge[1] not in x]
                     selected_e += [(edge)]
 
         if all(x == True for x in connected_v):
             break
     
-    print(selected_e)
+    print(f'selected edges:{selected_e}')
     
     #! 只在目标图上优化
     target_graph = nx.Graph();
@@ -130,16 +135,27 @@ def select_MA(no_vertices, depth, seed, graph_type, save = True):
         target_graph.get_edge_data(*edge)['weight'] = 1
 
     def obj_func(parameter_values):
+        for node in graph.nodes():
+            if node in selected_v:
+                parameter_values = np.append(parameter_values, 0)
+            else:
+                parameter_values = np.append(parameter_values, 0.7854)
         dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_values, depth, pauli_ops_dict, 'All')
         expectation_value = (hamiltonian * dens_mat).trace().real
         return expectation_value * (-1.0)
 
+    # initial_parameter_guesses = [gamma_0] * (target_graph.number_of_edges() * depth) + [beta_0] * (depth * no_vertices)
     #todo 设置选中点为0
-    initial_parameter_guesses = [gamma_0] * (target_graph.number_of_edges() * depth) + [beta_0] * (depth * no_vertices)
-    result = minimize(obj_func, initial_parameter_guesses, method="BFGS")
+    initial_parameter_guesses = [gamma_0] * (target_graph.number_of_edges() * depth)
+    result = minimize(obj_func, initial_parameter_guesses, method="Nelder-Mead")
 
     #! 输出结果
     parameter_list = list(result.x)
+    for node in graph.nodes():
+        if node in selected_v:
+            parameter_list += [0]
+        else:
+            parameter_list += [0.7854]
     dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_list, depth, pauli_ops_dict, 'All')
     hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
     cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
@@ -160,7 +176,7 @@ def select_MA(no_vertices, depth, seed, graph_type, save = True):
     print('***************')
     print(f'cut_approx_ratio: {cut_approx_ratio}')
     if(save):
-        with open(f"./results/parameters/{no_vertices}vertex/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}", 'w') as f:
+        with open(f"./results/parameters/heuristic/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}", 'w') as f:
             f.write(f"max cut: {max_cut_solution[0]}\n")
             f.write(f'r: {cut_approx_ratio}\n')
 
@@ -173,7 +189,7 @@ def select_MA(no_vertices, depth, seed, graph_type, save = True):
         print(f'beta: {[round(num, 4) for num in parameter_list[depth * no_edges + layer * no_vertices:depth * no_edges + (layer + 1) * no_vertices]]}')
 
         if(save):
-            with open(f"./results/parameters/{no_vertices}vertex/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}", 'a') as f:
+            with open(f"./results/parameters/heuristic/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}", 'a') as f:
                 f.write(f'layer {layer + 1:}\n')
                 for key, value in my_dict.items():
                     f.write(f"{key}: {value:.4f}\n")
@@ -197,7 +213,7 @@ def select_MA(no_vertices, depth, seed, graph_type, save = True):
                 pos[i] += np.array([0.0, -0.12]) 
             nx.draw_networkx_labels(graph, pos, font_color="g", font_size=10)
 
-            plt.title(f'MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}  r:{cut_approx_ratio}')
-            plt.savefig(f"./results/figures/{no_vertices}vertex/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}.png")
+            plt.title(f'select_MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}  r:{cut_approx_ratio}')
+            plt.savefig(f"./results/figures/heuristic/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}.png")
 
     print('-----------------------------------------------')
