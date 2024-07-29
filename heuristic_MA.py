@@ -136,12 +136,13 @@ def select_MA(no_vertices, depth, seed, graph_type, save = True):
     print(f'selected edges:{selected_e}')
     
     #! 只在目标图上优化
-    target_graph = nx.Graph();
+    target_graph = nx.Graph()
     target_graph.add_edges_from(selected_e)
     for index, edge in enumerate(target_graph.edges()):
         target_graph.get_edge_data(*edge)['weight'] = 1
 
     def obj_func(parameter_values):
+        #! 设置点为0和pi/4
         for node in graph.nodes():
             if node in selected_v:
                 parameter_values = np.append(parameter_values, 0)
@@ -152,12 +153,12 @@ def select_MA(no_vertices, depth, seed, graph_type, save = True):
         return expectation_value * (-1.0)
 
     # initial_parameter_guesses = [gamma_0] * (target_graph.number_of_edges() * depth) + [beta_0] * (depth * no_vertices)
-    #todo 设置选中点为0
     initial_parameter_guesses = [gamma_0] * (target_graph.number_of_edges() * depth)
     result = minimize(obj_func, initial_parameter_guesses, method="Nelder-Mead")
 
     #! 输出结果
     parameter_list = list(result.x)
+    #! 设置点为0和pi/4
     for node in graph.nodes():
         if node in selected_v:
             parameter_list += [0]
@@ -169,7 +170,7 @@ def select_MA(no_vertices, depth, seed, graph_type, save = True):
 
     tmp_list = []
     i = 0
-    #! 填充parameter_list
+    #! 填充parameter_list中的参数为0的边
     for edge in graph.edges():
         if edge not in selected_e:
             tmp_list += [0]
