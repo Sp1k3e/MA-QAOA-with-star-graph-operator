@@ -7,6 +7,9 @@ import numpy as np
 import matplotlib.pyplot as plt
     
 def mst_MA(no_vertices, depth, seed, graph_type, save = True):
+    '''
+    using mst to choose edges that need to be optimized
+    '''
     gamma_0 = 0
     beta_0 = 0.785
     graph = generate_graphs.generate_graph_type(no_vertices, graph_type, seed)[0]
@@ -87,6 +90,10 @@ def mst_MA(no_vertices, depth, seed, graph_type, save = True):
     print('-----------------------------------------------')
 
 def select_MA(no_vertices, depth, seed, graph_type, save = True):
+    '''
+    select nodes to be 0 (from largest drgee 
+    and its edges that connect all other -4/pi nodes
+    '''
     gamma_0 = -0.7854
     beta_0 = 0.785
     graph = generate_graphs.generate_graph_type(no_vertices, graph_type, seed)[0]
