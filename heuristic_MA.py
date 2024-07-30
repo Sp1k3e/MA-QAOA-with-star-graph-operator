@@ -5,6 +5,7 @@ from src_code import generate_graphs
 from scipy.optimize import minimize
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
     
 def mst_MA(no_vertices, depth, seed, graph_type, save = True):
     '''
@@ -95,7 +96,7 @@ def select_MA(no_vertices, depth, seed, graph_type, save = True):
     and its edges that connect all other -4/pi nodes
     '''
     gamma_0 = -0.7854
-    beta_0 = 0.785
+    beta_0 = 0.7854
     graph = generate_graphs.generate_graph_type(no_vertices, graph_type, seed)[0]
 
     no_edges = graph.number_of_edges()
@@ -103,7 +104,7 @@ def select_MA(no_vertices, depth, seed, graph_type, save = True):
     hamiltonian = build_operators.cut_hamiltonian(graph)
 
     max_cut_solution = useful_methods.find_optimal_cut(graph)
-    print(f"max cut: {max_cut_solution[0]}")
+    # print(f"max cut: {max_cut_solution[0]}")
     max_cut_value = max_cut_solution[1]
     max_ham_eigenvalue = max_cut_solution[2]
     #! 初始化完成------------------------------------------------
@@ -116,10 +117,16 @@ def select_MA(no_vertices, depth, seed, graph_type, save = True):
     selected_v = []
     selected_e = []
 
-    #! 从度数较大的点找0点
+    #! 从度数较大的点找0点 
+    #todo 重写为函数
     for n in sorted_nodes:
+        if connected_v[n[0]]:
+            for n1 in sorted_nodes:
+                if n[1] == n1[1]:
+                    n = n1
         selected_v += [n[0]]
         connected_v[n[0]] = True
+        first = True #保证连通性
         for edge in edges:
             # if n[0] in edge:
             if n[0] == edge[0]:
@@ -127,7 +134,30 @@ def select_MA(no_vertices, depth, seed, graph_type, save = True):
                     connected_v[edge[1]] = True
                     selected_e += [(edge)]
                 else:
-                    selected_e = [x for x in selected_e if edge[1] not in x]
+                    if edge[1] in selected_v:
+                        continue
+                    if first:
+                        first =False
+                        continue
+                    for e in selected_e:
+                        if edge[1] in e:
+                            selected_e.remove(e)
+                            break
+                    selected_e += [(edge)]
+            elif n[0] == edge[1]:
+                if not connected_v[edge[0]]:
+                    connected_v[edge[0]] = True
+                    selected_e += [(edge)]
+                else:
+                    if edge[0] in selected_v:
+                        continue
+                    if first:
+                        first =False
+                        continue
+                    for e in selected_e:
+                        if edge[0] in e:
+                            selected_e.remove(e)
+                            break
                     selected_e += [(edge)]
 
         if all(x == True for x in connected_v):
@@ -141,30 +171,27 @@ def select_MA(no_vertices, depth, seed, graph_type, save = True):
     for index, edge in enumerate(target_graph.edges()):
         target_graph.get_edge_data(*edge)['weight'] = 1
 
+    betas = []
+    for node in graph.nodes():
+        if node in selected_v:
+            betas += [0]
+        else:
+            betas += [0.7854]
+
     def obj_func(parameter_values):
-        #! 设置点为0和pi/4
-        for node in graph.nodes():
-            if node in selected_v:
-                parameter_values = np.append(parameter_values, 0)
-            else:
-                parameter_values = np.append(parameter_values, 0.7854)
-        dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_values, depth, pauli_ops_dict, 'All')
+        #! 设置点beta为0和pi/4
+        parameter_values = np.append(parameter_values, betas)
+        dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_values, 1, pauli_ops_dict, 'All')
         expectation_value = (hamiltonian * dens_mat).trace().real
         return expectation_value * (-1.0)
 
-    # initial_parameter_guesses = [gamma_0] * (target_graph.number_of_edges() * depth) + [beta_0] * (depth * no_vertices)
-    initial_parameter_guesses = [gamma_0] * (target_graph.number_of_edges() * depth)
+    initial_parameter_guesses = [gamma_0] * (target_graph.number_of_edges())
     result = minimize(obj_func, initial_parameter_guesses, method="Nelder-Mead")
 
     #! 输出结果
     parameter_list = list(result.x)
-    #! 设置点为0和pi/4
-    for node in graph.nodes():
-        if node in selected_v:
-            parameter_list += [0]
-        else:
-            parameter_list += [0.7854]
-    dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_list, depth, pauli_ops_dict, 'All')
+    parameter_list = parameter_list + betas
+    dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_list, 1, pauli_ops_dict, 'All')
     hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
     cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
 
@@ -179,7 +206,30 @@ def select_MA(no_vertices, depth, seed, graph_type, save = True):
             i += 1
     tmp_list += parameter_list[i:]
     parameter_list = tmp_list
+    # print(parameter_list)
 
+    #! 第二层
+    if depth > 1:
+        depth2 = depth - 1
+        def obj_func2(parameter_values):
+            #! 设置点beta为0和pi/4
+            dens_mat2 = build_operators.build_MA_qaoa_ansatz_from_initial(graph, parameter_values, depth2, pauli_ops_dict, 'All', dens_mat)
+            expectation_value = (hamiltonian * dens_mat2).trace().real
+            return expectation_value * (-1.0)
+
+        initial_parameter_guesses = [gamma_0] * (depth2 * no_edges) + [beta_0] * (depth2 * no_vertices)
+        result = minimize(obj_func2, initial_parameter_guesses, method="BFGS")
+
+        parameter_list2 = list(result.x)
+        gammas = parameter_list[:i] + parameter_list2[:depth2 * no_edges]
+        betas = parameter_list[i:] + parameter_list2[depth2 * no_edges:]
+        parameter_list = gammas + betas
+
+        dens_mat2 = build_operators.build_MA_qaoa_ansatz_from_initial(graph, parameter_list2, depth2, pauli_ops_dict, 'All', dens_mat)
+        hamiltonian_expectation = (hamiltonian * dens_mat2).trace().real
+        cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
+
+    #! 输出所有parameter
     print(f'layers:{depth} MA-All')
     print('***************')
     print(f'cut_approx_ratio: {cut_approx_ratio}')
