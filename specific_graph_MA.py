@@ -9,8 +9,8 @@ from matplotlib.backends.backend_pdf import PdfPages
     
 gamma_0 = -0.7854
 beta_0 = 0.7854
-depth = 1
-save = True
+depth = 2
+save = False
 
 # edge_list = [(0,1), (1,2), (1,3), (3,4), (4,5), (5,6)]
 edge_list = [(0,1), (1,2), (2,3)]

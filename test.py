@@ -1,5 +1,8 @@
-a = [1, 2, 3, 4]
+from src_code import generate_graphs
+import matplotlib.pyplot as plt
+import networkx as nx
 
-for i in a:
-    a[i+1] = a[i]
-    print(i)
+G = generate_graphs.generate_connected_graph(6,0.6,3)[0]
+
+nx.draw_networkx(G)
+plt.show()

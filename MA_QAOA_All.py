@@ -81,7 +81,7 @@ def MA_All(no_vertices, depth, seed, graph_type, save = True, minimize_method = 
                 pos[i] += np.array([0.0, -0.12]) 
             nx.draw_networkx_labels(graph, pos, font_color="g", font_size=10)
 
-            plt.title(f'MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{layer}_seed{seed}  r:{cut_approx_ratio}')
+            plt.title(f'MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{layer + 1}_seed{seed}  r:{cut_approx_ratio}')
             # plt.savefig(f"./results/figures/{no_vertices}vertex/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}.png")
             pdf_pages.savefig()
             plt.close()

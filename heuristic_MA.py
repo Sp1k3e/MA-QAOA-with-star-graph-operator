@@ -206,10 +206,10 @@ def select_MA(no_vertices, depth, seed, graph_type, save = True):
             i += 1
     tmp_list += parameter_list[i:]
     parameter_list = tmp_list
-    # print(parameter_list)
 
     #! 第二层
     if depth > 1:
+        print(f"layer1 r:{cut_approx_ratio}")
         depth2 = depth - 1
         def obj_func2(parameter_values):
             #! 设置点beta为0和pi/4
@@ -221,8 +221,8 @@ def select_MA(no_vertices, depth, seed, graph_type, save = True):
         result = minimize(obj_func2, initial_parameter_guesses, method="BFGS")
 
         parameter_list2 = list(result.x)
-        gammas = parameter_list[:i] + parameter_list2[:depth2 * no_edges]
-        betas = parameter_list[i:] + parameter_list2[depth2 * no_edges:]
+        gammas = parameter_list[:no_edges] + parameter_list2[:depth2 * no_edges]
+        betas = parameter_list[no_edges:] + parameter_list2[depth2 * no_edges:]
         parameter_list = gammas + betas
 
         dens_mat2 = build_operators.build_MA_qaoa_ansatz_from_initial(graph, parameter_list2, depth2, pauli_ops_dict, 'All', dens_mat)
@@ -230,7 +230,7 @@ def select_MA(no_vertices, depth, seed, graph_type, save = True):
         cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
 
     #! 输出所有parameter
-    print(f'layers:{depth} MA-All')
+    print(f'layers:{depth} heuristic_MA')
     print('***************')
     print(f'cut_approx_ratio: {cut_approx_ratio}')
     if(save):
