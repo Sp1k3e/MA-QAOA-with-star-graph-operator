@@ -1,3 +1,6 @@
+'''
+    手动输入图和参数
+'''
 import networkx as nx
 from src_code import build_operators
 from src_code import useful_methods
@@ -8,13 +11,12 @@ import matplotlib.pyplot as plt
 a = 0.7854
 b = -0.7854
 depth = 1
-save = True   
+save = False   
 
 # no_vertices = 6
 # depth = 1
 # seed = 7
 # graph_type = ['random', 0.4]
-# save = True
 # graph = generate_graphs.generate_graph_type(no_vertices, graph_type, seed)[0]
 # parameter_list = [a,0,b,b,b,b] + [0,a,0,a,0,0]
 
@@ -22,7 +24,6 @@ save = True
 # depth = 1
 # seed = 7
 # graph_type = ['random', 0]
-# save = True
 # graph = generate_graphs.generate_graph_type(no_vertices, graph_type, seed)[0]
 # parameter_list = [b,0,b] + [a,0,a]
 
@@ -30,8 +31,9 @@ save = True
 # edge_list = [(0,1)]
 # parameter_list = [b] + [0,a]
 
-# edge_list = [(0,1), (1,2)]
+edge_list = [(0,1), (1,2)]
 # parameter_list = [b,b] + [a,0,a]
+parameter_list = [b,b] + [0,a,0]
 
 # edge_list = [(0,1), (1,2), (1,3)]
 # parameter_list = [b,b,b] + [a,0,a,a]
@@ -44,9 +46,10 @@ save = True
 # parameter_list = [b,0,b] + [0,a,0,a]
 # save_name = '-1'
 
-edge_list = [(0,1), (1,2), (2,3), (2,4)]
-parameter_list = [b,b,b,b] + [0,a,0,a,a]
-save_name = ''
+# edge_list = [(0,1), (1,2), (2,3), (2,4)]
+# parameter_list = [b,b,b,b] + [0,a,0,a,a]
+# save_name = ''
+
 
 graph = nx.Graph();
 graph.add_edges_from(edge_list)
@@ -54,6 +57,9 @@ no_vertices = graph.number_of_nodes()
 for index, edge in enumerate(graph.edges()):
     graph.get_edge_data(*edge)['weight'] = 1
 
+# no_vertices = 8
+# graph = generate_graphs.generate_graph_type(no_vertices ,['random', 0.5], 5)[0]
+# parameter_list = [-0.7854, 0, 0, -0.7854, 0, -0.7854, 0, 0, -0.7854, -0.7854, -0.7854, 0, 0.7854, 0.7854, 0.7854, 0.7854, 0.7854, 0.7854, 0, 0]
 
 no_edges = graph.number_of_edges()
 pauli_ops_dict = build_operators.build_my_paulis(no_vertices) 
@@ -104,6 +110,6 @@ for layer in range(depth):
 
         plt.title(f'MA manual_input r:{cut_approx_ratio}')
         # plt.savefig(f"./results/manual_input{time.time()}.png")
-        plt.savefig(f"./results/specific_graph/manual/manual_input{no_vertices}{save_name}.png")
+        # plt.savefig(f"./results/specific_graph/manual/manual_input{no_vertices}{save_name}.png")
 
 print('-----------------------------------------------')

@@ -1,3 +1,6 @@
+'''
+    在特定图上的MA-QAOA
+'''
 import networkx as nx
 from src_code import build_operators
 from src_code import useful_methods

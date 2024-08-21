@@ -620,70 +620,15 @@ def build_MA_qaoa_ansatz(graph, parameter_list, no_layers, pauli_dict, mode):
     return dens_mat
 
 def build_MA_qaoa_ansatz_from_initial(graph, parameter_list, no_layers, pauli_dict, mode, initial_density):
+    '''
+        从给定初始密度矩阵开始演化
+    '''
     no_edges = graph.number_of_edges() 
     no_qubits = graph.number_of_nodes() 
     dens_mat = initial_density
 
-    #! 只改Mixer
-    if(mode == 'M'):
-        ham_parameters = parameter_list[:no_layers]
-        mixer_parameters = parameter_list[no_layers:]
-
-        # every layer
-        for layer in range(no_layers):
-            cut_unit = cut_unitary(graph, ham_parameters[layer], pauli_dict)
-            dens_mat = (cut_unit * dens_mat) * (cut_unit.transpose().conj())
-
-            first = True
-            for i in range(no_qubits):
-                if first:
-                    mix_unit = mixer_unitary('X' + str(i), mixer_parameters[i + no_qubits * layer], pauli_dict, no_qubits)
-                    first = False
-                else:
-                    mix_unit = mix_unit * mixer_unitary('X' + str(i), mixer_parameters[i + no_qubits * layer], pauli_dict, no_qubits)
-
-            dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
-
-    elif(mode == 'SM'):
-        ham_parameters = parameter_list[:no_layers]
-        mixer_parameters = parameter_list[no_layers:]
-
-        # every layer
-        for layer in range(no_layers - 1):
-            cut_unit = cut_unitary(graph, ham_parameters[layer], pauli_dict)
-            dens_mat = (cut_unit * dens_mat) * (cut_unit.transpose().conj())
-
-            mix_unit = mixer_unitary('standard_x', mixer_parameters[layer], pauli_dict, no_qubits)
-
-            dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
-
-        cut_unit = cut_unitary(graph, ham_parameters[no_layers - 1], pauli_dict)
-        dens_mat = (cut_unit * dens_mat) * (cut_unit.transpose().conj())
-
-        first = True
-        for i in range(no_qubits):
-            if first:
-                mix_unit = mixer_unitary('X' + str(i), mixer_parameters[i + no_layers - 1], pauli_dict, no_qubits)
-                first = False
-            else:
-                mix_unit = mix_unit * mixer_unitary('X' + str(i), mixer_parameters[i + no_layers - 1], pauli_dict, no_qubits)
-
-        dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
-
-    #! 只改Phaser
-    elif(mode == "P"):
-        ham_parameters = parameter_list[:no_layers * no_edges]
-        mixer_parameters = parameter_list[no_layers * no_edges:]
-
-        for layer in range(no_layers):
-            cut_unit = MA_cut_unitary(graph, ham_parameters[layer * no_edges: (layer + 1) * no_edges], pauli_dict)
-            dens_mat = (cut_unit * dens_mat) * (cut_unit.transpose().conj())
-
-            mix_unit = mixer_unitary('standard_x', mixer_parameters[layer], pauli_dict, no_qubits)
-            dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
-
     #! 都改
-    elif(mode == "All"):
+    if(mode == "All"):
         ham_parameters = parameter_list[:no_layers * no_edges]
         mixer_parameters = parameter_list[no_layers * no_edges:]
 
@@ -703,41 +648,64 @@ def build_MA_qaoa_ansatz_from_initial(graph, parameter_list, no_layers, pauli_di
 
     return dens_mat
 
-# def build_Y_qaoa_ansatz(graph, parameter_list, no_layers, pauli_dict):
-#     no_edges = graph.number_of_edges() # Problem
-#     no_qubits = graph.number_of_nodes() # Mixer
-#     dens_mat = initial_density_matrix(no_qubits)
+def build_heuristic_MA_qaoa_ansatz(graph, parameter_list, selected_v, pauli_dict, mode):
+    '''
+        第一层连接0点
+    '''
+    no_edges = graph.number_of_edges() 
+    no_qubits = graph.number_of_nodes() 
+    dens_mat = initial_density_matrix(no_qubits)
 
-#     ham_parameters = parameter_list[:no_layers]
-#     mixer_parameters = parameter_list[no_layers:]
-#     Y_parameters = parameter_list[-3:]
+    no_layers = 2
 
-#     # every layer
-#     for layer in range(no_layers):
-#         cut_unit = cut_unitary(graph, ham_parameters[layer], pauli_dict)
-#         dens_mat = (cut_unit * dens_mat) * (cut_unit.transpose().conj())
+    if(mode == "All"):
+        ham_parameters = parameter_list[:no_layers * no_edges]
+        mixer_parameters = parameter_list[no_layers * no_edges:]
+        layer1_gammas = parameter_list[-selected_v.len() * 2 + 1:-selected_v.len()]
+        layer1_betas = parameter_list[-selected_v.len():]
 
-#         first = True
-#         for i in range(no_qubits):
-#             if first:
-#                 mix_unit = mixer_unitary('X' + str(i), mixer_parameters[i + no_qubits * layer], pauli_dict, no_qubits)
-#                 first = False
-#             else:
-#                 mix_unit = mix_unit * mixer_unitary('X' + str(i), mixer_parameters[i + no_qubits * layer], pauli_dict, no_qubits)
+        # layer1
+        first = True
+        for i in range(selected_v.len()):
+            a = selected_v[i]
+            b = selected_v[i + 1]
+            if(a < b):
+                key = 'Z' + str(a) + 'Z' + str(b)
+            else:
+                key = 'Z' + str(b) + 'Z' + str(a)
 
-#         dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
+            tmp_matrix = pauli_dict['I'] * math.cos(layer1_gammas[i]) - pauli_dict[key] * math.sin(layer1_gammas[i]) * 1j
 
-#         switch_dict = {3:1,7:1,6:2,4:2}
-#         #Y
-#         first = True
-#         for i in range(no_qubits):
-#             j = switch_dict.get(i, 0)
-#             if first:
-#                 mix_unit = mixer_unitary('Y' + str(i), Y_parameters[j], pauli_dict, no_qubits)
-#                 first = False
-#             else:
-#                 mix_unit = mix_unit * mixer_unitary('Y' + str(i), Y_parameters[j], pauli_dict, no_qubits)
+            if first:
+                cut_unit = tmp_matrix
+                first = False
+            else:
+                cut_unit = tmp_matrix * cut_unit
 
-#         dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
+        dens_mat = (cut_unit * dens_mat) * (cut_unit.transpose().conj())
 
-#     return dens_mat
+        first = True
+        for i in selected_v:
+            if first:
+                mix_unit = mixer_unitary('X' + str(i), layer1_betas[i], pauli_dict, no_qubits)
+                first = False
+            else:
+                mix_unit = mix_unit * mixer_unitary('X' + str(i), layer1_betas[i], pauli_dict, no_qubits)
+        dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
+
+        # layer2
+        layer = 0
+        cut_unit = MA_cut_unitary(graph, ham_parameters[layer * no_edges: (layer + 1) * no_edges], pauli_dict)
+        dens_mat = (cut_unit * dens_mat) * (cut_unit.transpose().conj())
+
+        first = True
+        for i in range(no_qubits):
+            if first:
+                mix_unit = mixer_unitary('X' + str(i), mixer_parameters[i + no_qubits * layer], pauli_dict, no_qubits)
+                first = False
+            else:
+                mix_unit = mix_unit * mixer_unitary('X' + str(i), mixer_parameters[i + no_qubits * layer], pauli_dict, no_qubits)
+
+        dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
+
+    return dens_mat

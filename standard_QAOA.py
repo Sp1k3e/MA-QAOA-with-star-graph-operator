@@ -3,14 +3,14 @@ from src_code import useful_methods
 from src_code import generate_graphs
 from scipy.optimize import minimize
 import matplotlib.pyplot as plt
+import time
 
 no_vertices = 10
-depth = 2
-seed = 1
-p = 0.7
-save = False
+depth = 1
+seed = 0
+p = 0.5
+save = True
 graph = generate_graphs.generate_connected_graph(no_vertices, p, seed)[0]
-print(f'layers:{depth} standard-QAOA')
 
 gamma_0 = 0.2
 beta_0 = 1
@@ -21,6 +21,7 @@ max_ham_eigenvalue = max_cut_solution[2]
 
 pauli_ops_dict = build_operators.build_my_paulis(no_vertices)
 hamiltonian = build_operators.cut_hamiltonian(graph)
+print(f'layers:{depth} standard-QAOA')
 #! 初始化完成
 
 def obj_func(parameter_values):
@@ -28,8 +29,13 @@ def obj_func(parameter_values):
     expectation_value = (hamiltonian * dens_mat).trace().real
     return expectation_value * (-1.0)
 
+start_time = time.time()
+
 initial_parameter_guesses = [gamma_0] * (depth) + [beta_0] * (depth)
 result = minimize(obj_func, initial_parameter_guesses, method="BFGS")
+
+end_time = time.time()
+print(f"optimization_time: {round(end_time - start_time, 2)} seconds")
 
 parameter_list = list(result.x)
 
@@ -44,7 +50,8 @@ print(f'beta: {parameter_list[depth:]}')
 
 if(save):
     #only save parameters for standard QAOA
-    with open(f"./results/parameters/standard/standard{no_vertices}", 'a') as f:
+    #todo 改正则图的保存文件名
+    with open(f"./results/standard/standard{no_vertices}_{p}random_layer{depth}_seed{seed}", 'a') as f:
         f.write(f"layers:{depth} standard-QAOA")
         f.write(f'gamma: {parameter_list[:depth]}')
         f.write(f'beta: {parameter_list[depth:]}')
