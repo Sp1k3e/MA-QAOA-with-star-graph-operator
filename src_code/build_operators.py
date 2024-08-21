@@ -651,12 +651,13 @@ def build_MA_qaoa_ansatz_from_initial(graph, parameter_list, no_layers, pauli_di
 def build_heuristic_MA_qaoa_ansatz(graph, parameter_list, selected_v, pauli_dict, mode):
     '''
         第一层连接0点
+        第一层参数在最后
     '''
     no_edges = graph.number_of_edges() 
     no_qubits = graph.number_of_nodes() 
     dens_mat = initial_density_matrix(no_qubits)
 
-    no_layers = 2
+    no_layers = 1
 
     if(mode == "All"):
         ham_parameters = parameter_list[:no_layers * no_edges]
