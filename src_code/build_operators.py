@@ -658,16 +658,18 @@ def build_heuristic_MA_qaoa_ansatz(graph, parameter_list, selected_v, pauli_dict
     dens_mat = initial_density_matrix(no_qubits)
 
     no_layers = 1
+    n1 = len(selected_v)
+    n2 = n1 * 2 - 1
 
     if(mode == "All"):
-        ham_parameters = parameter_list[:no_layers * no_edges]
-        mixer_parameters = parameter_list[no_layers * no_edges:]
-        layer1_gammas = parameter_list[-selected_v.len() * 2 + 1:-selected_v.len()]
-        layer1_betas = parameter_list[-selected_v.len():]
+        ham_parameters = parameter_list[n2 : n2+no_layers * no_edges]
+        mixer_parameters = parameter_list[n2+no_layers * no_edges:]
+        layer1_gammas = parameter_list[:n1-1]
+        layer1_betas = parameter_list[n1-1:n2]
 
         # layer1
         first = True
-        for i in range(selected_v.len()):
+        for i in range(len(selected_v) - 1):
             a = selected_v[i]
             b = selected_v[i + 1]
             if(a < b):
@@ -686,12 +688,15 @@ def build_heuristic_MA_qaoa_ansatz(graph, parameter_list, selected_v, pauli_dict
         dens_mat = (cut_unit * dens_mat) * (cut_unit.transpose().conj())
 
         first = True
+        j = 0
         for i in selected_v:
             if first:
-                mix_unit = mixer_unitary('X' + str(i), layer1_betas[i], pauli_dict, no_qubits)
+                mix_unit = mixer_unitary('X' + str(i), layer1_betas[j], pauli_dict, no_qubits)
                 first = False
             else:
-                mix_unit = mix_unit * mixer_unitary('X' + str(i), layer1_betas[i], pauli_dict, no_qubits)
+                mix_unit = mix_unit * mixer_unitary('X' + str(i), layer1_betas[j], pauli_dict, no_qubits)
+            j += 1
+
         dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
 
         # layer2
