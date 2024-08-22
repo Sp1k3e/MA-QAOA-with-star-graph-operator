@@ -685,7 +685,8 @@ def build_heuristic_MA_qaoa_ansatz(graph, parameter_list, selected_v, pauli_dict
             else:
                 cut_unit = tmp_matrix * cut_unit
 
-        dens_mat = (cut_unit * dens_mat) * (cut_unit.transpose().conj())
+        if not first:
+            dens_mat = (cut_unit * dens_mat) * (cut_unit.transpose().conj())
 
         first = True
         j = 0

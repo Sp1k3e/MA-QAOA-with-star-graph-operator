@@ -50,7 +50,6 @@ print(f'beta: {parameter_list[depth:]}')
 
 if(save):
     #only save parameters for standard QAOA
-    #todo 改正则图的保存文件名
     with open(f"./results/standard/standard{no_vertices}_{p}random_layer{depth}_seed{seed}", 'a') as f:
         f.write(f"layers:{depth} standard-QAOA")
         f.write(f'gamma: {parameter_list[:depth]}')

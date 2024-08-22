@@ -5,8 +5,8 @@ from scipy.optimize import minimize
 import networkx as nx
 import matplotlib.pyplot as plt
 
-depth = 4
-save = True
+depth = 1
+save = False
 
 edge_list = [(0,1),(1,2),(2,3)]
 

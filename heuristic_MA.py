@@ -120,13 +120,17 @@ def select_MA(no_vertices, depth, seed, graph_type, save = True):
 
     #! 从度数较大的点找0点 
     #todo 重写为函数
-    for n in sorted_nodes:
+    for n in sorted_nodes: #n[0]为点
         if connected_v[n[0]]:
             for n1 in sorted_nodes:
-                if n[1] == n1[1]:
+                if n[1] == n1[1] and connected_v[n1[0]] == False:
+                    index1 = sorted_nodes.index(n)
+                    index2 = sorted_nodes.index(n1)
+                
+                    sorted_nodes[index1], sorted_nodes[index2] = sorted_nodes[index2], sorted_nodes[index1]
                     n = n1
         selected_v += [n[0]]
-        connected_v[n[0]] = True #保证连通性
+        connected_v[n[0]] = True 
         first = True 
         for edge in edges:
             if n[0] == edge[0]:
@@ -136,17 +140,17 @@ def select_MA(no_vertices, depth, seed, graph_type, save = True):
                 else: #边上另一点被连接
                     if edge[1] in selected_v:
                         continue
-                    # if first:
-                    #     first =False
-                    #     continue
                     if first:
-                        first = False
-                        # for e in selected_e:
-                        #     if edge[1] in e:
-                        #         selected_e.remove(e)
-                        #         break
-                    else:
+                        first =False
                         continue
+                    # if first:
+                        # first = False
+                    for e in selected_e:
+                        if edge[1] in e:
+                            selected_e.remove(e)
+                            break
+                    # else:
+                        # continue
                     selected_e += [(edge)]
 
             elif n[0] == edge[1]:
@@ -156,23 +160,22 @@ def select_MA(no_vertices, depth, seed, graph_type, save = True):
                 else:
                     if edge[0] in selected_v:
                         continue
-                    # if first:
-                    #     first =False
-                    #     continue
                     if first:
-                        first = False
-                        # for e in selected_e:
-                        #     if edge[0] in e:
-                        #         selected_e.remove(e)
-                        #         break
-                    else:
+                        first =False
                         continue
+                    # if first:
+                        # first = False
+                    for e in selected_e:
+                        if edge[0] in e:
+                            selected_e.remove(e)
+                            break
+                    # else:
+                        # continue
                     selected_e += [(edge)]
 
         if all(x == True for x in connected_v):
             break
 
-    # selected_e += [(1,3)]
     print(f'selected nodes:{selected_v}')
     print(f'selected edges:{selected_e}')
     
@@ -309,6 +312,13 @@ def select_layer2_MA(no_vertices, seed, graph_type, save = True):
     beta_0 = 0.7854
     graph = generate_graphs.generate_graph_type(no_vertices, graph_type, seed)[0]
 
+    # edge_list = [(0,1), (1,2), (2,3)]
+    # graph = nx.Graph();
+    # graph.add_edges_from(edge_list)
+    # no_vertices = graph.number_of_nodes()
+    # for index, edge in enumerate(graph.edges()):
+    #     graph.get_edge_data(*edge)['weight'] = 1
+
     no_edges = graph.number_of_edges()
     pauli_ops_dict = build_operators.build_my_paulis(no_vertices) 
     hamiltonian = build_operators.cut_hamiltonian(graph)
@@ -329,13 +339,17 @@ def select_layer2_MA(no_vertices, seed, graph_type, save = True):
 
     #! 从度数较大的点找0点 
     #todo 重写为函数
-    for n in sorted_nodes:
+    for n in sorted_nodes: #n[0]为点
         if connected_v[n[0]]:
             for n1 in sorted_nodes:
-                if n[1] == n1[1]:
+                if n[1] == n1[1] and connected_v[n1[0]] == False:
+                    index1 = sorted_nodes.index(n)
+                    index2 = sorted_nodes.index(n1)
+                
+                    sorted_nodes[index1], sorted_nodes[index2] = sorted_nodes[index2], sorted_nodes[index1]
                     n = n1
         selected_v += [n[0]]
-        connected_v[n[0]] = True #保证连通性
+        connected_v[n[0]] = True 
         first = True 
         for edge in edges:
             if n[0] == edge[0]:
@@ -381,7 +395,6 @@ def select_layer2_MA(no_vertices, seed, graph_type, save = True):
         if all(x == True for x in connected_v):
             break
 
-    # selected_e += [(1,3)]
     print(f'selected nodes:{selected_v}')
     print(f'selected edges:{selected_e}')
     
@@ -401,11 +414,12 @@ def select_layer2_MA(no_vertices, seed, graph_type, save = True):
     def obj_func(parameter_values):
         #! 设置点beta为0和pi/4
         parameter_values = np.append(parameter_values, betas)
-        dens_mat = build_operators.build_heuristic_MA_qaoa_ansatz(target_graph, parameter_values, selected_v, pauli_ops_dict, 'All')
+        dens_mat = build_operators.build_heuristic_MA_qaoa_ansatz(target_graph, parameter_values, selected_v, pauli_ops_dict, 'All') #heuristic_layer2
         expectation_value = (hamiltonian * dens_mat).trace().real
         return expectation_value * (-1.0)
 
     initial_parameter_guesses = [gamma_0] * (len(selected_v)*2 - 1) + [gamma_0] * (target_graph.number_of_edges())
+    # initial_parameter_guesses = [gamma_0] * (len(selected_v)*2 - 1) + [gamma_0] * (target_graph.number_of_edges()) + [beta_0] * (target_graph.number_of_nodes())
     result = minimize(obj_func, initial_parameter_guesses, method="Nelder-Mead")
 
     #! 输出结果
@@ -419,7 +433,8 @@ def select_layer2_MA(no_vertices, seed, graph_type, save = True):
     print(f'heuristic_layer2_MA')
     print('***************')
     print(f'cut_approx_ratio: {cut_approx_ratio}')
-    print(parameter_list)
+    print(parameter_list[:(len(selected_v)*2 - 1)])
+    print(parameter_list[(len(selected_v)*2 - 1):])
     # # 保存最优参数
     # if(save):
     #     with open(f"./results/parameters/heuristic/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}", 'w') as f:

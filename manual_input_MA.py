@@ -31,12 +31,12 @@ save = False
 # edge_list = [(0,1)]
 # parameter_list = [b] + [0,a]
 
-edge_list = [(0,1), (1,2)]
+# edge_list = [(0,1), (1,2)]
 # parameter_list = [b,b] + [a,0,a]
-parameter_list = [b,b] + [0,a,0]
+# parameter_list = [b,b] + [0,a,0]
 
-# edge_list = [(0,1), (1,2), (1,3)]
-# parameter_list = [b,b,b] + [a,0,a,a]
+edge_list = [(0,1), (1,2), (1,3)]
+parameter_list = [b,0,b] + [a,0,0,a]
 # save_name = '-2'
 
 # edge_list = [(0,1), (1,2), (2,3)]
