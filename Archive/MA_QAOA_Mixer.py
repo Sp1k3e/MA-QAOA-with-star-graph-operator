@@ -34,7 +34,6 @@ def obj_func(parameter_values):
 
 # 只改mixer
 initial_parameter_guesses = [gamma_0] * (depth) + [beta_0] * (depth * no_vertices)
-
 result = minimize(obj_func, initial_parameter_guesses, method="BFGS")
 
 #! 输出结果

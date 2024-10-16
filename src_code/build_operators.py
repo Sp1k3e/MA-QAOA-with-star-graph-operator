@@ -99,8 +99,8 @@ def cut_unitary(graph, parameter, dict_paulis):
 
         weight = graph.get_edge_data(*edge)['weight']
         #原代码*0.5
-        # total_param = 0.5 * parameter * weight
-        total_param = parameter * weight
+        total_param = 0.5 * parameter * weight
+        # total_param = parameter * weight
         key = 'Z' + str(edge[0]) + 'Z' + str(edge[1])
 
         if key not in dict_paulis:
@@ -109,8 +109,8 @@ def cut_unitary(graph, parameter, dict_paulis):
             raise Exception(key)
         
         # 原代码为+
-        # tmp_matrix = dict_paulis['I'] * math.cos(total_param) + dict_paulis[key] * math.sin(total_param) * 1j
-        tmp_matrix = dict_paulis['I'] * math.cos(total_param) - dict_paulis[key] * math.sin(total_param) * 1j
+        tmp_matrix = dict_paulis['I'] * math.cos(total_param) + dict_paulis[key] * math.sin(total_param) * 1j
+        # tmp_matrix = dict_paulis['I'] * math.cos(total_param) - dict_paulis[key] * math.sin(total_param) * 1j
 
         if first:
             result = tmp_matrix
@@ -123,29 +123,25 @@ def cut_unitary(graph, parameter, dict_paulis):
 def MA_cut_unitary(graph, parameter, dict_paulis):
     """
     """
-
-    if not isinstance(graph, nx.Graph):
-        raise Exception
-
     i = 0
     first = True
     for edge in graph.edges:
 
         weight = graph.get_edge_data(*edge)['weight']
-        # total_param = 0.5 * parameter[i] * weight
-        total_param = parameter[i] * weight
+        total_param = 0.5 * parameter[i] * weight
+        # total_param = parameter[i] * weight
         if(edge[0] < edge[1]):
             key = 'Z' + str(edge[0]) + 'Z' + str(edge[1])
         else:
             key = 'Z' + str(edge[1]) + 'Z' + str(edge[0])
-
+        
         # if key not in dict_paulis:
         #     key = 'Z' + str(edge[1]) + 'Z' + str(edge[0])
         # if key not in dict_paulis:
         #     raise Exception
         
-        # tmp_matrix = dict_paulis['I'] * math.cos(total_param) + dict_paulis[key] * math.sin(total_param) * 1j
-        tmp_matrix = dict_paulis['I'] * math.cos(total_param) - dict_paulis[key] * math.sin(total_param) * 1j
+        tmp_matrix = dict_paulis['I'] * math.cos(total_param) + dict_paulis[key] * math.sin(total_param) * 1j
+        # tmp_matrix = dict_paulis['I'] * math.cos(total_param) - dict_paulis[key] * math.sin(total_param) * 1j
 
         if first:
             result = tmp_matrix
@@ -618,6 +614,65 @@ def build_MA_qaoa_ansatz(graph, parameter_list, no_layers, pauli_dict, mode):
             dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
 
     return dens_mat
+
+def build_MA_qaoa_ansatz_without_pauli_dict(graph, parameter_list, no_layers):
+    no_edges = graph.number_of_edges() 
+    no_qubits = graph.number_of_nodes() 
+    dens_mat = initial_density_matrix(no_qubits)
+
+    ham_parameters = parameter_list[:no_layers * no_edges]
+    mixer_parameters = parameter_list[no_layers * no_edges:]
+    I = sparse.csr_matrix(np.identity(2**no_qubits, dtype=complex))
+
+    for layer in range(no_layers):
+        parameter = ham_parameters[layer * no_edges: (layer + 1) * no_edges]
+        i = 0
+        #prob
+        first = True
+        for edge in graph.edges:
+            total_param = parameter[i] * 0.5
+            if(edge[0] < edge[1]):
+                smaller_node = edge[0]
+                larger_node = edge[1]
+            else:
+                smaller_node = edge[1]
+                larger_node = edge[0]
+
+            pauli_string = 'I' * (smaller_node) + 'Z' + 'I' * (larger_node-smaller_node-1) + 'Z' + 'I' * (no_qubits - larger_node - 1)
+            pauli_string = pauli_string[::-1]
+            ZZ = sparse.csr_matrix(qi.Pauli(pauli_string).to_matrix())
+            tmp_matrix = I * math.cos(total_param) + ZZ * math.sin(total_param) * 1j
+
+            if first:
+                cut_unit = tmp_matrix
+                first = False
+            else:
+                cut_unit = tmp_matrix * cut_unit
+            i += 1
+
+        dens_mat = (cut_unit * dens_mat) * (cut_unit.transpose().conj())
+
+        # Mixer
+        first = True
+        for i in range(no_qubits):
+
+            para = mixer_parameters[i + no_qubits * layer]
+            pauli_string = 'I' * (i) + 'X' + 'I' * (no_qubits - i - 1)
+            pauli_string = pauli_string[::-1]
+            mixer_X = sparse.csr_matrix(qi.Pauli(pauli_string).to_matrix())
+
+            mixer = math.cos(para) * I - 1j*math.sin(para) * mixer_X
+
+            if first:
+                mix_unit = mixer
+                first = False
+            else:
+                mix_unit = mix_unit * mixer
+
+        dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
+
+    return dens_mat
+
 
 def build_MA_qaoa_ansatz_from_initial(graph, parameter_list, no_layers, pauli_dict, mode, initial_density):
     '''

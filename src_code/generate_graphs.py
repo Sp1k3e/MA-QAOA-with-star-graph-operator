@@ -26,7 +26,7 @@ def generate_complete_graph(n, seed, weights = False):
 
 def generate_connected_graph(n, p, seed, weights = False):
     """
-
+    generate every edge with probability p
     """
     print(f'random graph  no_v:{n} p:{p} seed:{seed} ' )
 
