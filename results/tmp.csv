@@ -500,3 +500,5 @@ heuristic_select ,8 ,['random'  ,0.5]       ,1 ,  74 ,0.9905547236473762
 heuristic_select ,8 ,['random'  ,0.5]       ,1 ,  75 ,0.9569315623733076
 heuristic_select ,8 ,['random'  ,0.5]       ,1 ,  76 ,0.9925570046947065
 heuristic_select ,8 ,['random'  ,0.5]       ,1 ,  77 ,0.8333333319187607
+standard_QAOA,8,['random', 0.5],1,0,0.8381858256774269
+standard_QAOA,6,['random', 0.6],1,0,0.8484603525204069
