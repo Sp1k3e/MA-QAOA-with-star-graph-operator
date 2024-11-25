@@ -1,9 +1,27 @@
-from qiskit import quantum_info as qi
+from itertools import permutations
 import networkx as nx
-from scipy import sparse
-import numpy as np
 
-type = ['random', 0.5]
+def longest_simple_path(G):
+    # 找到所有连通分量
+    components = nx.connected_components(G)
+    longest_path = []
+    for component in components:
+        subgraph = G.subgraph(component)
+        # 枚举所有节点排列，找到最长简单路径
+        for path in permutations(subgraph.nodes):
+            if all(subgraph.has_edge(path[i], path[i+1]) for i in range(len(path) - 1)):
+                if len(path) > len(longest_path):
+                    longest_path = path
+    return longest_path
 
-print(type[0]+ str(type[1]))
-# for i in range(D.size):
+# 创建一个无向图
+G = nx.Graph()
+edges = [
+    (1, 2), (2, 3),(2,6), (3, 4), (4, 5), (7, 6),
+    (7, 8), (8, 9), (9,10),(10,11)
+]
+G.add_edges_from(edges)
+
+path = longest_simple_path(G)
+print("Longest Path in Graph:", path)
+print("Longest Path Length:", len(path) - 1)
