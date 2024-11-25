@@ -445,7 +445,7 @@ def build_all_paulis(no_nodes):
 def build_my_paulis(no_nodes):
     result = {}
 
-    mixer_types = ['X','ZZ']
+    mixer_types = ['X','Z','ZZ']
     for mixer in mixer_types:
         if len(mixer) == 1:
             for node in range(no_nodes):

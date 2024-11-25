@@ -1,9 +1,9 @@
 from qiskit import quantum_info as qi
+import networkx as nx
 from scipy import sparse
 import numpy as np
 
-D = np.array([[6,10], [3,5]])
-G = [7,7]
-optimal_value = 16
+type = ['random', 0.5]
 
-print(D.size)
+print(type[0]+ str(type[1]))
+# for i in range(D.size):

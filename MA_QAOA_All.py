@@ -8,15 +8,13 @@ import time
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
     
-def MA_All(no_vertices, depth, seed, graph_type, save = True, minimize_method = 'BFGS'):
+def MA_All(no_vertices, depth, seed, graph_type, save = True, show = True, minimize_method = 'BFGS'):
     gamma_0 = 0.1
     beta_0 = 0.7854
     graph = generate_graphs.generate_graph_type(no_vertices, graph_type, seed)[0]
-    threshold = 10 #超过点数就不用pauli_dict，会爆内存?
 
     no_edges = graph.number_of_edges()
-    if no_vertices < threshold:
-        pauli_ops_dict = build_operators.build_my_paulis(no_vertices)
+    pauli_ops_dict = build_operators.build_my_paulis(no_vertices)
     hamiltonian = build_operators.cut_hamiltonian(graph)
 
     max_cut_solution = useful_methods.find_optimal_cut(graph)
@@ -27,45 +25,46 @@ def MA_All(no_vertices, depth, seed, graph_type, save = True, minimize_method = 
     #! 初始化完成
 
     def obj_func(parameter_values):
-        if no_vertices < threshold:
-            dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_values, depth, pauli_ops_dict, 'All')
-        else:
-            dens_mat = build_operators.build_MA_qaoa_ansatz_without_pauli_dict(graph, parameter_values, depth)
+        dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_values, depth, pauli_ops_dict, 'All')
         expectation_value = (hamiltonian * dens_mat).trace().real
         return expectation_value * (-1.0)
 
-    # start_time = time.time();
+    start_time = time.time()
 
     initial_parameter_guesses = [gamma_0] * (depth * no_edges) + [beta_0] * (depth * no_vertices)
     result = minimize(obj_func, initial_parameter_guesses, method=minimize_method)
 
-    # end_time = time.time();
-    # execution_time = end_time - start_time
-    # hours = int(execution_time // 3600)
-    # minutes = int((execution_time % 3600) // 60)
-    # seconds = execution_time % 60
-    # print(f"Minimize function took {hours}h {minutes}m {seconds:.2f}s.")
+    end_time = time.time()
+    execution_time = end_time - start_time
+    hours = int(execution_time // 3600)
+    minutes = int((execution_time % 3600) // 60)
+    seconds = execution_time % 60
+    print(f"Minimize function took {hours}h {minutes}m {seconds:.2f}s.")
 
     #! 输出结果
     parameter_list = list(result.x)
-    if no_vertices < threshold:
-        dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_list, depth, pauli_ops_dict, 'All')
-    else:
-        dens_mat = build_operators.build_MA_qaoa_ansatz_without_pauli_dict(graph, parameter_list, depth)
+    dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_list, depth, pauli_ops_dict, 'All')
+
     hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
-    print(hamiltonian_expectation)
+    # print(hamiltonian_expectation)
     cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
 
     print(f'layers:{depth} MA-All')
     print('***************')
     print(f'cut_approx_ratio: {cut_approx_ratio}')
-    with open("./results/tmp.csv", "a") as f:
-        f.write(f'MA_QAOA,{no_vertices},{graph_type},{depth},{seed},{cut_approx_ratio}\n')
 
+    #保存结果到csv
+    with open("./results/MA-QAOA/MA-QAOA.csv", "a") as f:
+        f.write(f'MA_QAOA,{no_vertices},{graph_type[0] + str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')
+
+    #保存最优参数
+    with open(f"./results/parameters/{no_vertices}vertex/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}", 'w') as f:
+        f.write(f"max cut: {max_cut_solution[0]}\n")
+        f.write(f'r: {cut_approx_ratio}\n')
+        f.write(parameter_list)
+
+    # 画图
     if(save):
-        with open(f"./results/parameters/{no_vertices}vertex/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}", 'w') as f:
-            f.write(f"max cut: {max_cut_solution[0]}\n")
-            f.write(f'r: {cut_approx_ratio}\n')
         pdf_pages = PdfPages(f"./results/figures/{no_vertices}vertex/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}.pdf")
 
     for layer in range(depth):
@@ -76,15 +75,15 @@ def MA_All(no_vertices, depth, seed, graph_type, save = True, minimize_method = 
             print(f"{key}: {value:.4f}")
         print(f'beta: {[round(num, 4) for num in parameter_list[depth * no_edges + layer * no_vertices:depth * no_edges + (layer + 1) * no_vertices]]}')
 
-        if(save):
-            # save parameters
-            with open(f"./results/parameters/{no_vertices}vertex/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}", 'a') as f:
-                f.write(f'layer {layer + 1:}\n')
-                for key, value in my_dict.items():
-                    f.write(f"{key}: {value:.4f}\n")
-                    my_dict[key] = format(my_dict[key], '.2f')
-                f.write(f'beta: {[round(num, 4) for num in parameter_list[depth * no_edges + layer * no_vertices:depth * no_edges + (layer + 1) * no_vertices]]}\n')
+        # save parameters
+        # with open(f"./results/parameters/{no_vertices}vertex/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}", 'a') as f:
+        #     f.write(f'layer {layer + 1:}\n')
+        #     for key, value in my_dict.items():
+        #         f.write(f"{key}: {value:.4f}\n")
+        #         my_dict[key] = format(my_dict[key], '.2f')
+        #     f.write(f'beta: {[round(num, 4) for num in parameter_list[depth * no_edges + layer * no_vertices:depth * no_edges + (layer + 1) * no_vertices]]}\n')
 
+        if(save or show):
             # draw parameter graph
             plt.clf()
             l_dict = {}
@@ -105,8 +104,11 @@ def MA_All(no_vertices, depth, seed, graph_type, save = True, minimize_method = 
 
             plt.title(f'MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{layer + 1}_seed{seed}  r:{cut_approx_ratio}')
             # plt.savefig(f"./results/figures/{no_vertices}vertex/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}.png")
-            pdf_pages.savefig()
-            plt.close()
+            if(show):
+                plt.show()
+            if(save):
+                pdf_pages.savefig()
+                plt.close()
 
     if(save):
         pdf_pages.close()

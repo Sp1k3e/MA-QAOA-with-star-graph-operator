@@ -1,27 +1,61 @@
 import csv
+import matplotlib.pyplot as plt
 
-a = 0
+depth = 2
+counts = 0
+QAOA = 0
+TR_QAOA = 0
+TR_MA = 0
 MA = 0
-b = 0
-selectMA = 0
-c = 0
-standard = 0
+skip_seed = []
 
-with open('results/tmp.csv', newline='') as f:
+with open('results/QAOA/TR_QAOA.csv', newline='') as f:
     csvreader = csv.reader(f, delimiter=',')
 
+    i = 0
     for row in csvreader:
-        if  'MA_QAOA' in row[0]:
-            MA += float(row[6])
-            a += 1
-        if 'select' in row[0]:
-            selectMA += float(row[6])
-            b += 1
-        if 'standard' in row[0] and int(row[4]) == 1:
-            standard += float(row[6])
-            c += 1
+        if row[-3] == str(depth):
+            if str(i) != row[-2]:
+                skip_seed += [str(i)]
+                i += 1
 
-# print(MA/a)
-# print(b)
-# print(selectMA/b)
-# print(standard/c)
+            i += 1
+            counts += 1
+            TR_QAOA += float(row[-1])
+print(f'skip seed {skip_seed}')    
+    
+with open('results/QAOA/QAOA.csv', newline='') as f:
+    csvreader = csv.reader(f, delimiter=',')
+    for row in csvreader:
+        if row[-3] == str(depth):
+            if row[-2] in skip_seed:
+                continue
+
+            QAOA += float(row[-1])
+
+""" 
+with open('results/MA-QAOA/TR_MA.csv', newline='') as f:
+    csvreader = csv.reader(f, delimiter=',')
+    next(csvreader)
+
+    for row in csvreader:
+        if row[-2] in skip_seed:
+            continue
+
+        TR_MA += float(row[-1])
+
+with open('results/MA-QAOA/MA-QAOA.csv', newline='') as f:
+    csvreader = csv.reader(f, delimiter=',')
+    next(csvreader)
+
+    for row in csvreader:
+        if row[-2] in skip_seed:
+            continue
+
+        MA += float(row[-1])
+ """
+
+print(TR_QAOA)
+print(QAOA)
+# print(TR_MA)
+# print(MA)

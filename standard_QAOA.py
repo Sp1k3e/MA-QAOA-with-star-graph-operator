@@ -3,9 +3,13 @@ from src_code import useful_methods
 from src_code import generate_graphs
 from scipy.optimize import minimize
 import matplotlib.pyplot as plt
+import networkx as nx
 import time
 
 def QAOA(no_vertices, depth, seed, graph_type, save):
+    """
+    standard QAOA
+    """
     graph = generate_graphs.generate_graph_type(no_vertices, graph_type, seed)[0]
 
     gamma_0 = 0.2
@@ -25,30 +29,28 @@ def QAOA(no_vertices, depth, seed, graph_type, save):
         expectation_value = (hamiltonian * dens_mat).trace().real
         return expectation_value * (-1.0)
 
-    start_time = time.time()
+    # start_time = time.time()
 
     initial_parameter_guesses = [gamma_0] * (depth) + [beta_0] * (depth)
     result = minimize(obj_func, initial_parameter_guesses, method="BFGS")
 
-    end_time = time.time()
-    print(f"optimization_time: {round(end_time - start_time, 2)} seconds")
+    # end_time = time.time()
+    # print(f"optimization_time: {round(end_time - start_time, 2)} seconds")
 
     parameter_list = list(result.x)
 
     dens_mat = build_operators.build_standard_qaoa_ansatz(graph, parameter_list, pauli_ops_dict)
     hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
-    ham_approx_ratio = hamiltonian_expectation / max_ham_eigenvalue
     cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
 
     print(f'cut_approx_ratio: {cut_approx_ratio}')
-    print(f'gamma: {parameter_list[:depth]}')
-    print(f'beta: {parameter_list[depth:]}')
-    with open("./results/tmp.csv", "a") as f:
-        f.write(f'standard_QAOA,{no_vertices},{graph_type},{depth},{seed},{cut_approx_ratio}\n')
+    # print(f'gamma: {parameter_list[:depth]}')
+    # print(f'beta: {parameter_list[depth:]}')
 
     if(save):
-        #only save parameters for standard QAOA
-        with open(f"./results/standard/standard{no_vertices}_{depth}random_layer{depth}_seed{seed}", 'a') as f:
-            f.write(f"layers:{depth} standard-QAOA")
-            f.write(f'gamma: {parameter_list[:depth]}')
-            f.write(f'beta: {parameter_list[depth:]}')
+        with open("./results/QAOA/QAOA.csv", "a") as f:
+            f.write(f'standard_QAOA,{no_vertices},{graph_type[0] + str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')
+        # with open(f"./results/standard/standard{no_vertices}_{depth}random_layer{depth}_seed{seed}", 'a') as f:
+        #     f.write(f"layers:{depth} standard-QAOA")
+        #     f.write(f'gamma: {parameter_list[:depth]}')
+        #     f.write(f'beta: {parameter_list[depth:]}')

@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 depth = 1
 save = False
 
-edge_list = [(0,1),(1,2),(2,3)]
+edge_list = [(0,1),(1,2),(3,1)]
 
 graph = nx.Graph()
 graph.add_edges_from(edge_list)

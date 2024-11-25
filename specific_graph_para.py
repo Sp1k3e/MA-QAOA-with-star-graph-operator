@@ -12,7 +12,7 @@ a = 1.5708
 b = 0.7854
 depth = 1
 save = False   
-show = True
+show = False
 
 # no_vertices = 6
 # depth = 1
@@ -50,62 +50,39 @@ parameter_list = [a,-a,a] + [0,b,b,b]
 # parameter_list = [b,b,b,b] + [0,a,0,a,a]
 # save_name = ''
 
+depth = 2
+edge_list = [(0,1), (1,2), (2,3)]
+parameter_list = [0, 1.5708, 0]+[-1.5708, -0.863, -1.5708] + [0.1579, 0.3927, 0.3927, 0.1579] + [0.7854, 1.5708, 1.5708, 0.7854]
+parameter_list = [0, 1.5708, 0]+[-1.5708, -0.863, -1.5708] + [0.1579, 0.3927, 0.3927, 0.1579] + [0.7854, 1.5708, 1.5708, 0.7854]
+
 graph = nx.Graph();
 graph.add_edges_from(edge_list)
 no_vertices = graph.number_of_nodes()
 for index, edge in enumerate(graph.edges()):
     graph.get_edge_data(*edge)['weight'] = 1
 
-no_vertices = 8
-for seed in range(1):
-    graph = generate_graphs.generate_graph_type(no_vertices ,['random', 0.5], seed)[0]
+no_edges = graph.number_of_edges()
 
-    target_graph = graph
-
-    target_edge_list = []
-    for i in range(no_vertices - 1):
-        target_edge_list += [(0, i + 1)]
-
-    # target_edge_list = [(0,1),(0,2),(0,3)]
-    target_graph = nx.Graph();
-    target_graph.add_edges_from(target_edge_list)
-    no_vertices = target_graph.number_of_nodes()
-    for index, edge in enumerate(target_graph.edges()):
-        target_graph.get_edge_data(*edge)['weight'] = 1
+target_graph = graph
 
 
-    no_edges = target_graph.number_of_edges()
-    pauli_ops_dict = build_operators.build_my_paulis(no_vertices) 
-    hamiltonian = build_operators.cut_hamiltonian(graph)
+pauli_ops_dict = build_operators.build_my_paulis(no_vertices) 
+hamiltonian = build_operators.cut_hamiltonian(graph)
+max_cut_solution = useful_methods.find_optimal_cut(graph)
+print(f"max cut: {max_cut_solution[0]}")
+max_cut_value = max_cut_solution[1]
+max_ham_eigenvalue = max_cut_solution[2]
 
-    max_cut_solution = useful_methods.find_optimal_cut(graph)
-    print(f"max cut: {max_cut_solution[0]}")
-    max_cut_value = max_cut_solution[1]
-    max_ham_eigenvalue = max_cut_solution[2]
 
-    parameter_list = []
-    i0 = max_cut_solution[0][0]
-    for i in max_cut_solution[0][1:]:
-        if i == i0:
-            parameter_list += [-a]
-        else:
-            parameter_list += [a]
+#! 直接运行
+dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_list, depth, pauli_ops_dict, 'All')
+hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
+# print(hamiltonian_expectation)
+cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
 
-    parameter_list += [0]
-    for _ in range(no_vertices-1):
-        parameter_list += [b]
-
-    #! 初始化完成
-
-    #! 直接运行
-    dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_list, depth, pauli_ops_dict, 'All')
-    hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
-    # print(hamiltonian_expectation)
-    cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
-
-    print(f'layers:{depth} MA-All specific graph and parameters')
-    print(f'cut_approx_ratio: {cut_approx_ratio}')
-    print('-----------------------------------------------')
+print(f'layers:{depth} MA-All specific graph and parameters')
+print(f'cut_approx_ratio: {cut_approx_ratio}')
+print('-----------------------------------------------')
 
 for layer in range(depth):
     print('-----------------------------------------------')
@@ -135,9 +112,20 @@ for layer in range(depth):
             pos[i] += np.array([0.0, -0.12]) 
         nx.draw_networkx_labels(target_graph, pos, font_color="g", font_size=10)
 
-        plt.title(f'MA manual_input r:{cut_approx_ratio}')
+        plt.title(f'MA subgraph r:{cut_approx_ratio}')
         if show:
             plt.show()
+            plt.clf()
+            nx.draw_networkx_nodes(graph, pos)
+            nx.draw_networkx_edges(graph, pos)
+            for i in range(no_vertices):
+                pos[i] += np.array([-0.06, 0.06]) 
+            nx.draw_networkx_labels(target_graph, pos, {key:value for key, value in zip(range(no_vertices), max_cut_solution[0])}, font_color= "r", alpha=0.8,font_size=10)
+            for i in range(no_vertices):
+                pos[i] += np.array([0.0, -0.12]) 
+            nx.draw_networkx_labels(target_graph, pos, font_color="g", font_size=10)
+            plt.show()
+
         # plt.savefig(f"./results/manual_input{time.time()}.png")
         # plt.savefig(f"./results/specific_target_graph/manual/manual_input{no_vertices}{save_name}.png")
 
