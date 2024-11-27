@@ -70,20 +70,21 @@ print(f'TRMA-QAOA: {sum(TR_MA)/l}')
 print(f'MA-QAOA:   {sum(MA)/l}')
 
 
-all_data = [QAOA, TR_MA, MA]
+all_data = [QAOA, TR_MA, MA, [1]]
 labels = ['QAOA', 'TRMA-QAOA', 'MA-QAOA']
+labels = ['QAOA', 'TRMA-QAOA', 'MA-QAOA', 'star graph MA']
 
-positions = [0.1, 0.2, 0.3]
+positions = [0.1, 0.2, 0.3, 0.4]
 
 
 fig, ax = plt.subplots()
-bplot = ax.boxplot(all_data,patch_artist=True, positions=positions, showfliers=False, widths=0.09)
+bplot = ax.boxplot(all_data,patch_artist=True, positions=positions, showfliers=False, widths=0.08)
 
-colors = ['pink', 'lightblue', 'red']  # 可以根据需要选择更多颜色
+colors = ['pink', 'lightblue', 'red', 'yellow']  # 可以根据需要选择更多颜色
 for patch, color in zip(bplot['boxes'], colors):
     patch.set_facecolor(color)
 
-ax.legend(bplot['boxes'], labels, title="Data Sets")
+ax.legend(bplot['boxes'], labels)
 
 ax.set_title('Approximate Ratio')
 ax.set_xlabel('p')

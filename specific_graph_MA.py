@@ -12,13 +12,13 @@ from matplotlib.backends.backend_pdf import PdfPages
     
 gamma_0 = -0.7854
 beta_0 = 0.7854
-depth = 5
+depth = 1
 save = False
 
-# edge_list = [(0,1), (1,2), (2,3)]
-edge_list = [(0,1), (1,2), (2,3),(3,4)]
+edge_list = [(0,1), (1,2), (2,3)]
+# edge_list = [(0,1), (1,2), (2,3),(3,4)]
 # edge_list = [(0,1), (1,2), (2,3), (1,4),(1,5),(2,6),(6,7),(7,8)] #can't solve in 2 layer
-edge_list = [(0,1), (1,2), (2,3),(3,4),(4,5),(6,7)]
+# edge_list = [(0,1), (1,2), (2,3),(3,4),(4,5),(6,7)]
 # edge_list = [(0,1), (1,2), (0,2)] #三角形
 # edge_list = [(0,1), (1,2), (2,3), (0,3)] #正方形
 # edge_list = [(0,1), (1,2), (0,2), (0,3), (3,4)]
