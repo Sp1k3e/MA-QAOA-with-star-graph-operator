@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 from networkx.algorithms.approximation import steiner_tree
 import time
+from collections import Counter
     
 def mst_MA(no_vertices, depth, seed, graph_type, save = True):
     '''
@@ -441,7 +442,7 @@ def sub_graph_MA(no_vertices, depth, seed, graph_type, save = True):
     random sub graph phase operator MA-QAOA
     '''
 
-def TR_MA(no_vertices, depth, seed, graph_type, save = True):
+def TR_MA(no_vertices, depth, seed, graph_type, TR_type, save = True):
     '''
     triangle removal phase operator MA-QAOA
     '''
@@ -464,11 +465,28 @@ def TR_MA(no_vertices, depth, seed, graph_type, save = True):
     #! 只在目标图上优化
     target_graph = graph
     triangles = [cycle for cycle in nx.cycle_basis(target_graph) if len(cycle) == 3]
-    for triangle in triangles:
-    # 随机移除三角形中的一条边
-        u, v = triangle[0], triangle[1]
-        if target_graph.has_edge(u, v):
-            target_graph.remove_edge(u, v)
+    if(TR_type == 'All'):
+        for triangle in triangles:
+        # 随机移除三角形中的一条边
+            u, v = triangle[0], triangle[1]
+            if target_graph.has_edge(u, v):
+                target_graph.remove_edge(u, v)
+    if(TR_type == 'Most'):
+        # 移除出现在三角形中最多的一条边
+        # triangles = [tuple(sorted(triangle)) for triangle in nx.enumerate_all_cliques(graph) if len(triangle) == 3]
+        
+        # 统计边的出现次数
+        edge_counter = Counter()
+        for triangle in triangles:
+            edges = [(triangle[i], triangle[j]) for i in range(3) for j in range(i+1, 3)]
+            edge_counter.update(edges)
+        
+        # 找到出现次数最多的边
+        max_edge = max(edge_counter, key=edge_counter.get)
+        # max_count = edge_counter[max_edge]
+        
+        target_graph.remove_edge(max_edge[0], max_edge[1])
+
     if nx.is_connected(target_graph) == False:
         print("bad seed, disconnected graph")
         return
@@ -514,12 +532,17 @@ def TR_MA(no_vertices, depth, seed, graph_type, save = True):
     parameter_list = tmp_list
 
     #! 输出所有parameter
-    print(f'layers:{depth} TR_MA')
-    print('***************')
+    print(f'layers:{depth} TR_{TR_type}_MA')
+    # print('***************')
     print(f'cut_approx_ratio: {cut_approx_ratio}')
+    print('----------------------------------------------------')
 
-    with open("./results/MA-QAOA/TR_MA.csv", "a") as f:
-        f.write(f'TR_ALL_MA,{no_vertices},{graph_type[0]+str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')
+    if(save):
+        with open(f"./results/MA-QAOA/TR_{TR_type}_MA.csv", "a") as f:
+            f.write(f'TR_{TR_type}_MA,{no_vertices},{graph_type[0]+str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')
+
+
+
 
 # def MDER_MA(no_vertices, depth, seed, graph_type, save = True):
 

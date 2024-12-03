@@ -70,12 +70,12 @@ print(f'TRMA-QAOA: {sum(TR_MA)/l}')
 print(f'MA-QAOA:   {sum(MA)/l}')
 
 
+#box plot
 all_data = [QAOA, TR_MA, MA, [1]]
 labels = ['QAOA', 'TRMA-QAOA', 'MA-QAOA']
 labels = ['QAOA', 'TRMA-QAOA', 'MA-QAOA', 'star graph MA']
 
 positions = [0.1, 0.2, 0.3, 0.4]
-
 
 fig, ax = plt.subplots()
 bplot = ax.boxplot(all_data,patch_artist=True, positions=positions, showfliers=False, widths=0.08)

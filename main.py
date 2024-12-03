@@ -3,11 +3,11 @@ import heuristic_MA
 import standard_QAOA
 import heuristic_QAOA
 
-n = 12
+n = 8
 seed = 3
 graph_type = ['random', 0.5]
 # graph_type = ['regular', 3]
-save = True
+save = False
 show = False
 
 # minimize_method = 'Nelder-Mead'
@@ -16,13 +16,14 @@ layer = 1
 
 for seed in range(100):
     # print('#')
-    standard_QAOA.QAOA(n, layer, seed, graph_type, save)
+    # standard_QAOA.QAOA(n, layer, seed, graph_type, save)
     # heuristic_QAOA.TR_QAOA(n, layer, seed, graph_type, save)
 
     # MA_QAOA_All.MA_All(n, layer, seed, graph_type, save)
     # heuristic_MA.select_MA(n, layer, seed, graph_type, save) 
     # heuristic_MA.random_select_MA(n, layer, seed, graph_type, save)
-    # heuristic_MA.TR_MA(n, layer, seed, graph_type, save)
+    # heuristic_MA.TR_MA(n, layer, seed, graph_type, 'All',save)
+    heuristic_MA.TR_MA(n, layer, seed, graph_type, 'Most',save)
 
 
 #!standard-QAOA
