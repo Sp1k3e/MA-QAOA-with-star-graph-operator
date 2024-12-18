@@ -7,7 +7,7 @@ n = 8
 seed = 3
 graph_type = ['random', 0.5]
 # graph_type = ['regular', 3]
-save = False
+save = True
 show = False
 
 # minimize_method = 'Nelder-Mead'

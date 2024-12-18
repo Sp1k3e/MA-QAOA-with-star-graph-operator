@@ -502,7 +502,7 @@ def TR_MA(no_vertices, depth, seed, graph_type, TR_type, save = True):
     start_time = time.time()
 
     initial_parameter_guesses = [gamma_0] * (target_graph.number_of_edges() * depth) + [beta_0] * (no_vertices * depth)
-    result = minimize(obj_func, initial_parameter_guesses, method="BFGS")
+    result = minimize(obj_func, initial_parameter_guesses, method="Nelder-Mead")
 
     end_time = time.time()
     execution_time = end_time - start_time
@@ -538,7 +538,7 @@ def TR_MA(no_vertices, depth, seed, graph_type, TR_type, save = True):
     print('----------------------------------------------------')
 
     if(save):
-        with open(f"./results/MA-QAOA/TR_{TR_type}_MA.csv", "a") as f:
+        with open(f"./results/MA-QAOA/TR_{TR_type}_MA_Ne.csv", "a") as f:
             f.write(f'TR_{TR_type}_MA,{no_vertices},{graph_type[0]+str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')
 
 
