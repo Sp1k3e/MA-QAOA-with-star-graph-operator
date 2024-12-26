@@ -38,7 +38,8 @@ with open('results/QAOA/QAOA.csv', newline='') as f:
             QAOA += [float(row[-1])]
 
 # TR-All MA-QAOA
-with open('results/MA-QAOA/TR_All_MA.csv', newline='') as f:
+# with open('results/MA-QAOA/TR_All_MA.csv', newline='') as f:
+with open('results/MA-QAOA/TR_All_MA_Ne.csv', newline='') as f:
     csvreader = csv.reader(f, delimiter=',')
     next(csvreader)
 
@@ -49,7 +50,9 @@ with open('results/MA-QAOA/TR_All_MA.csv', newline='') as f:
 
         TR_All_MA += [float(row[-1])]
 
-with open('results/MA-QAOA/TR_Most_MA.csv', newline='') as f:
+# TR-Most MA-QAOA
+# with open('results/MA-QAOA/TR_Most_MA.csv', newline='') as f:
+with open('results/MA-QAOA/TR_Most_MA_Ne.csv', newline='') as f:
     csvreader = csv.reader(f, delimiter=',')
     next(csvreader)
 
@@ -107,4 +110,6 @@ ax.set_ylabel('AR')
 ax.set_xticks([0.2])
 ax.set_xticklabels(['1'])
 
+# plt.savefig('results/my_plot.eps', format='eps', dpi=1000)
+plt.savefig('results/my_plots.pdf', format='pdf')
 plt.show()

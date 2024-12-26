@@ -29,17 +29,17 @@ def MA_All(no_vertices, depth, seed, graph_type, save = False, show = False, min
         expectation_value = (hamiltonian * dens_mat).trace().real
         return expectation_value * (-1.0)
 
-    # start_time = time.time()
+    start_time = time.time()
 
     initial_parameter_guesses = [gamma_0] * (depth * no_edges) + [beta_0] * (depth * no_vertices)
     result = minimize(obj_func, initial_parameter_guesses, method=minimize_method)
 
-    # end_time = time.time()
-    # execution_time = end_time - start_time
-    # hours = int(execution_time // 3600)
-    # minutes = int((execution_time % 3600) // 60)
-    # seconds = execution_time % 60
-    # print(f"Minimize function took {hours}h {minutes}m {seconds:.2f}s.")
+    end_time = time.time()
+    execution_time = end_time - start_time
+    hours = int(execution_time // 3600)
+    minutes = int((execution_time % 3600) // 60)
+    seconds = execution_time % 60
+    print(f"Minimize function took {hours}h {minutes}m {seconds:.2f}s.")
 
     #! 输出结果
     parameter_list = list(result.x)
@@ -52,14 +52,17 @@ def MA_All(no_vertices, depth, seed, graph_type, save = False, show = False, min
     print(f'cut_approx_ratio: {cut_approx_ratio}')
 
     #保存结果到csv
-    with open(f"./results/MA-QAOA/MA-QAOA{depth}.csv", "a") as f:
-        f.write(f'MA_QAOA,{no_vertices},{graph_type[0] + str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')
+    # with open(f"./results/MA-QAOA/MA-QAOA{depth}.csv", "a") as f:
+        # f.write(f'MA_QAOA,{no_vertices},{graph_type[0] + str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')
+
+    with open(f"./results/parameters/MA-QAOA{depth}.csv", "a") as f:
+        f.write(f'MA_QAOA,{no_vertices},{graph_type[0] + str(graph_type[1])},{depth},{seed},{cut_approx_ratio}, {execution_time}, {list(map(float,parameter_list))}\n')
 
     #保存最优参数
     # with open(f"./results/parameters/{no_vertices}vertex/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}", 'w') as f:
     #     f.write(f"max cut: {max_cut_solution[0]}\n")
     #     f.write(f'r: {cut_approx_ratio}\n')
-    #     f.write(parameter_list)
+        # f.write(parameter_list)
 
     # 画图
     if(save or show):

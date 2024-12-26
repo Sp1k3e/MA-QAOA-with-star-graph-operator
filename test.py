@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from collections import Counter
 
 
-seed = 1
+seed = 0
 
 G = nx.Graph()
 G = generate_graphs.generate_graph_type(8,['random',0.5],seed)[0]

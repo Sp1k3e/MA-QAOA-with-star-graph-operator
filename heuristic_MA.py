@@ -531,7 +531,6 @@ def TR_MA(no_vertices, depth, seed, graph_type, TR_type, save = True):
     tmp_list += parameter_list[i:]
     parameter_list = tmp_list
 
-    #! 输出所有parameter
     print(f'layers:{depth} TR_{TR_type}_MA')
     # print('***************')
     print(f'cut_approx_ratio: {cut_approx_ratio}')
@@ -540,7 +539,6 @@ def TR_MA(no_vertices, depth, seed, graph_type, TR_type, save = True):
     if(save):
         with open(f"./results/MA-QAOA/TR_{TR_type}_MA_Ne.csv", "a") as f:
             f.write(f'TR_{TR_type}_MA,{no_vertices},{graph_type[0]+str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')
-
 
 
 
