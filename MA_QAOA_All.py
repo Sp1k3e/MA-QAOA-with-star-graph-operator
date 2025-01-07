@@ -52,11 +52,12 @@ def MA_All(no_vertices, depth, seed, graph_type, save = False, show = False, min
     print(f'cut_approx_ratio: {cut_approx_ratio}')
 
     #保存结果到csv
-    # with open(f"./results/MA-QAOA/MA-QAOA{depth}.csv", "a") as f:
-        # f.write(f'MA_QAOA,{no_vertices},{graph_type[0] + str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')
+    with open(f"./results/MA-QAOA/MA-QAOA{depth}.csv", "a") as f:
+        f.write(f'MA_QAOA,{no_vertices},{graph_type[0] + str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')
 
-    with open(f"./results/parameters/MA-QAOA{depth}.csv", "a") as f:
-        f.write(f'MA_QAOA,{no_vertices},{graph_type[0] + str(graph_type[1])},{depth},{seed},{cut_approx_ratio}, {execution_time}, {list(map(float,parameter_list))}\n')
+    if depth == 1:
+        with open(f"./results/parameters/MA-QAOA{depth}.csv", "a") as f:
+            f.write(f'MA_QAOA,{no_vertices},{graph_type[0] + str(graph_type[1])},{depth},{seed},{cut_approx_ratio}, {execution_time}, {list(map(float,parameter_list))}\n')
 
     #保存最优参数
     # with open(f"./results/parameters/{no_vertices}vertex/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}", 'w') as f:
@@ -65,7 +66,7 @@ def MA_All(no_vertices, depth, seed, graph_type, save = False, show = False, min
         # f.write(parameter_list)
 
     # 画图
-    if(save or show):
+    if(save and show):
         pdf_pages = PdfPages(f"./results/figures/{no_vertices}vertex/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}.pdf")
         for layer in range(depth):
             print('-----------------------------------------------')

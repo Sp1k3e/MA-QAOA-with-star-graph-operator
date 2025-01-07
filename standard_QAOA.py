@@ -48,7 +48,7 @@ def QAOA(no_vertices, depth, seed, graph_type, save):
     # print(f'beta: {parameter_list[depth:]}')
 
     if(save):
-        with open("./results/QAOA/QAOA.csv", "a") as f:
+        with open(f"./results/QAOA/QAOA_{depth}.csv", "a") as f:
             f.write(f'standard_QAOA,{no_vertices},{graph_type[0] + str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')
         # with open(f"./results/standard/standard{no_vertices}_{depth}random_layer{depth}_seed{seed}", 'a') as f:
         #     f.write(f"layers:{depth} standard-QAOA")
