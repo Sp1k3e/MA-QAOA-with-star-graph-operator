@@ -6,6 +6,7 @@ from collections import Counter
 def find_edge_in_most_triangles(graph):
     # 获取所有三角形
     triangles = [tuple(sorted(triangle)) for triangle in nx.enumerate_all_cliques(graph) if len(triangle) == 3]
+    print(triangles)
     
     # 统计边的出现次数
     edge_counter = Counter()
@@ -19,9 +20,8 @@ def find_edge_in_most_triangles(graph):
     
     return max_edge, max_count
 
-seed = 1
 
-for seed in range(100):
+for seed in range(10):
     G = nx.Graph()
     G = generate_graphs.generate_graph_type(8,['random',0.5],seed)[0]
 
@@ -36,7 +36,7 @@ for seed in range(100):
 
     result = find_edge_in_most_triangles(G)
     # print(G.edges())
-    # print(f"出现次数最多的边是 {result[0]}，出现在 {result[1]} 个三角形中")
+    print(f"出现次数最多的边是 {result[0]}，出现在 {result[1]} 个三角形中")
     # print(result[0][0], result[0][1])
     # G.remove_edge(result[0][0], result[0][1])
     # print(G.edges())
@@ -55,8 +55,3 @@ for seed in range(100):
             # G.remove_edge(u, v)
             removed_edge += [(u,v)]
 
-    if (result[0] in removed_edge):
-        print('true')
-        # continue
-    else:
-        print('false')

@@ -6,7 +6,7 @@ n = '8'
 depth = '1'
 
 graph_type = 'random0.5'
-# graph_type = 'random0.7'
+graph_type = 'random0.7'
 
 counts = 0
 TR_QAOA = []
@@ -21,10 +21,10 @@ TR_Most_MA2 = []
 TR_All_MA2 = []
 MA2 = []
 
-skip_seed = ['25', '56', '85', '92']
+# skip_seed = ['25', '56', '85', '92']
 
 # TR-QAOA
-# skip_seed = []
+skip_seed = []
 # with open('results/QAOA/TR_QAOA.csv', newline='') as f:
 #     csvreader = csv.reader(f, delimiter=',')
 
@@ -59,6 +59,7 @@ with open(f'results/QAOA/QAOA_2.csv', newline='') as f:
                 continue
 
             QAOA2 += [float(row[-1])]
+
 # TR-All MA-QAOA
 # with open('results/MA-QAOA/TR_All_MA.csv', newline='') as f:
 with open(f'results/MA-QAOA/TR_All_MA_Ne_{depth}.csv', newline='') as f:
@@ -150,7 +151,7 @@ positions = [0.1, 0.2, 0.3, 0.4, 0.8,0.9,1.0,1.1]
 fig, ax = plt.subplots()
 bplot = ax.boxplot(all_data,patch_artist=True, positions=positions, showfliers=False, widths=0.08)
 # 虚线
-plt.axhline(y=1, color='black', linestyle='--', label='Horizontal Dashed Line')
+plt.axhline(y=1, color='black', linestyle='--', linewidth = 0.8, label='Horizontal Dashed Line')
 
 colors = ['pink', 'green', 'lightblue', 'red','pink', 'green', 'lightblue', 'red']  # 可以根据需要选择更多颜色
 for patch, color in zip(bplot['boxes'], colors):
