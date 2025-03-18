@@ -144,19 +144,21 @@ with open(f'results/MA-QAOA/MA-QAOA2.csv', newline='') as f:
 
 
 #box plot
+# print(MA2)
 all_data = [QAOA, TR_Most_MA, TR_All_MA, MA, QAOA2, TR_Most_MA2, TR_All_MA2, MA2]
 # labels = ['QAOA', 'TRMA-QAOA', 'MA-QAOA']
 labels = ['QAOA', 'TR-Most MA-QAOA', 'TR-All MA-QAOA', 'MA-QAOA', 'QAOA', 'TR-Most MA-QAOA', 'TR-All MA-QAOA', 'MA-QAOA']
 
-positions = [1,1.5,2,2.5,5,5.5,6,6.5]
+positions = [1,1.5,2,2.5, 5,5.5,6,6.5]
 
 
 fig, ax = plt.subplots()
-bplot = ax.boxplot(all_data,patch_artist=True, positions=positions, showfliers=False, medianprops={'color': 'orange', 'linewidth': 1.6}, widths=0.45)
+# boxplot
+bplot = ax.boxplot(all_data,patch_artist=True, positions=positions,  medianprops={'color': 'orange', 'linewidth': 1.6}, widths=0.45)
 # 虚线
 plt.axhline(y=1, color='black', linestyle='--', linewidth = 0.8, label='Horizontal Dashed Line')
 
-colors = ['pink', 'green', 'lightblue', 'red','pink', 'green', 'lightblue', 'red']  # 可以根据需要选择更多颜色
+colors = ['pink', 'green', 'lightblue', 'red','pink', 'green', 'lightblue', 'red']  # 颜色
 for patch, color in zip(bplot['boxes'], colors):
     patch.set_facecolor(color)
 
@@ -182,20 +184,20 @@ ax.set_xticklabels(['1', '2'])
 plt.tight_layout()
 # plt.savefig('results/my_plot.eps', format='eps', dpi=1000)
 # plt.savefig('results/my_plots.pdf', format='pdf')
-# plt.show()
+plt.show()
 
 
 print(graph_type)
 
 #! 平均结果
-all_data_name = ['QAOA', 'TR_Most_MA', 'TR_All_MA', 'MA', 'QAOA2', 'TR_Most_MA2', 'TR_All_MA2', 'MA2']
-j = 0
-for l in all_data:
-    result = 0
-    for i in l:
-        result += i
-    print(f'{all_data_name[j]}: {result/len(l)}')
-    j += 1
+# all_data_name = ['QAOA', 'TR_Most_MA', 'TR_All_MA', 'MA', 'QAOA2', 'TR_Most_MA2', 'TR_All_MA2', 'MA2']
+# j = 0
+# for l in all_data:
+#     result = 0
+#     for i in l:
+#         result += i
+#     print(f'{all_data_name[j]}: {result/len(l)}')
+#     j += 1
 
 #! 和原版效果一样的例子
 # n = len(TR_All_MA)
