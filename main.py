@@ -13,9 +13,9 @@ show = False
 
 # minimize_method = 'Nelder-Mead'
 minimize_method = 'BFGS'
-layer = 1
+layer = 2
 
-for seed in range(51,100):
+for seed in range(54,100):
     # print('#')
     # standard_QAOA.QAOA(n, layer, seed, graph_type, save)
     # heuristic_QAOA.TR_QAOA(n, layer, seed, graph_type, save)
