@@ -6,7 +6,7 @@ n = '8'
 # depth = '1'
 
 graph_type = 'random0.5'
-# graph_type = 'random0.7'
+graph_type = 'random0.7'
 
 counts = 0
 TR_QAOA = []
@@ -153,8 +153,8 @@ positions = [1,1.5,2,2.5, 5,5.5,6,6.5]
 
 
 fig, ax = plt.subplots()
-# boxplot
-bplot = ax.boxplot(all_data,patch_artist=True, positions=positions,  medianprops={'color': 'orange', 'linewidth': 1.6}, widths=0.45)
+# boxplot fliter控制离异点
+bplot = ax.boxplot(all_data,patch_artist=True,positions=positions,  medianprops={'color': 'orange', 'linewidth': 1.6}, widths=0.45)
 # 虚线
 plt.axhline(y=1, color='black', linestyle='--', linewidth = 0.8, label='Horizontal Dashed Line')
 
@@ -184,6 +184,7 @@ ax.set_xticklabels(['1', '2'])
 plt.tight_layout()
 # plt.savefig('results/my_plot.eps', format='eps', dpi=1000)
 # plt.savefig('results/my_plots.pdf', format='pdf')
+
 plt.show()
 
 
