@@ -25,6 +25,8 @@ def TR_QAOA(no_vertices, depth, seed, graph_type, save):
 
     #! phase operator
     target_graph = graph
+
+    # TR_Most
     """ 
     triangles = [cycle for cycle in nx.cycle_basis(target_graph) if len(cycle) == 3]
     for triangle in triangles:
@@ -33,6 +35,7 @@ def TR_QAOA(no_vertices, depth, seed, graph_type, save):
             target_graph.remove_edge(u, v)
     """
 
+    # TR_All
     while [cycle for cycle in nx.cycle_basis(target_graph) if len(cycle) == 3]:
         c = [cycle for cycle in nx.cycle_basis(target_graph) if len(cycle) == 3][0]
         u, v = c[0], c[1]

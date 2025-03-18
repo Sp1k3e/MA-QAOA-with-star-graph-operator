@@ -441,6 +441,79 @@ def sub_graph_MA(no_vertices, depth, seed, graph_type, save = True):
     '''
     random sub graph phase operator MA-QAOA
     '''
+    gamma_0 = 1.5708
+    beta_0 = 0.7854
+    graph = generate_graphs.generate_graph_type(no_vertices, graph_type, seed)[0]
+    if nx.is_connected(graph) == False:
+        print("bad seed, disconnected graph")
+        return
+
+    no_edges = graph.number_of_edges()
+    pauli_ops_dict = build_operators.build_my_paulis(no_vertices) 
+    hamiltonian = build_operators.cut_hamiltonian(graph)
+
+    max_cut_solution = useful_methods.find_optimal_cut(graph)
+    max_cut_value = max_cut_solution[1]
+    max_ham_eigenvalue = max_cut_solution[2]
+    #! 初始化完成------------------------------------------------
+
+    #! 只在目标图上优化
+    target_graph = nx.minimum_spanning_tree(graph)
+
+    if nx.is_connected(target_graph) == False:
+        print("bad seed, disconnected graph")
+        return
+    selected_e = target_graph.edges()
+    # print(f'selected edges:{selected_e}')
+
+
+    def obj_func(parameter_values):
+        dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_values, depth, pauli_ops_dict, 'All')
+        expectation_value = (hamiltonian * dens_mat).trace().real
+        return expectation_value * (-1.0)
+
+    start_time = time.time()
+
+    initial_parameter_guesses = [gamma_0] * (target_graph.number_of_edges() * depth) + [beta_0] * (no_vertices * depth)
+    #! Nelder-Mead比BFDS好很多
+    result = minimize(obj_func, initial_parameter_guesses, method="Nelder-Mead")
+
+    end_time = time.time()
+    execution_time = end_time - start_time
+    hours = int(execution_time // 3600)
+    minutes = int((execution_time % 3600) // 60)
+    seconds = execution_time % 60
+    print(f"Minimize function took {hours}h {minutes}m {seconds:.2f}s.")
+
+    #! 输出结果
+    parameter_list = list(result.x)
+    dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_list, depth, pauli_ops_dict, 'All')
+    hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
+    cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
+    # print(parameter_list)
+
+    tmp_list = []
+    i = 0
+    #! 填充parameter_list中的gamma为0的边
+    for _ in range(depth):
+        for edge in graph.edges():
+            if edge not in selected_e:
+                tmp_list += [0]
+            else: 
+                tmp_list += [parameter_list[i]]
+                i += 1
+    tmp_list += parameter_list[i:]
+    parameter_list = tmp_list
+
+    print(f'layers:{depth} subgraph_MA')
+    # print('***************')
+    print(f'cut_approx_ratio: {cut_approx_ratio}')
+    print('----------------------------------------------------')
+
+    if(save):
+        with open(f"./results/MA-QAOA/subgraph_MA_Ne_{depth}.csv", "a") as f:
+            f.write(f'subgraph_MA,{no_vertices},{graph_type[0]+str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')
+
 
 def TR_MA(no_vertices, depth, seed, graph_type, TR_type, save = True):
     '''
@@ -471,10 +544,9 @@ def TR_MA(no_vertices, depth, seed, graph_type, TR_type, save = True):
             u, v = triangle[0], triangle[1]
             if target_graph.has_edge(u, v):
                 target_graph.remove_edge(u, v)
+
     if(TR_type == 'Most'):
         # 移除出现在三角形中最多的一条边
-        # triangles = [tuple(sorted(triangle)) for triangle in nx.enumerate_all_cliques(graph) if len(triangle) == 3]
-        
         # 统计边的出现次数
         edge_counter = Counter()
         for triangle in triangles:
@@ -495,7 +567,7 @@ def TR_MA(no_vertices, depth, seed, graph_type, TR_type, save = True):
 
 
     def obj_func(parameter_values):
-        dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_values, 1, pauli_ops_dict, 'All')
+        dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_values, depth, pauli_ops_dict, 'All')
         expectation_value = (hamiltonian * dens_mat).trace().real
         return expectation_value * (-1.0)
 
@@ -514,7 +586,7 @@ def TR_MA(no_vertices, depth, seed, graph_type, TR_type, save = True):
 
     #! 输出结果
     parameter_list = list(result.x)
-    dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_list, 1, pauli_ops_dict, 'All')
+    dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_list, depth, pauli_ops_dict, 'All')
     hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
     cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
     # print(parameter_list)
@@ -537,9 +609,9 @@ def TR_MA(no_vertices, depth, seed, graph_type, TR_type, save = True):
     print(f'cut_approx_ratio: {cut_approx_ratio}')
     print('----------------------------------------------------')
 
-    # if(save):
-    with open(f"./results/MA-QAOA/TR_{TR_type}_MA_Ne_{depth}.csv", "a") as f:
-        f.write(f'TR_{TR_type}_MA,{no_vertices},{graph_type[0]+str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')
+    if(save):
+        with open(f"./results/MA-QAOA/TR_{TR_type}_MA_Ne_{depth}.csv", "a") as f:
+            f.write(f'TR_{TR_type}_MA,{no_vertices},{graph_type[0]+str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')
 
 
 
@@ -572,7 +644,7 @@ def longest_path_MA(no_vertices, depth, seed, graph_type, save = True):
 
 
     def obj_func(parameter_values):
-        dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_values, 1, pauli_ops_dict, 'All')
+        dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_values, depth, pauli_ops_dict, 'All')
         expectation_value = (hamiltonian * dens_mat).trace().real
         return expectation_value * (-1.0)
 
@@ -590,7 +662,7 @@ def longest_path_MA(no_vertices, depth, seed, graph_type, save = True):
 
     #! 输出结果
     parameter_list = list(result.x)
-    dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_list, 1, pauli_ops_dict, 'All')
+    dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_list, depth, pauli_ops_dict, 'All')
     hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
     cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
     # print(parameter_list)
@@ -615,3 +687,73 @@ def longest_path_MA(no_vertices, depth, seed, graph_type, save = True):
 
     with open("./results/MA-QAOA/TR_MA.csv", "a") as f:
         f.write(f'TR_ALL_MA,{no_vertices},{graph_type[0]+str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')
+
+
+def complete_MA(no_vertices, depth, seed, graph_type, TR_type, save = True):
+    '''
+    complete graph phase operator MA-QAOA
+    '''
+    gamma_0 = 1.5708
+    beta_0 = 0.7854
+    graph = generate_graphs.generate_graph_type(no_vertices, graph_type, seed)[0]
+    if nx.is_connected(graph) == False:
+        print("bad seed, disconnected graph")
+        return
+
+    no_edges = graph.number_of_edges()
+    pauli_ops_dict = build_operators.build_my_paulis(no_vertices) 
+    hamiltonian = build_operators.cut_hamiltonian(graph)
+
+    max_cut_solution = useful_methods.find_optimal_cut(graph)
+    max_cut_value = max_cut_solution[1]
+    max_ham_eigenvalue = max_cut_solution[2]
+    #! 初始化完成------------------------------------------------
+
+    #! 只在目标图上优化
+    target_graph = nx.complete_graph(no_vertices)
+
+    weights = [1 for i in range(len(target_graph.edges()))]
+    for index, edge in enumerate(target_graph.edges()):
+        target_graph.get_edge_data(*edge)['weight'] = weights[index]
+
+    if nx.is_connected(target_graph) == False:
+        print("bad seed, disconnected graph")
+        return
+    selected_e = target_graph.edges()
+    # print(f'selected edges:{selected_e}')
+
+
+    def obj_func(parameter_values):
+        dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_values, depth, pauli_ops_dict, 'All')
+        expectation_value = (hamiltonian * dens_mat).trace().real
+        return expectation_value * (-1.0)
+
+    start_time = time.time()
+
+    initial_parameter_guesses = [gamma_0] * (target_graph.number_of_edges() * depth) + [beta_0] * (no_vertices * depth)
+    #! Nelder-Mead比BFDS好很多
+    result = minimize(obj_func, initial_parameter_guesses, method="Nelder-Mead")
+
+    end_time = time.time()
+    execution_time = end_time - start_time
+    hours = int(execution_time // 3600)
+    minutes = int((execution_time % 3600) // 60)
+    seconds = execution_time % 60
+    print(f"Minimize function took {hours}h {minutes}m {seconds:.2f}s.")
+
+    #! 输出结果
+    parameter_list = list(result.x)
+    dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_list, depth, pauli_ops_dict, 'All')
+    hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
+    cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
+    # print(parameter_list)
+
+    
+
+    print(f'layers:{depth} TR_{TR_type}_MA')
+    print(f'cut_approx_ratio: {cut_approx_ratio}')
+    print('----------------------------------------------------')
+
+    if(save):
+        with open(f"./results/MA-QAOA/complete_MA_Ne_{depth}.csv", "a") as f:
+            f.write(f'complete_MA,{no_vertices},{graph_type[0]+str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')

@@ -1,7 +1,6 @@
 # MA-QAOA
 
 todo
-- 存结果前看已知结果存不存在
 
 
 ## 1-layer
@@ -19,6 +18,5 @@ todo
 再确定中间的每一点和最边上点的关系  
 
 ## 2-layer
-和longest length有关？
-能解决一条直线上五个点
-六个点以上不行
+为什么TR MA-QAOA多层效果比TR QAOA差
+会不会是卡在local minimal上，试一下小图上的性能

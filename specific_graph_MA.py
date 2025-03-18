@@ -12,10 +12,10 @@ from matplotlib.backends.backend_pdf import PdfPages
     
 gamma_0 = -0.7854
 beta_0 = 0.7854
-depth = 1
+depth = 2
 save = False
 
-edge_list = [(0,1), (1,2), (2,3)]
+# edge_list = [(0,1), (1,2), (2,3)]
 # edge_list = [(0,1), (1,2), (2,3),(3,4)]
 # edge_list = [(0,1), (1,2), (2,3), (1,4),(1,5),(2,6),(6,7),(7,8)] #can't solve in 2 layer
 # edge_list = [(0,1), (1,2), (2,3),(3,4),(4,5),(6,7)]
@@ -26,6 +26,7 @@ edge_list = [(0,1), (1,2), (2,3)]
 
 # edge_list = [(0,7), (3,7), (5,7), (2,7), (1,7), (2,3), (2,1), (1,6),(2,6),(5,6), (3,4), (4,6)]
 # edge_list = [(0,1), (0,2), (1,2), (1,3),(2,3), (0,4), (0,5), (0,6)]
+edge_list = [(0,1),(1,2),(2,3),(3,4),(4,5),(5,6),(6,7),(0,7)]
 
 graph = nx.Graph();
 graph.add_edges_from(edge_list)
@@ -53,11 +54,10 @@ def obj_func(parameter_values):
 initial_parameter_guesses = [gamma_0] * (depth * no_edges) + [beta_0] * (depth * no_vertices)
 bounds = [(-3.1416, 3.1416)] * (depth * no_edges) + [(0, 6.2832)] * (depth * no_vertices)
 # result = minimize(obj_func, initial_parameter_guesses,  method="BFGS")
-result = minimize(obj_func, initial_parameter_guesses, bounds=bounds, method="L-BFGS-B")
+result = minimize(obj_func, initial_parameter_guesses, bounds=bounds, method="Nelder-Mead")
 
 #! 输出结果
 parameter_list = list(result.x)
-#todo 单独计算每层ap
 dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_list, depth, pauli_ops_dict, 'All')
 hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
 cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
