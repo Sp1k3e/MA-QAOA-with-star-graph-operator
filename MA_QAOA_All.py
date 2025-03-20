@@ -25,8 +25,17 @@ def MA_All(no_vertices, depth, seed, graph_type, save = False, show = False, min
     #! 初始化完成
 
     def obj_func(parameter_values):
+        start_time = time.time()
+
         dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_values, depth, pauli_ops_dict, 'All')
         expectation_value = (hamiltonian * dens_mat).trace().real
+
+        end_time = time.time()
+        execution_time = end_time - start_time
+        minutes = int((execution_time % 3600) // 60)
+        seconds = execution_time % 60
+        print(f"One round simulation took {minutes}m {seconds:.2f}s.")
+
         return expectation_value * (-1.0)
 
     start_time = time.time()
@@ -48,16 +57,24 @@ def MA_All(no_vertices, depth, seed, graph_type, save = False, show = False, min
     hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
     cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
 
-    print('***************')
+    # print('***************')
+    print(f'total iteration: {result.nit}')
     print(f'cut_approx_ratio: {cut_approx_ratio}')
 
     #保存结果到csv
-    with open(f"./results/MA-QAOA/MA-QAOA{depth}.csv", "a") as f:
-        f.write(f'MA_QAOA,{no_vertices},{graph_type[0] + str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')
+    # if(save):
+        # with open(f"./results/MA-QAOA/MA-QAOA{depth}.csv", "a") as f:
+            # f.write(f'MA_QAOA,{no_vertices},{graph_type[0] + str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')
 
-    if depth == 1:
-        with open(f"./results/parameters/MA-QAOA{depth}.csv", "a") as f:
-            f.write(f'MA_QAOA,{no_vertices},{graph_type[0] + str(graph_type[1])},{depth},{seed},{cut_approx_ratio}, {execution_time}, {list(map(float,parameter_list))}\n')
+    if(save):
+        with open("./results/tmp_rounds.csv", "a") as f:
+            f.write(f'MA-QAOA,{no_vertices},{graph_type},{depth},{seed},{cut_approx_ratio}, {result.nit}, {execution_time}\n')
+    
+
+    # 保存参数
+    # if depth == 1:
+    #     with open(f"./results/parameters/MA-QAOA{depth}.csv", "a") as f:
+    #         f.write(f'MA_QAOA,{no_vertices},{graph_type[0] + str(graph_type[1])},{depth},{seed},{cut_approx_ratio}, {execution_time}, {list(map(float,parameter_list))}\n')
 
     #保存最优参数
     # with open(f"./results/parameters/{no_vertices}vertex/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}", 'w') as f:

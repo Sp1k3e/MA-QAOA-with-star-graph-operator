@@ -8,6 +8,21 @@ from scipy import sparse
 import math
 from src_code import useful_methods
 
+def initial_density_matrix(no_qubits):
+    """
+    Returns density matrix corresponding to the initial state for QAOA algorithms.
+
+    Parameters:
+        no_qubits - number of qubits in system
+    Returns:
+        dens_mat - DensityMatrix Instance
+    """
+
+    dim = 2**no_qubits
+    dens_mat = qi.DensityMatrix(np.full((dim, dim), 1/dim))
+
+    return sparse.csr_matrix(dens_mat.data)
+
 def MIS_hamiltonian(graph):
     """
     return MIS hamiltonian
@@ -39,8 +54,29 @@ def MIS_hamiltonian(graph):
 
 
 def uncontrained_MIS_hamiltonian(graph):
+    """
+    cost Hamiltonian
+    """
 
 
 
 
 def build_MIS_QAOAnsatz(graph, parameter_list, pauli_dict):
+
+    no_layers = len(parameter_list) // 2
+    ham_parameters = parameter_list[:no_layers]
+    mixer_parameters = parameter_list[no_layers:]
+    
+    no_qubits = graph.number_of_nodes()
+
+    dens_mat = initial_density_matrix(no_qubits)
+
+    for layer in range(no_layers):
+
+        cut_unit = cut_unitary(graph, ham_parameters[layer], pauli_dict)
+        dens_mat = (cut_unit * dens_mat) * (cut_unit.transpose().conj())
+    
+        mix_unit = mixer_unitary('standard_x', mixer_parameters[layer], pauli_dict, no_qubits)
+        dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
+
+    return dens_mat

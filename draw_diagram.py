@@ -14,6 +14,7 @@ TR_QAOA = []
 QAOA = []
 TR_Most_MA = []
 TR_All_Most_MA = []
+TR_All_Most_MA = []
 TR_All_MA = []
 MA = []
 
@@ -99,6 +100,18 @@ with open(f'results/MA-QAOA/TR_All_without_Most_MA_Ne_1.csv', newline='') as f:
             else:
                 TR_All_Most_MA += [float(row[-1])]
 
+
+with open(f'results/MA-QAOA/TR_All_without_Most_MA_Ne_1.csv', newline='') as f:
+    csvreader = csv.reader(f, delimiter=',')
+    next(csvreader)
+
+    for row in csvreader:
+        if row[-3] == '1' and row[1] == n and row[2] == graph_type:
+            if row[-2] in skip_seed:
+                continue
+            else:
+                TR_All_Most_MA += [float(row[-1])]
+
 # TR-Most MA-QAOA
 # with open('results/MA-QAOA/TR_Most_MA.csv', newline='') as f:
 with open(f'results/MA-QAOA/TR_Most_MA_Ne_1.csv', newline='') as f:
@@ -158,8 +171,8 @@ with open(f'results/MA-QAOA/MA-QAOA2.csv', newline='') as f:
 
 #box plot
 # print(MA2)
-all_data = [QAOA, TR_Most_MA, TR_All_MA, MA, QAOA2, TR_Most_MA2, TR_All_MA2, MA2]
-# all_data = [QAOA, TR_All_Most_MA, TR_All_MA, MA, QAOA2, TR_Most_MA2, TR_All_MA2, MA2]
+# all_data = [QAOA, TR_Most_MA, TR_All_MA, MA, QAOA2, TR_Most_MA2, TR_All_MA2, MA2]
+all_data = [QAOA, TR_All_Most_MA, TR_All_MA, MA, QAOA2, TR_Most_MA2, TR_All_MA2, MA2]
 # labels = ['QAOA', 'TRMA-QAOA', 'MA-QAOA']
 labels = ['QAOA', 'TR-Most MA-QAOA', 'TR-All MA-QAOA', 'MA-QAOA', 'QAOA', 'TR-Most MA-QAOA', 'TR-All MA-QAOA', 'MA-QAOA']
 
@@ -199,7 +212,7 @@ plt.tight_layout()
 # plt.savefig('results/my_plot.eps', format='eps', dpi=1000)
 # plt.savefig('results/my_plots.pdf', format='pdf')
 
-plt.show()
+# plt.show()
 
 
 print(graph_type)
@@ -214,18 +227,18 @@ print(graph_type)
 #     print(f'{all_data_name[j]}: {result/len(l)}')
 #     j += 1
 
-#! 和原版效果一样的例子
-# n = len(TR_All_MA)
-# same = 0
+#! TR-All和原版效果一样的例子
+n = len(TR_All_MA)
+same = 0
 
-# for i in range(n):
-#     if abs(TR_All_MA[i] - MA[i]) <= 0.005:
-#     # if TR_All_MA[i] > MA[i]: 
-#         # print(TR_All_MA[i] - MA[i])
-#         same += 1
+for i in range(n):
+    if abs(TR_All_MA2[i] - MA2[i]) <= 0.005:
+    # if TR_All_MA[i] > MA[i]: #greater 
+        # print(TR_All_MA[i] - MA[i])
+        same += 1
 
-# print(n)
-# print(same)
+print(n)
+print(same)
 
 # same = 0
 # n = len(MA2)

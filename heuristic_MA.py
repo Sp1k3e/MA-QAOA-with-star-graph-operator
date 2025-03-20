@@ -336,7 +336,7 @@ def star_graph_MA(no_vertices, depth, seed, graph_type, save = True):
     for i in range(no_vertices - 1):
         selected_e += [(0, i + 1)]
 
-    print(f'selected edges:{selected_e}')
+    # print(f'selected edges:{selected_e}')
     
     #! 只在目标图上优化
     target_graph = nx.Graph()
@@ -354,6 +354,7 @@ def star_graph_MA(no_vertices, depth, seed, graph_type, save = True):
 
     initial_parameter_guesses = [gamma_0] * (target_graph.number_of_edges() * depth) + [beta_0] * (no_vertices * depth)
     result = minimize(obj_func, initial_parameter_guesses, method="BFGS")
+    # result = minimize(obj_func, initial_parameter_guesses, method="Nelder-Mead")
 
     end_time = time.time()
     execution_time = end_time - start_time
@@ -367,7 +368,7 @@ def star_graph_MA(no_vertices, depth, seed, graph_type, save = True):
     dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_list, 1, pauli_ops_dict, 'All')
     hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
     cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
-    print(parameter_list)
+    # print(parameter_list)
 
     tmp_list = []
     i = 0
@@ -382,18 +383,20 @@ def star_graph_MA(no_vertices, depth, seed, graph_type, save = True):
     tmp_list += parameter_list[i:]
     parameter_list = tmp_list
 
-    #! 输出所有parameter
-    print(f'layers:{depth} random_select_MA')
-    print('***************')
+    #! 输出结果
+    print(f'layers:{depth} star_graph_MA')
+    print(f'total iteration: {result.nit}')
     print(f'cut_approx_ratio: {cut_approx_ratio}')
-    with open("./results/tmp.csv", "a") as f:
-        f.write(f'heuristic_select,{no_vertices},{graph_type},{depth},{seed},{cut_approx_ratio}\n')
-    # 保存最优参数
-    if(save):
-        with open(f"./results/parameters/heuristic/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}", 'w') as f:
-            f.write(f"max cut: {max_cut_solution[0]}\n")
-            f.write(f'r: {cut_approx_ratio}\n')
 
+    if(save):
+        with open("./results/tmp_star_graph.csv", "a") as f:
+            f.write(f'star_graph,{no_vertices},{graph_type},{depth},{seed},{cut_approx_ratio}, {result.nit}, {execution_time}\n')
+    # 保存最优参数
+    # if(save):
+    #     with open(f"./results/parameters/heuristic/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}", 'w') as f:
+    #         f.write(parameter_list)
+
+    """ 
     for layer in range(depth):
         print('-----------------------------------------------')
         print(f'layer {layer + 1:}')
@@ -430,7 +433,7 @@ def star_graph_MA(no_vertices, depth, seed, graph_type, save = True):
 
             plt.title(f'select_MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}  r:{cut_approx_ratio}')
             plt.savefig(f"./results/figures/heuristic/heuristic_MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}.png")
-
+    """
     print('-----------------------------------------------')
 
 
@@ -515,7 +518,7 @@ def sub_graph_MA(no_vertices, depth, seed, graph_type, save = True):
             f.write(f'subgraph_MA,{no_vertices},{graph_type[0]+str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')
 
 
-def TR_MA(no_vertices, depth, seed, graph_type, TR_type, save = True):
+def TR_MA(no_vertices, depth, seed, graph_type, TR_type, save = True, minimize_method = "BFGS"):
     '''
     triangle removal phase operator MA-QAOA
     '''
@@ -593,7 +596,7 @@ def TR_MA(no_vertices, depth, seed, graph_type, TR_type, save = True):
 
     initial_parameter_guesses = [gamma_0] * (target_graph.number_of_edges() * depth) + [beta_0] * (no_vertices * depth)
     #! Nelder-Mead比BFDS好很多
-    result = minimize(obj_func, initial_parameter_guesses, method="Nelder-Mead")
+    result = minimize(obj_func, initial_parameter_guesses, method=minimize_method)
 
     end_time = time.time()
     execution_time = end_time - start_time
@@ -623,7 +626,7 @@ def TR_MA(no_vertices, depth, seed, graph_type, TR_type, save = True):
     # parameter_list = tmp_list
 
     print(f'layers:{depth} TR_{TR_type}_MA')
-    # print('***************')
+    print(f'total iteration: {result.nit}')
     print(f'cut_approx_ratio: {cut_approx_ratio}')
     print('----------------------------------------------------')
 
