@@ -6,13 +6,14 @@ n = '8'
 # depth = '1'
 
 graph_type = 'random0.5'
-graph_type = 'random0.7'
+# graph_type = 'random0.7'
 
 counts = 0
 TR_QAOA = []
 
 QAOA = []
 TR_Most_MA = []
+TR_All_Most_MA = []
 TR_All_MA = []
 MA = []
 
@@ -86,6 +87,18 @@ with open(f'results/MA-QAOA/TR_All_MA_Ne_2.csv', newline='') as f:
 
             TR_All_MA2 += [float(row[-1])]
 
+
+with open(f'results/MA-QAOA/TR_All_without_Most_MA_Ne_1.csv', newline='') as f:
+    csvreader = csv.reader(f, delimiter=',')
+    next(csvreader)
+
+    for row in csvreader:
+        if row[-3] == '1' and row[1] == n and row[2] == graph_type:
+            if row[-2] in skip_seed:
+                continue
+            else:
+                TR_All_Most_MA += [float(row[-1])]
+
 # TR-Most MA-QAOA
 # with open('results/MA-QAOA/TR_Most_MA.csv', newline='') as f:
 with open(f'results/MA-QAOA/TR_Most_MA_Ne_1.csv', newline='') as f:
@@ -146,6 +159,7 @@ with open(f'results/MA-QAOA/MA-QAOA2.csv', newline='') as f:
 #box plot
 # print(MA2)
 all_data = [QAOA, TR_Most_MA, TR_All_MA, MA, QAOA2, TR_Most_MA2, TR_All_MA2, MA2]
+# all_data = [QAOA, TR_All_Most_MA, TR_All_MA, MA, QAOA2, TR_Most_MA2, TR_All_MA2, MA2]
 # labels = ['QAOA', 'TRMA-QAOA', 'MA-QAOA']
 labels = ['QAOA', 'TR-Most MA-QAOA', 'TR-All MA-QAOA', 'MA-QAOA', 'QAOA', 'TR-Most MA-QAOA', 'TR-All MA-QAOA', 'MA-QAOA']
 

@@ -544,6 +544,24 @@ def TR_MA(no_vertices, depth, seed, graph_type, TR_type, save = True):
             u, v = triangle[0], triangle[1]
             if target_graph.has_edge(u, v):
                 target_graph.remove_edge(u, v)
+                
+    if(TR_type == 'All_without_Most'):
+        edge_counter = Counter()
+        for triangle in triangles:
+            edges = [(triangle[i], triangle[j]) for i in range(3) for j in range(i+1, 3)]
+            edge_counter.update(edges)
+
+        max_edge = max(edge_counter, key=edge_counter.get)
+
+        # flag = False
+        for triangle in triangles:
+            u, v = triangle[0], triangle[1]
+            if (u, v) == max_edge or (v, u) == max_edge:
+                v = triangle[2]
+        # 随机移除三角形中的一条边
+            if target_graph.has_edge(u, v): 
+                target_graph.remove_edge(u, v)
+    
 
     if(TR_type == 'Most'):
         # 移除出现在三角形中最多的一条边
@@ -591,18 +609,18 @@ def TR_MA(no_vertices, depth, seed, graph_type, TR_type, save = True):
     cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
     # print(parameter_list)
 
-    tmp_list = []
-    i = 0
-    #! 填充parameter_list中的gamma为0的边
-    for _ in range(depth):
-        for edge in graph.edges():
-            if edge not in selected_e:
-                tmp_list += [0]
-            else: 
-                tmp_list += [parameter_list[i]]
-                i += 1
-    tmp_list += parameter_list[i:]
-    parameter_list = tmp_list
+    # tmp_list = []
+    # i = 0
+    # #! 填充parameter_list中的gamma为0的边
+    # for _ in range(depth):
+    #     for edge in graph.edges():
+    #         if edge not in selected_e:
+    #             tmp_list += [0]
+    #         else: 
+    #             tmp_list += [parameter_list[i]]
+    #             i += 1
+    # tmp_list += parameter_list[i:]
+    # parameter_list = tmp_list
 
     print(f'layers:{depth} TR_{TR_type}_MA')
     # print('***************')
