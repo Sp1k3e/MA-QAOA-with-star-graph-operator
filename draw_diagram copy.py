@@ -6,7 +6,7 @@ n = '8'
 # depth = '1'
 
 graph_type = 'random0.5'
-graph_type = 'random0.7'
+# graph_type = 'random0.7'
 
 counts = 0
 TR_QAOA = []
@@ -176,25 +176,26 @@ with open(f'results/star-graph/star_graph2.csv', newline='') as f:
 
 #box plot
 # print(MA)
-all_data = [QAOA, TR_Most_MA, TR_All_MA, MA, QAOA2, TR_Most_MA2, TR_All_MA2, MA2]
-labels = ['QAOA', 'TR-Most MA-QAOA', 'TR-All MA-QAOA', 'MA-QAOA', 'QAOA', 'TR-Most MA-QAOA', 'TR-All MA-QAOA', 'MA-QAOA']
+# all_data = [QAOA, TR_Most_MA, TR_All_MA, MA, QAOA2, TR_Most_MA2, TR_All_MA2, MA2]
+all_data = [QAOA, TR_Most_MA, TR_All_MA, MA, MA_star, QAOA2, TR_Most_MA2, TR_All_MA2, MA2, MA_star2]
+labels = ['QAOA', 'TR-Most MA-QAOA', 'TR-All MA-QAOA', 'MA-QAOA', 'MA-star', 'QAOA', 'TR-Most MA-QAOA', 'TR-All MA-QAOA', 'MA-QAOA', 'MA-star']
 
 # positions = [1,1.5,2,2.5, 5,5.5,6,6.5]
-positions = [1,1.5,2,2.5, 5,5.5,6,6.5]
+positions = [1,1.5,2,2.5,3, 5,5.5,6,6.5,7]
 
 
 fig, ax = plt.subplots()
 # boxplot fliter控制离异点
 bplot = ax.boxplot(all_data,patch_artist=True,positions=positions,  medianprops={'color': 'orange', 'linewidth': 1.6}, widths=0.45)
 # 虚线
-plt.axhline(y=1, color='black', linestyle='--', linewidth = 0.8, label='Horizontal Dashed Line')
+# plt.axhline(y=1, color='black', linestyle='--', linewidth = 0.8, label='Horizontal Dashed Line')
 
 colors = ['pink', 'green', 'lightblue', 'red','pink', 'green', 'lightblue', 'red']  # 颜色
 for patch, color in zip(bplot['boxes'], colors):
     patch.set_facecolor(color)
 
 # 图例
-ax.legend(bplot['boxes'], labels[:4], loc='lower right', prop=FontProperties(size=10))
+ax.legend(bplot['boxes'], labels[:5], loc='lower right', prop=FontProperties(size=10))
 
 # 标题
 ax.set_title(f'Approximate Ratio with edge generation probability {graph_type[-3:]}')

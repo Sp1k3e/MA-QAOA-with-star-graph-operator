@@ -389,8 +389,12 @@ def star_graph_MA(no_vertices, depth, seed, graph_type, save = True):
     print(f'cut_approx_ratio: {cut_approx_ratio}')
 
     if(save):
-        with open("./results/tmp_star_graph.csv", "a") as f:
-            f.write(f'star_graph,{no_vertices},{graph_type},{depth},{seed},{cut_approx_ratio}, {result.nit}, {execution_time}\n')
+        with open(f"./results/star-graph/star-graph{depth}.csv", "a") as f:
+            f.write(f'star_graph,{no_vertices},{graph_type[0] + str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')
+
+    # if(save):
+    #     with open("./results/tmp_star_graph.csv", "a") as f:
+    #         f.write(f'star_graph,{no_vertices},{graph_type},{depth},{seed},{cut_approx_ratio}, {result.nit}, {execution_time}\n')
     # 保存最优参数
     # if(save):
     #     with open(f"./results/parameters/heuristic/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}", 'w') as f:
