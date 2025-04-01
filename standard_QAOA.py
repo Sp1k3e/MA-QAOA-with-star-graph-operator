@@ -39,27 +39,27 @@ def QAOA(no_vertices, depth, seed, graph_type, save):
 
         return expectation_value * (-1.0)
 
-    cut_approx_ratio = 0
-    for _ in range(10):
+    # cut_approx_ratio = 0
+    # for _ in range(10):
 
-        start_time = time.time()
+    start_time = time.time()
 
-        # initial_parameter_guesses = [gamma_0] * (depth) + [beta_0] * (depth)
-        # random initial parameters
-        initial_parameter_guesses = [random.random() * 3 for _ in range(2*depth)]
-        result = minimize(obj_func, initial_parameter_guesses, method="BFGS")
+    # initial_parameter_guesses = [gamma_0] * (depth) + [beta_0] * (depth)
+    # random initial parameters
+    initial_parameter_guesses = [random.random() * 3 for _ in range(2*depth)]
+    result = minimize(obj_func, initial_parameter_guesses, method="BFGS")
 
-        end_time = time.time()
-        execution_time = end_time - start_time
-        print(f"optimization_time: {round(execution_time, 2)} seconds")
+    end_time = time.time()
+    execution_time = end_time - start_time
+    print(f"optimization_time: {round(execution_time, 2)} seconds")
 
-        parameter_list = list(result.x)
+    parameter_list = list(result.x)
 
-        dens_mat = build_operators.build_standard_qaoa_ansatz(graph, parameter_list, pauli_ops_dict)
-        hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
-        # cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
+    dens_mat = build_operators.build_standard_qaoa_ansatz(graph, parameter_list, pauli_ops_dict)
+    hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
+    cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
 
-        cut_approx_ratio = max(cut_approx_ratio,(hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value)
+    # cut_approx_ratio = max(cut_approx_ratio,(hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value)
 
     print(f'total iteration: {result.nit}')
     print(f'cut_approx_ratio: {cut_approx_ratio}')

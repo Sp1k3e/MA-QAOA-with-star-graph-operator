@@ -184,8 +184,8 @@ positions = [1,1.5,2,2.5, 5,5.5,6,6.5]
 
 
 fig, ax = plt.subplots()
-# boxplot fliter控制离异点
-bplot = ax.boxplot(all_data,patch_artist=True,positions=positions,  medianprops={'color': 'orange', 'linewidth': 1.6}, widths=0.45)
+# boxplot showfliers控制离异点
+bplot = ax.boxplot(all_data,patch_artist=True, showfliers = False, positions=positions,  medianprops={'color': 'orange', 'linewidth': 1.6}, widths=0.45)
 # 虚线
 plt.axhline(y=1, color='black', linestyle='--', linewidth = 0.8, label='Horizontal Dashed Line')
 
@@ -197,7 +197,8 @@ for patch, color in zip(bplot['boxes'], colors):
 ax.legend(bplot['boxes'], labels[:4], loc='lower right', prop=FontProperties(size=10))
 
 # 标题
-ax.set_title(f'Approximate Ratio with edge generation probability {graph_type[-3:]}')
+# ax.set_title(f'Approximate Ratio with edge generation probability {graph_type[-3:]}')
+ax.set_title(f'Approximate Ratio on ER graph (p={graph_type[-3:]})')
 # 横竖轴
 ax.set_xlabel(r'$p$',fontsize=13)
 # ax.set_xlabel('p', fontsize=14)

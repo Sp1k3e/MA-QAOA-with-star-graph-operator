@@ -9,7 +9,6 @@ import random
 
 def star_graph_MA(no_vertices, depth, seed, graph_type, save = True):
     """
-    随机选择连通子图作为phase operator
     """
     gamma_0 = 1.5708
     beta_0 = 0.7854
