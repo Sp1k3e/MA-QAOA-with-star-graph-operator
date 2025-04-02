@@ -42,7 +42,6 @@ def QAOA(no_vertices, depth, seed, graph_type, save):
 
         return expectation_value * (-1.0)
 
-
     # cut_approx_ratio = 0
     # for _ in range(10):
 
@@ -57,11 +56,16 @@ def QAOA(no_vertices, depth, seed, graph_type, save):
     execution_time = end_time - start_time
 
     parameter_list = list(result.x)
+    parameter_list = list(result.x)
 
     dens_mat = build_operators.build_standard_qaoa_ansatz(graph, parameter_list, pauli_ops_dict)
     hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
     cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
+    dens_mat = build_operators.build_standard_qaoa_ansatz(graph, parameter_list, pauli_ops_dict)
+    hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
+    cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
 
+    # cut_approx_ratio = max(cut_approx_ratio,(hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value)
     # cut_approx_ratio = max(cut_approx_ratio,(hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value)
 
     print(f'total iteration: {result.nit}')
