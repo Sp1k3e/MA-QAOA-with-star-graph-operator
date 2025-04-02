@@ -25,44 +25,50 @@ def QAOA(no_vertices, depth, seed, graph_type, save):
     print(f'layers:{depth} standard-QAOA')
     #! 初始化完成
 
+    simulation_time = 0
+
     def obj_func(parameter_values):
-        # start_time = time.time()
+        start_time = time.time()
 
         dens_mat = build_operators.build_standard_qaoa_ansatz(graph, parameter_values, pauli_ops_dict)
         expectation_value = (hamiltonian * dens_mat).trace().real
 
-        # end_time = time.time()
-        # execution_time = end_time - start_time
+        end_time = time.time()
+        execution_time = end_time - start_time
         # minutes = int((execution_time % 3600) // 60)
         # seconds = execution_time % 60
         # print(f"One round simulation took {minutes}m {seconds:.2f}s.")
+        simulation_time += execution_time
 
         return expectation_value * (-1.0)
 
-    cut_approx_ratio = 0
-    for _ in range(10):
 
-        start_time = time.time()
+    # cut_approx_ratio = 0
+    # for _ in range(10):
 
-        # initial_parameter_guesses = [gamma_0] * (depth) + [beta_0] * (depth)
-        # random initial parameters
-        initial_parameter_guesses = [random.random() * 3 for _ in range(2*depth)]
-        result = minimize(obj_func, initial_parameter_guesses, method="BFGS")
+    start_time = time.time()
 
-        end_time = time.time()
-        execution_time = end_time - start_time
-        print(f"optimization_time: {round(execution_time, 2)} seconds")
+    # initial_parameter_guesses = [gamma_0] * (depth) + [beta_0] * (depth)
+    # random initial parameters
+    initial_parameter_guesses = [random.random() * 3 for _ in range(2*depth)]
+    result = minimize(obj_func, initial_parameter_guesses, method="BFGS")
 
-        parameter_list = list(result.x)
+    end_time = time.time()
+    execution_time = end_time - start_time
 
-        dens_mat = build_operators.build_standard_qaoa_ansatz(graph, parameter_list, pauli_ops_dict)
-        hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
-        # cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
+    parameter_list = list(result.x)
 
-        cut_approx_ratio = max(cut_approx_ratio,(hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value)
+    dens_mat = build_operators.build_standard_qaoa_ansatz(graph, parameter_list, pauli_ops_dict)
+    hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
+    cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
+
+    # cut_approx_ratio = max(cut_approx_ratio,(hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value)
 
     print(f'total iteration: {result.nit}')
     print(f'cut_approx_ratio: {cut_approx_ratio}')
+    print(f"optimization_time: {round(execution_time, 2)} seconds")
+    print(f'simulation_time ')
+
     # print(f'gamma: {parameter_list[:depth]}')
     # print(f'beta: {parameter_list[depth:]}')
 
