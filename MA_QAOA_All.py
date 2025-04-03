@@ -24,31 +24,31 @@ def MA_All(no_vertices, depth, seed, graph_type, save = False, show = False, min
     print(f'layers:{depth} MA-All')
     #! 初始化完成
 
+    simulation_time = []
+
     def obj_func(parameter_values):
-        start_time = time.time()
+        start_time = time.perf_counter()
 
         dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_values, depth, pauli_ops_dict, 'All')
-        expectation_value = (hamiltonian * dens_mat).trace().real
 
-        end_time = time.time()
+        end_time = time.perf_counter()
         execution_time = end_time - start_time
-        minutes = int((execution_time % 3600) // 60)
-        seconds = execution_time % 60
-        print(f"One round simulation took {minutes}m {seconds:.2f}s.")
+        # seconds = execution_time % 60
+        # print(f"One round simulation took {minutes}m {seconds:.2f}s.")
+        simulation_time.append(execution_time)
 
+        expectation_value = (hamiltonian * dens_mat).trace().real
         return expectation_value * (-1.0)
 
-    start_time = time.time()
+    start_time = time.perf_counter()
 
     initial_parameter_guesses = [gamma_0] * (depth * no_edges) + [beta_0] * (depth * no_vertices)
     result = minimize(obj_func, initial_parameter_guesses, method=minimize_method)
 
-    end_time = time.time()
+    end_time = time.perf_counter()
     execution_time = end_time - start_time
-    hours = int(execution_time // 3600)
-    minutes = int((execution_time % 3600) // 60)
-    seconds = execution_time % 60
-    print(f"Minimize function took {hours}h {minutes}m {seconds:.2f}s.")
+    # minutes = int((execution_time % 3600) // 60)
+    # seconds = execution_time % 60
 
     #! 输出结果
     parameter_list = list(result.x)
@@ -58,7 +58,11 @@ def MA_All(no_vertices, depth, seed, graph_type, save = False, show = False, min
     cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
 
     # print('***************')
+    print("目标函数总调用次数:", result.nfev)
     print(f'total iteration: {result.nit}')
+    # print(f"Minimize function took {minutes}m {seconds:.2f}s.")
+    print(f"Minimize time: {execution_time}s")
+    print(f"simulation time: {sum(simulation_time)}s")
     print(f'cut_approx_ratio: {cut_approx_ratio}')
 
     #保存结果到csv
@@ -67,8 +71,8 @@ def MA_All(no_vertices, depth, seed, graph_type, save = False, show = False, min
             # f.write(f'MA_QAOA,{no_vertices},{graph_type[0] + str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')
 
     if(save):
-        with open("./results/tmp_rounds.csv", "a") as f:
-            f.write(f'MA-QAOA,{no_vertices},{graph_type},{depth},{seed},{cut_approx_ratio}, {result.nit}, {execution_time}\n')
+        with open(f"./results/tmp_MA{depth}.csv", "a") as f:
+            f.write(f'MA-QAOA,{no_vertices},{graph_type},{depth},{seed},{cut_approx_ratio},{result.nfev}, {result.nit}, {execution_time}, {sum(simulation_time)}\n')
     
 
     # 保存参数

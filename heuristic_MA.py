@@ -344,9 +344,15 @@ def star_graph_MA(no_vertices, depth, seed, graph_type, save = True):
     for index, edge in enumerate(target_graph.edges()):
         target_graph.get_edge_data(*edge)['weight'] = 1
 
+    simulation_time = []
 
     def obj_func(parameter_values):
+        start_time = time.time()
+
         dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_values, 1, pauli_ops_dict, 'All')
+
+        simulation_time.append(time.time() - start_time)
+
         expectation_value = (hamiltonian * dens_mat).trace().real
         return expectation_value * (-1.0)
 
@@ -358,10 +364,10 @@ def star_graph_MA(no_vertices, depth, seed, graph_type, save = True):
 
     end_time = time.time()
     execution_time = end_time - start_time
-    hours = int(execution_time // 3600)
-    minutes = int((execution_time % 3600) // 60)
-    seconds = execution_time % 60
-    print(f"Minimize function took {hours}h {minutes}m {seconds:.2f}s.")
+    # hours = int(execution_time // 3600)
+    # minutes = int((execution_time % 3600) // 60)
+    # seconds = execution_time % 60
+    # print(f"Minimize function took {hours}h {minutes}m {seconds:.2f}s.")
 
     #! 输出结果
     parameter_list = list(result.x)
@@ -370,6 +376,26 @@ def star_graph_MA(no_vertices, depth, seed, graph_type, save = True):
     cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
     # print(parameter_list)
 
+
+    #! 输出结果
+    print(f'layers:{depth} star_graph_MA')
+
+    print("目标函数总调用次数:", result.nfev)
+    print(f'total iteration: {result.nit}')
+    print(f"Minimize time: {execution_time}s")
+    print(f"simulation time: {sum(simulation_time)}s")
+    print(f'cut_approx_ratio: {cut_approx_ratio}')
+
+    # if(save):
+    #     with open(f"./results/star-graph/star-graph{depth}.csv", "a") as f:
+    #         f.write(f'star_graph,{no_vertices},{graph_type[0] + str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')
+
+    if(save):
+        with open("./results/tmp_star_graph.csv", "a") as f:
+            # f.write(f'star_graph,{no_vertices},{graph_type},{depth},{seed},{cut_approx_ratio}, {result.nit}, {execution_time}\n')
+            f.write(f'star-graph,{no_vertices},{graph_type},{depth},{seed},{cut_approx_ratio}, {result.nfev}, {result.nit}, {execution_time}, {sum(simulation_time)}\n')
+
+    """ 
     tmp_list = []
     i = 0
     #! 填充parameter_list中的gamma为0的边
@@ -382,19 +408,7 @@ def star_graph_MA(no_vertices, depth, seed, graph_type, save = True):
                 i += 1
     tmp_list += parameter_list[i:]
     parameter_list = tmp_list
-
-    #! 输出结果
-    print(f'layers:{depth} star_graph_MA')
-    print(f'total iteration: {result.nit}')
-    print(f'cut_approx_ratio: {cut_approx_ratio}')
-
-    if(save):
-        with open(f"./results/star-graph/star-graph{depth}.csv", "a") as f:
-            f.write(f'star_graph,{no_vertices},{graph_type[0] + str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')
-
-    # if(save):
-    #     with open("./results/tmp_star_graph.csv", "a") as f:
-    #         f.write(f'star_graph,{no_vertices},{graph_type},{depth},{seed},{cut_approx_ratio}, {result.nit}, {execution_time}\n')
+    """
     # 保存最优参数
     # if(save):
     #     with open(f"./results/parameters/heuristic/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}", 'w') as f:

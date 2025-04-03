@@ -9,12 +9,12 @@ graph_type = ['random', 0.5]
 # graph_type = ['regular', 3]
 # number_of_iteration = 100
 #! save
-save = True
+save =True
 show = False
 
 # minimize_method = 'Nelder-Mead'
 minimize_method = 'BFGS'
-layer = 1
+layer = 3
 
 print("save:", save)
 print("minimize_method:", minimize_method)
