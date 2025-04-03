@@ -19,9 +19,12 @@ def MIS_QAOA(no_vertices, depth, G):
 
     MIS = nx.approximation.maximum_independent_set(G)
     solution = len(MIS)
+    print("solution:", solution)
+    print(MIS)
 
     pauli_ops_dict = build_operators.build_my_paulis(no_vertices)
-    hamiltonian = constrained_operators.uncontrained_MIS_hamiltonian()
+    hamiltonian = constrained_operators.uncontrained_MIS_hamiltonian(G)
+
 
     def obj_func(parameter_values):
         dens_mat = constrained_operators.build_MIS_QAOAnsatz(G, parameter_values, pauli_ops_dict)
@@ -35,5 +38,8 @@ def MIS_QAOA(no_vertices, depth, G):
     dens_mat = constrained_operators.build_MIS_QAOAnsatz(G, optimal_para, pauli_ops_dict)
     hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
 
-    print("solution:", solution)
     print(hamiltonian_expectation)
+
+    print(f'layers:{depth} MIS_QAOA')
+
+    print('approximate ratio:', hamiltonian_expectation)

@@ -57,8 +57,23 @@ def uncontrained_MIS_hamiltonian(graph):
     """
     cost Hamiltonian
     """
+    hamiltonian_operator = None
+    no_nodes = graph.number_of_nodes()
 
+    pauli_strings = [None] * no_nodes
+    # coeffs = [None] * no_ops
+    index = 0
 
+    for i in range(no_nodes):
+                tmp_str = 'I' * (i) + 'Z' + 'I' * (no_nodes - i - 1)
+                tmp_str = tmp_str[::-1]
+                pauli_strings[index] = tmp_str
+                # coeffs[index] = (-0.5) * graph.get_edge_data(i, k)['weight']
+                index += 1
+
+    hamiltonian_operator = qi.SparsePauliOp(pauli_strings).to_operator()
+
+    return sparse.csr_matrix(hamiltonian_operator.data)
 
 
 def build_MIS_QAOAnsatz(graph, parameter_list, pauli_dict):

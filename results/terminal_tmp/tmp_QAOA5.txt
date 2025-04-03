@@ -1,0 +1,66 @@
+save: False
+minimize_method: BFGS
+---------------------------------
+random graph  no_v:8 p:0.5 seed:0 
+layers:5 standard-QAOA
+目标函数总调用次数: 1254
+total iteration: 101
+cut_approx_ratio: 0.9709377680953888
+optimization_time: 300.2688845829107 s
+simulation_time: 299.73542630206794
+random graph  no_v:8 p:0.5 seed:1 
+layers:5 standard-QAOA
+目标函数总调用次数: 748
+total iteration: 59
+cut_approx_ratio: 0.9647288134269306
+optimization_time: 181.52104941592552 s
+simulation_time: 181.2124180747196
+random graph  no_v:8 p:0.5 seed:2 
+layers:5 standard-QAOA
+目标函数总调用次数: 748
+total iteration: 59
+cut_approx_ratio: 0.9559756248705673
+optimization_time: 180.55619766702875 s
+simulation_time: 180.23614202300087
+random graph  no_v:8 p:0.5 seed:3 
+layers:5 standard-QAOA
+目标函数总调用次数: 1485
+total iteration: 112
+cut_approx_ratio: 0.981962706534089
+optimization_time: 353.24612291692756 s
+simulation_time: 352.62640842585824
+random graph  no_v:8 p:0.5 seed:4 
+layers:5 standard-QAOA
+目标函数总调用次数: 803
+total iteration: 61
+cut_approx_ratio: 0.9756906067531229
+optimization_time: 191.88185708294623 s
+simulation_time: 191.57834912044927
+random graph  no_v:8 p:0.5 seed:5 
+layers:5 standard-QAOA
+目标函数总调用次数: 825
+total iteration: 62
+cut_approx_ratio: 0.9052189257870111
+optimization_time: 199.35236337501556 s
+simulation_time: 199.029724964872
+random graph  no_v:8 p:0.5 seed:6 
+layers:5 standard-QAOA
+目标函数总调用次数: 913
+total iteration: 72
+cut_approx_ratio: 0.9670771855964956
+optimization_time: 219.11021191603504 s
+simulation_time: 218.77115607541054
+random graph  no_v:8 p:0.5 seed:7 
+layers:5 standard-QAOA
+目标函数总调用次数: 814
+total iteration: 55
+cut_approx_ratio: 0.9480310244697664
+optimization_time: 198.84104108298197 s
+simulation_time: 198.51967281964608
+random graph  no_v:8 p:0.5 seed:8 
+layers:5 standard-QAOA
+目标函数总调用次数: 715
+total iteration: 51
+cut_approx_ratio: 0.9057542921778333
+optimization_time: 172.64447099994868 s
+simulation_time: 172.35591115872376
