@@ -25,6 +25,13 @@ QAOA3_evaluations = []
 QAOA3_time = []
 QAOA3_simul_time = []
 
+QAOA5_AR = []
+QAOA5_rounds = []
+QAOA5_evaluations = []
+QAOA5_time = []
+QAOA5_simul_time = []
+
+
 with open(f'results/tmp_star_graph.csv') as f:
     csvreader = csv.reader(f, delimiter=',')
 
@@ -61,6 +68,17 @@ with open(f'results/tmp_QAOA3.csv') as f:
         QAOA3_time += [float(row[-2])]
         QAOA3_simul_time += [float(row[-1])]
 
+with open(f'results/tmp_QAOA5.csv') as f:
+    csvreader = csv.reader(f, delimiter=',')
+
+    for row in csvreader:
+        QAOA5_AR += [float(row[-5])]
+        QAOA5_evaluations += [int(row[-4])]        
+        QAOA5_rounds += [float(row[-3])]
+        QAOA5_time += [float(row[-2])]
+        QAOA5_simul_time += [float(row[-1])]
+
+
 print("star graph")
 print(sum(star_evaluations)/len(star_evaluations))
 print(sum(star_rounds)/len(star_rounds))
@@ -88,3 +106,11 @@ print(sum(QAOA3_rounds)/len(QAOA3_rounds))
 print(sum(QAOA3_time)/len(QAOA3_time))
 print(sum(QAOA3_simul_time)/len(QAOA3_simul_time))
 print("optimizer time:", sum(QAOA3_time)/len(QAOA3_time) - sum(QAOA3_simul_time)/len(QAOA3_simul_time))
+
+print("QAOA5")
+print(sum(QAOA5_evaluations)/len(QAOA5_evaluations))
+print(sum(QAOA5_rounds)/len(QAOA5_rounds))
+print(sum(QAOA5_time)/len(QAOA5_time))
+print(sum(QAOA5_simul_time)/len(QAOA5_simul_time))
+print("optimizer time:", sum(QAOA5_time)/len(QAOA5_time) - sum(QAOA5_simul_time)/len(QAOA5_simul_time))
+print(sum(QAOA5_AR)/len(QAOA5_AR))

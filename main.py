@@ -9,18 +9,18 @@ graph_type = ['random', 0.5]
 # graph_type = ['regular', 3]
 # number_of_iteration = 100
 #! save
-save = False
+save = True
 show = False
 
 # minimize_method = 'Nelder-Mead'
 minimize_method = 'BFGS'
-layer = 5
+layer = 3
 
 print("save:", save)
 print("minimize_method:", minimize_method)
 print("---------------------------------")
 
-for seed in range(0, 100):
+for seed in range(87, 100):
     # print('#')
     standard_QAOA.QAOA(n, layer, seed, graph_type, save)
     # heuristic_QAOA.TR_QAOA(n, layer, seed, graph_type, save)

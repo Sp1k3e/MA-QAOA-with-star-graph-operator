@@ -6,7 +6,7 @@ n = '8'
 # depth = '1'
 
 graph_type = 'random0.5'
-graph_type = 'random0.7'
+# graph_type = 'random0.7'
 
 counts = 0
 TR_QAOA = []
@@ -215,7 +215,7 @@ ax.set_xticklabels(['1', '2'])
 
 plt.tight_layout()
 # plt.savefig('results/my_plot.eps', format='eps', dpi=1000)
-# plt.savefig('results/my_plots.pdf', format='pdf')
+plt.savefig('results/my_plots.pdf', format='pdf')
 
 plt.show()
 
@@ -233,12 +233,12 @@ print(graph_type)
 #     j += 1
 
 #! TR-All和原版效果一样的例子
-n = len(TR_All_MA)
-same = 0
+# n = len(TR_All_MA)
+# same = 0
 
-for i in range(n):
-    if abs(TR_All_MA[i] - MA[i]) <= 0.005:
-        same += 1
+# for i in range(n):
+#     if abs(TR_All_MA[i] - MA[i]) <= 0.005:
+#         same += 1
 
-print(n)
-print(same)
+# print(n)
+# print(same)
