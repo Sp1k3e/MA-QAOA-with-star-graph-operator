@@ -217,20 +217,20 @@ plt.tight_layout()
 # plt.savefig('results/my_plot.eps', format='eps', dpi=1000)
 plt.savefig('results/my_plots.pdf', format='pdf')
 
-plt.show()
+# plt.show()
 
 
 print(graph_type)
 
 #! 平均结果
-# all_data_name = ['QAOA', 'TR_Most_MA', 'TR_All_MA', 'MA', 'QAOA2', 'TR_Most_MA2', 'TR_All_MA2', 'MA2']
-# j = 0
-# for l in all_data:
-#     result = 0
-#     for i in l:
-#         result += i
-#     print(f'{all_data_name[j]}: {result/len(l)}')
-#     j += 1
+all_data_name = ['QAOA', 'TR_Most_MA', 'TR_All_MA', 'MA', 'QAOA2', 'TR_Most_MA2', 'TR_All_MA2', 'MA2']
+j = 0
+for l in all_data:
+    result = 0
+    for i in l:
+        result += i
+    print(f'{all_data_name[j]}: {result/len(l)}')
+    j += 1
 
 #! TR-All和原版效果一样的例子
 # n = len(TR_All_MA)

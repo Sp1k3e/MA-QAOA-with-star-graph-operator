@@ -31,6 +31,7 @@ def MIS_QAOA(no_vertices, depth, G):
         expectation_value = (hamiltonian * dens_mat).trace().real
         return expectation_value * (-1.0)
     
+
     initial_parameter = [gamma_0] * (depth) + [beta_0] * (depth)
     result = minimize(obj_func, initial_parameter, method="BFGS")
 
