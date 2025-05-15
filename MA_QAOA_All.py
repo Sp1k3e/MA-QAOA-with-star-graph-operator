@@ -7,9 +7,10 @@ import numpy as np
 import time
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
+import random
     
 def MA_All(no_vertices, depth, seed, graph_type, save = False, show = False, minimize_method = 'BFGS'):
-    gamma_0 = 0.1
+    gamma_0 = 1
     beta_0 = 0.7854
     graph = generate_graphs.generate_graph_type(no_vertices, graph_type, seed)[0]
 
@@ -42,7 +43,9 @@ def MA_All(no_vertices, depth, seed, graph_type, save = False, show = False, min
 
     start_time = time.perf_counter()
 
-    initial_parameter_guesses = [gamma_0] * (depth * no_edges) + [beta_0] * (depth * no_vertices)
+    # initial_parameter_guesses = [gamma_0] * (depth * no_edges) + [beta_0] * (depth * no_vertices)
+    initial_parameter_guesses = [random.random() * 3 for _ in range(depth * (no_edges + no_vertices))] 
+    # print(initial_parameter_guesses)
     result = minimize(obj_func, initial_parameter_guesses, method=minimize_method)
 
     end_time = time.perf_counter()

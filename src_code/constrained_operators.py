@@ -25,7 +25,7 @@ def MIS_hamiltonian(graph):
     no_nodes = graph.number_of_nodes()
 
     pauli_strings = [None] * no_nodes
-    # coeffs = [None] * no_ops
+    coeffs = [-1] * no_nodes
     index = 0
 
     for i in range(no_nodes):
@@ -35,32 +35,16 @@ def MIS_hamiltonian(graph):
         # coeffs[index] = (-0.5) * graph.get_edge_data(i, k)['weight']
         index += 1
 
-    hamiltonian_operator = qi.SparsePauliOp(pauli_strings).to_operator()
+    # hamiltonian_operator = qi.SparsePauliOp(pauli_strings).to_operator()
+    hamiltonian_operator = qi.SparsePauliOp(pauli_strings, np.array(coeffs)).to_operator()
 
     return sparse.csr_matrix(hamiltonian_operator.data)
 
 
-def mixer_unitary(mixer_type, parameter_value, dict_paulis, no_nodes):
-    """
-    Returns unitary operator corresponding to expontential of mixer of specified type.
-    """
-    if mixer_type == 'standard_x':
-        first = True
-        for i in range(no_nodes):
-            if first:
-                result = math.cos(parameter_value) * dict_paulis['I'] - 1j * math.sin(parameter_value) * dict_paulis[mixer_type[-1].upper() + str(i)]
-                first = False
-
-            else:
-                result = result * (math.cos(parameter_value) * dict_paulis['I'] - 1j * math.sin(parameter_value) * dict_paulis[mixer_type[-1].upper()  + str(i)])
-
-    else:
-        result = math.cos(parameter_value) * dict_paulis['I'] - 1j * math.sin(parameter_value) * dict_paulis[mixer_type]
-
-    return result
 
 def MIS_constrained_mixer_unitary(graph, parameter, dict_paulis):
     """
+    X on each qubit
     """
     i = 0
     first = True

@@ -1,4 +1,4 @@
-import constrained_QAOA
+import constrained_problem_QAOA
 from src_code import generate_graphs
 import networkx as nx
 
@@ -8,8 +8,8 @@ seed = 0
 
 G = nx.Graph()
 edge_list = [(0,1)]
-edge_list = [(0,1), (1,2), (0,2)] #三角形
-edge_list = [(0,1), (1,2), (2,3), (0,3)]
+# edge_list = [(0,1), (1,2), (0,2)] #三角形
+# edge_list = [(0,1), (1,2), (2,3), (0,3)]
 # edge_list = [(0,1), (1,2), (1,3)]
 # edge_list = [(0,1), (1,2), (1,3), (3,4), (2,3)]
 G.add_edges_from(edge_list)
@@ -18,4 +18,5 @@ G.add_edges_from(edge_list)
 
 no_vertices = G.number_of_nodes()
 
-constrained_QAOA.MIS_QAOA(no_vertices, depth, G)
+# constrained_problem_QAOA.MIS_QAOA(no_vertices, depth, G, True)
+constrained_problem_QAOA.MIS_QAOA(no_vertices, depth, G, False, penalty_term = 2)

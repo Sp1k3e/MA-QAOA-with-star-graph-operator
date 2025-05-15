@@ -215,9 +215,9 @@ ax.set_xticklabels(['1', '2'])
 
 plt.tight_layout()
 # plt.savefig('results/my_plot.eps', format='eps', dpi=1000)
-plt.savefig('results/my_plots.pdf', format='pdf')
+# plt.savefig('results/my_plots.pdf', format='pdf')
 
-# plt.show()
+plt.show()
 
 
 print(graph_type)
