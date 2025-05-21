@@ -6,7 +6,7 @@ n = '8'
 # depth = '1'
 
 graph_type = 'random0.5'
-# graph_type = 'random0.7'
+graph_type = 'random0.7'
 
 counts = 0
 TR_QAOA = []
@@ -177,7 +177,7 @@ with open(f'results/star-graph/star_graph2.csv', newline='') as f:
 #box plot
 # print(MA)
 all_data = [QAOA, TR_Most_MA, TR_All_MA, MA, QAOA2, TR_Most_MA2, TR_All_MA2, MA2]
-labels = ['QAOA', 'TR-Most MA-QAOA', 'TR-All MA-QAOA', 'MA-QAOA', 'QAOA', 'TR-Most MA-QAOA', 'TR-All MA-QAOA', 'MA-QAOA']
+labels = ['QAOA', 'TR-Most MA-QAOA', 'TR_Most_MA', 'TR_All_MA', 'QAOA', 'TR-Most MA-QAOA', 'TR-All MA-QAOA', 'MA-QAOA']
 
 # positions = [1,1.5,2,2.5, 5,5.5,6,6.5]
 positions = [1,1.5,2,2.5, 5,5.5,6,6.5]
@@ -185,20 +185,34 @@ positions = [1,1.5,2,2.5, 5,5.5,6,6.5]
 
 fig, ax = plt.subplots()
 # boxplot showfliers控制离异点
-bplot = ax.boxplot(all_data,patch_artist=True, showfliers = False, positions=positions,  medianprops={'color': 'orange', 'linewidth': 1.6}, widths=0.45)
-# 虚线
-plt.axhline(y=1, color='black', linestyle='--', linewidth = 0.8, label='Horizontal Dashed Line')
+bplot = ax.boxplot(all_data,patch_artist=True, showfliers = False, positions=positions,  medianprops={'color': 'orange', 'linewidth': 2.5}, widths=0.45, labels=labels)
 
-colors = ['pink', 'green', 'lightblue', 'red','pink', 'green', 'lightblue', 'red']  # 颜色
+# 虚线
+hline = plt.axhline(y=1, color='#ff1111', linestyle='-.', linewidth = 1.5, label='Star Graph MA-QAOA')
+
+colors = ['pink', 'green', 'lightblue', '#0cc','pink', 'green', 'lightblue', '#0cc']  # 颜色
 for patch, color in zip(bplot['boxes'], colors):
     patch.set_facecolor(color)
 
 # 图例
-ax.legend(bplot['boxes'], labels[:4], loc='lower right', prop=FontProperties(size=10))
+# handles ,labels = ax.get_legend_handles_labels()
+
+# blegend = ax.legend(bplot['boxes'], labels[:4], loc='lower right', prop=FontProperties(size=10))
+
+# handles.append(bplot)
+# labels.append('star graph')
+# ax.legend(handles=handles, labels=labels)
+
+# hlinelegend = ax.legend()
+box_proxy1 = plt.Line2D([0], [0], color='pink', lw=5, label='QAOA')
+box_proxy2 = plt.Line2D([0], [0], color='green', lw=5, label='TR-Most MA-QAOA')
+box_proxy3 = plt.Line2D([0], [0], color='lightblue', lw=5, label='TR-All MA-QAOA')
+box_proxy4 = plt.Line2D([0], [0], color='#0cc', lw=5, label='MA-QAOA')
+ax.legend(handles=[box_proxy1,box_proxy2,box_proxy3,box_proxy4,hline], loc='lower right', prop=FontProperties(size=10))
 
 # 标题
 # ax.set_title(f'Approximate Ratio with edge generation probability {graph_type[-3:]}')
-ax.set_title(f'Approximate Ratio on ER graph (p={graph_type[-3:]})')
+ax.set_title(f'Approximate Ratio on ER graph (edge probabilty = {graph_type[-3:]})')
 # 横竖轴
 ax.set_xlabel(r'$p$',fontsize=13)
 # ax.set_xlabel('p', fontsize=14)
@@ -215,22 +229,22 @@ ax.set_xticklabels(['1', '2'])
 
 plt.tight_layout()
 # plt.savefig('results/my_plot.eps', format='eps', dpi=1000)
-plt.savefig('results/my_plots.pdf', format='pdf')
+# plt.savefig(f'results/performance_diagram{graph_type[-3:]}.pdf', format='pdf')
 
-plt.show()
+# plt.show()
 
 
 print(graph_type)
 
 #! 平均结果
-# all_data_name = ['QAOA', 'TR_Most_MA', 'TR_All_MA', 'MA', 'QAOA2', 'TR_Most_MA2', 'TR_All_MA2', 'MA2']
-# j = 0
-# for l in all_data:
-#     result = 0
-#     for i in l:
-#         result += i
-#     print(f'{all_data_name[j]}: {result/len(l)}')
-#     j += 1
+all_data_name = ['QAOA', 'TR_Most_MA', 'TR_All_MA', 'MA', 'QAOA2', 'TR_Most_MA2', 'TR_All_MA2', 'MA2']
+j = 0
+for l in all_data:
+    result = 0
+    for i in l:
+        result += i
+    print(f'{all_data_name[j]}: {result/len(l)}')
+    j += 1
 
 #! TR-All和原版效果一样的例子
 # n = len(TR_All_MA)
