@@ -56,6 +56,7 @@ def cut_hamiltonian(graph):
                 tmp_str = 'I' * (i) + 'Z' + 'I' * (k-i-1) + 'Z' + 'I' * (no_nodes - k - 1)
                 tmp_str = tmp_str[::-1]
                 pauli_strings[index] = tmp_str
+                #! maxmize I-ZZ
                 coeffs[index] = (-0.5) * graph.get_edge_data(i, k)['weight']
                 index += 1
 
@@ -287,8 +288,8 @@ def build_standard_qaoa_ansatz(graph, parameter_list, pauli_dict, noisy=False, n
 
         cut_unit = cut_unitary(graph, ham_parameters[layer], pauli_dict)
         dens_mat = (cut_unit * dens_mat) * (cut_unit.transpose().conj())
-        if noisy:
-            dens_mat = useful_methods.noisy_ham_unitary_evolution(dens_mat, noise_prob=noise_prob, graph=graph, pauli_dict=pauli_dict)
+        # if noisy:
+            # dens_mat = useful_methods.noisy_ham_unitary_evolution(dens_mat, noise_prob=noise_prob, graph=graph, pauli_dict=pauli_dict)
     
         mix_unit = mixer_unitary('standard_x', mixer_parameters[layer], pauli_dict, no_qubits)
         dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
