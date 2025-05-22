@@ -14,10 +14,10 @@ def MIS_hamiltonian(graph, penalty):
     hamiltonian_operator = None
     no_nodes = graph.number_of_nodes()
     no_edges = graph.number_of_edges()
+    penalty /= 2
 
-    # pauli_strings = [None] * no_nodes
     pauli_strings = [None] * (no_nodes + 3 * no_edges)
-    coeffs = [-1] * no_nodes + [penalty, penalty, -penalty] * no_edges
+    coeffs = [-0.5] * no_nodes + [penalty, penalty, -penalty] * no_edges
     index = 0
 
     for i in range(no_nodes):
@@ -60,22 +60,23 @@ def MIS_unconstrained_mixer_unitary(no_nodes, parameter_value, dict_paulis):
     first = True
     for i in range(no_nodes):
         if first:
-            result = math.cos(parameter_value) * dict_paulis['I'] - 1j * math.sin(parameter_value) * dict_paulis["X" + str(i)]
+            result = math.cos(parameter_value) * dict_paulis['I'] + 1j * math.sin(parameter_value) * dict_paulis["X" + str(i)]
             first = False
 
         else:
-            result = result * (math.cos(parameter_value) * dict_paulis['I'] - 1j * math.sin(parameter_value) * dict_paulis["X" + str(i)])
+            result = result * (math.cos(parameter_value) * dict_paulis['I'] + 1j * math.sin(parameter_value) * dict_paulis["X" + str(i)])
 
     return result
 
-def MIS_unconstrained_phase_unitary(graph, parameter, dict_paulis):
+def MIS_unconstrained_phase_unitary(graph, parameter, dict_paulis, penalty_term):
     """
     phase unitary with objective function and penelty term
     
     """
 
     first = True
-    parameter = parameter
+    parameter = 0.5 * parameter
+    lambda_parameter = penalty_term * parameter
     for i in range(graph.number_of_nodes()):
         tmp_matrix = dict_paulis['I'] * math.cos(parameter) + dict_paulis['Z' + str(i)] * math.sin(parameter) * 1j
 
@@ -87,14 +88,12 @@ def MIS_unconstrained_phase_unitary(graph, parameter, dict_paulis):
     
     edges = graph.edges()
     for (i, j) in edges:
-        # tmp_matrix = dict_paulis['I'] * math.cos(parameter) + (dict_paulis['Z' + str(i)] + dict_paulis['Z' + str(j)]) * math.sin(parameter) * 1j
+        tmp_matrix = dict_paulis['I'] * math.cos(lambda_parameter) - (dict_paulis['Z' + str(i)]) * math.sin(lambda_parameter) * 1j 
 
-        tmp_matrix = dict_paulis['I'] * math.cos(parameter) + (dict_paulis['Z' + str(i)]) * math.sin(parameter) * 1j 
+        tmp_matrix *= dict_paulis['I'] * math.cos(lambda_parameter) - (dict_paulis['Z' + str(j)]) * math.sin(lambda_parameter) * 1j 
 
-        tmp_matrix *= dict_paulis['I'] * math.cos(parameter) + (dict_paulis['Z' + str(j)]) * math.sin(parameter) * 1j 
-
-        # tmp_matrix = dict_paulis['I'] * math.cos(parameter) - (dict_paulis['Z' + str(i)] * dict_paulis['Z' + str(j)]) * math.sin(parameter) * 1j * tmp_matrix
-        tmp_matrix *= dict_paulis['I'] * math.cos(parameter) - (dict_paulis['Z' + str(i) + 'Z' + str(j)]) * math.sin(parameter) * 1j
+        # tmp_matrix = dict_paulis['I'] * math.cos(lambda_parameter) - (dict_paulis['Z' + str(i)] * dict_paulis['Z' + str(j)]) * math.sin(lambda_parameter) * 1j * tmp_matrix
+        tmp_matrix *= dict_paulis['I'] * math.cos(lambda_parameter) + (dict_paulis['Z' + str(i) + 'Z' + str(j)]) * math.sin(lambda_parameter) * 1j
 
         # np.set_printoptions(precision=3, suppress=True)
         # print(tmp_matrix.todense())
@@ -103,18 +102,17 @@ def MIS_unconstrained_phase_unitary(graph, parameter, dict_paulis):
         
     return result
 
-def build_MIS_unconstrained_QAOAnsatz(graph, parameter_list, pauli_dict):
+def build_MIS_unconstrained_QAOAnsatz(graph, parameter_list, pauli_dict, penalty_term):
     no_layers = len(parameter_list) // 2
     ham_parameters = parameter_list[:no_layers]
     mixer_parameters = parameter_list[no_layers:]
     
     no_qubits = graph.number_of_nodes()
 
-    # Initial state is a feasible state
     dens_mat = initial_density_matrix(no_qubits)
 
     for layer in range(no_layers):
-        cut_unit = MIS_unconstrained_phase_unitary(graph, ham_parameters[layer], pauli_dict)
+        cut_unit = MIS_unconstrained_phase_unitary(graph, ham_parameters[layer], pauli_dict, penalty_term)
         dens_mat = (cut_unit * dens_mat) * (cut_unit.transpose().conj())
     
         mix_unit = MIS_unconstrained_mixer_unitary(no_qubits, mixer_parameters[layer], pauli_dict)

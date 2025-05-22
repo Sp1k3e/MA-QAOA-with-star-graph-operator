@@ -19,4 +19,7 @@ G.add_edges_from(edge_list)
 no_vertices = G.number_of_nodes()
 
 # constrained_problem_QAOA.MIS_QAOA(no_vertices, depth, G, True)
-constrained_problem_QAOA.MIS_QAOA(no_vertices, depth, G, False, penalty_term = 2)
+
+#! unconstraned circuit
+penalty_term = 1
+constrained_problem_QAOA.MIS_QAOA(no_vertices, depth, G, False, penalty_term)
