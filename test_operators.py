@@ -20,8 +20,8 @@ pauli_ops_dict = build_operators.build_my_paulis(n)
 
 # initial_density_matrix = constrained_operators.initial_density_matrix(n).todense()
 initial_density_matrix = unconstrained_operators.initial_density_matrix(n).todense()
-print('initial density matrix')
-print(initial_density_matrix)
+# print('initial density matrix')
+# print(initial_density_matrix)
 
 # MIS_hamiltonian = constrained_operators.MIS_hamiltonian(G)
 
@@ -38,18 +38,17 @@ print(initial_density_matrix)
 # print('eigenvalues:')
 # print(eigenvalues)
 
+phase_para = 0.5 * pi
+# MIS_phase_unitary = constrained_operators.MIS_constrained_phase_unitary(G, phase_para, pauli_ops_dict)
+MIS_phase_unitary = unconstrained_operators.MIS_unconstrained_phase_unitary(G, -phase_para, pauli_ops_dict, 1)
+print("phase_unitary")
+print(MIS_phase_unitary.todense())
 
 mix_para = 0.375 * pi
 # mixer_unitary = constrained_operators.MIS_constrained_mixer_unitary(G, mixer_para, pauli_ops_dict)
 mix_unitary = unconstrained_operators.MIS_unconstrained_mixer_unitary(n, -mix_para, pauli_ops_dict)
 print("mix_unitary")
 print(mix_unitary.todense())
-
-phase_para = 0.5 * pi
-# MIS_phase_unitary = constrained_operators.MIS_constrained_phase_unitary(G, phase_para, pauli_ops_dict)
-MIS_phase_unitary = unconstrained_operators.MIS_unconstrained_phase_unitary(G, -phase_para, pauli_ops_dict, 1)
-print("phase_unitary")
-print(MIS_phase_unitary.todense())
 
 dens_mat = initial_density_matrix
 dens_mat = (MIS_phase_unitary * dens_mat) * (MIS_phase_unitary.transpose().conj())
