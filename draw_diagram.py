@@ -6,7 +6,7 @@ n = '8'
 # depth = '1'
 
 graph_type = 'random0.5'
-graph_type = 'random0.7'
+# graph_type = 'random0.7'
 
 counts = 0
 TR_QAOA = []
@@ -174,6 +174,7 @@ with open(f'results/star-graph/star_graph2.csv', newline='') as f:
 # print(f'TR-All MA-QAOA: {sum(TR_All_MA)/l}')
 # print(f'MA-QAOA:        {sum(MA)/l}')
 
+MA2 = [0.996, 0.997, 0.99999, 1.0, 0.9999]
 #box plot
 # print(MA)
 all_data = [QAOA, TR_Most_MA, TR_All_MA, MA, QAOA2, TR_Most_MA2, TR_All_MA2, MA2]
@@ -231,7 +232,7 @@ plt.tight_layout()
 # plt.savefig('results/my_plot.eps', format='eps', dpi=1000)
 # plt.savefig(f'results/performance_diagram{graph_type[-3:]}.pdf', format='pdf')
 
-# plt.show()
+plt.show()
 
 
 print(graph_type)
