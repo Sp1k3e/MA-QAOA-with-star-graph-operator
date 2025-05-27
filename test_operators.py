@@ -18,12 +18,12 @@ n = G.number_of_nodes()
 
 pauli_ops_dict = build_operators.build_my_paulis(n)
 
-initial_density_matrix = constrained_operators.initial_density_matrix(n).todense()
+# initial_density_matrix = constrained_operators.initial_density_matrix(n).todense()
 initial_density_matrix = unconstrained_operators.initial_density_matrix(n).todense()
-print('initial density matrix')
-print(initial_density_matrix)
+# print('initial density matrix')
+# print(initial_density_matrix)
 
-MIS_hamiltonian = constrained_operators.MIS_hamiltonian(G)
+# MIS_hamiltonian = constrained_operators.MIS_hamiltonian(G)
 
 # vec = np.zeros(4)
 # vec[2] = 1
@@ -32,30 +32,36 @@ MIS_hamiltonian = constrained_operators.MIS_hamiltonian(G)
 # print('eigen')
 # print(eigen)
 
-print('cost hamiltonian')
-print(MIS_hamiltonian.todense())
+# print('cost hamiltonian')
+# print(MIS_hamiltonian.todense())
 # eigenvalues = np.linalg.eig(MIS_hamiltonian.todense())[0]
 # print('eigenvalues:')
 # print(eigenvalues)
 
-
-mixer_para = pi/2
-mixer_unitary = constrained_operators.MIS_constrained_mixer_unitary(G, mixer_para, pauli_ops_dict)
-mixer_unitary = unconstrained_operators.MIS_unconstrained_mixer_unitary(n, mixer_para, pauli_ops_dict)
-print("mixer_unitary")
-print(mixer_unitary.todense())
-
-phase_para = pi/2
-MIS_phase_unitary = constrained_operators.MIS_constrained_phase_unitary(G, phase_para, pauli_ops_dict)
-MIS_phase_unitary = unconstrained_operators.MIS_unconstrained_phase_unitary(G, phase_para, pauli_ops_dict)
+phase_para = 0.5 * pi
+# MIS_phase_unitary = constrained_operators.MIS_constrained_phase_unitary(G, phase_para, pauli_ops_dict)
+MIS_phase_unitary = unconstrained_operators.MIS_unconstrained_phase_unitary(G, -phase_para, pauli_ops_dict, 1)
 print("phase_unitary")
 print(MIS_phase_unitary.todense())
 
-paras = [0.2, 1.57]
-dens_mat = constrained_operators.build_MIS_constrained_QAOAnsatz(G, paras, pauli_ops_dict)
-dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz(G, paras, pauli_ops_dict)
+mix_para = 0.375 * pi
+# mixer_unitary = constrained_operators.MIS_constrained_mixer_unitary(G, mixer_para, pauli_ops_dict)
+mix_unitary = unconstrained_operators.MIS_unconstrained_mixer_unitary(n, -mix_para, pauli_ops_dict)
+print("mix_unitary")
+print(mix_unitary.todense())
+
+dens_mat = initial_density_matrix
+dens_mat = (MIS_phase_unitary * dens_mat) * (MIS_phase_unitary.transpose().conj())
+dens_mat = (mix_unitary * dens_mat) * (mix_unitary.transpose().conj())
+print('dens_mat')
+print(dens_mat)
+
+paras = [0.5 * pi, 0.375 * pi]
+# dens_mat = constrained_operators.build_MIS_constrained_QAOAnsatz(G, paras, pauli_ops_dict)
+dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz(G, paras, pauli_ops_dict, 1)
 
 print('dens_mat')
+print(dens_mat.todense())
 # row_idx, col_idx = np.unravel_index(dens_mat.argmax(), dens_mat.shape)
 # np.set_printoptions(precision=2, suppress=True)
 # print(f"最大值: {dens_mat.max()}, 位置: ({row_idx}, {col_idx})")

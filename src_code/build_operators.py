@@ -99,7 +99,7 @@ def cut_unitary(graph, parameter, dict_paulis):
     for edge in graph.edges:
 
         weight = graph.get_edge_data(*edge)['weight']
-        #原代码*0.5
+        #? 原代码*0.5
         total_param = 0.5 * parameter * weight
         # total_param = parameter * weight
         key = 'Z' + str(edge[0]) + 'Z' + str(edge[1])
