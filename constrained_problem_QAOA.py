@@ -26,7 +26,6 @@ def MIS_QAOA(no_vertices, depth, G, use_constrain_operator, penalty_term = 1):
     vec = np.zeros(2**no_vertices)
     for i in MIS:
         num += 2**i
-    # vec[num] = 1 / np.sqrt(solution)
     vec[num] = 1
 
     print(MIS)
@@ -74,9 +73,6 @@ def MIS_QAOA(no_vertices, depth, G, use_constrain_operator, penalty_term = 1):
 
         #! 计算AR时用不带惩罚项的Hamiltonian
         hamiltonian = constrained_operators.MIS_hamiltonian(G)
-        # max_ham_eigenvalue = float(vec @ hamiltonian @ vec)
-        max_ham_eigenvalue = (vec @ hamiltonian @ vec).real
-
         hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
         approx_ratio = (hamiltonian_expectation + solution - max_ham_eigenvalue) / solution
 

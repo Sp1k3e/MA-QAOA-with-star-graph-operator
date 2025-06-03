@@ -6,9 +6,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 n = 8
+seed = 56
 graph_type = ['random', 0.5]
 
-G = generate_graphs.generate_graph_type(n, graph_type, 9)[0]
+G = generate_graphs.generate_graph_type(n, graph_type, seed)[0]
 
 # pos = nx.spring_layout(G)
 nx.draw(G)

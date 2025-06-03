@@ -71,9 +71,7 @@ def MIS_unconstrained_mixer_unitary(no_nodes, parameter_value, dict_paulis):
 def MIS_unconstrained_phase_unitary(graph, parameter, dict_paulis, penalty_term):
     """
     phase unitary with objective function and penelty term
-    
     """
-
     first = True
     parameter = 0.5 * parameter
     lambda_parameter = penalty_term * parameter

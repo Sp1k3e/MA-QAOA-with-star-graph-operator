@@ -22,9 +22,9 @@ G.add_edges_from(edge_list)
 
 no_vertices = G.number_of_nodes()
 
-
+#! partial mixer
 # constrained_problem_QAOA.MIS_QAOA(no_vertices, depth, G, True)
 
 #! unconstraned circuit
 penalty_term = 1
-# constrained_problem_QAOA.MIS_QAOA(no_vertices, depth, G, False, penalty_term)
+constrained_problem_QAOA.MIS_QAOA(no_vertices, depth, G, False, penalty_term)

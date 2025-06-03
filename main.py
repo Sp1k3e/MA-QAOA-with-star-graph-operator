@@ -5,18 +5,21 @@ import heuristic_QAOA
 
 n = 8
 graph_type = ['random', 0.5]
+skip_seed = [25, 56, 85, 92]
+
 # graph_type = ['random', 0.7]
+# skip_seed = []
+
 # graph_type = ['regular', 3]
-# number_of_iteration = 100
 #! save
 save = True
 show = False
 
 # minimize_method = 'Nelder-Mead'
-minimize_method = 'BFGS'
+minimize_method = 'COBYLA'
+# minimize_method = 'BFGS'
 layer = 5
 
-skip_seed = [25, 56, 85, 92]
 
 print("save:", save)
 print("minimize_method:", minimize_method)
@@ -48,11 +51,10 @@ for seed in range(100):
 
 seed = 31
 # seeds = [51, 57, 65, 68, 86]
-seeds = [45, 67, 70, 78, 82]
 #!standard-QAOA
-for seed in seeds:
-    for _ in range(2):
-        standard_QAOA.QAOA(n, layer, seed, graph_type, save)
+# for seed in seeds:
+#     for _ in range(2):
+#         standard_QAOA.QAOA(n, layer, seed, graph_type, save)
 # heuristic_QAOA.TR_QAOA(n, layer, seed, graph_type, save)
 
 #! MA-QAOA
