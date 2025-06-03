@@ -6,7 +6,7 @@ n = '8'
 # depth = '1'
 
 graph_type = 'random0.5'
-# graph_type = 'random0.7'
+graph_type = 'random0.7'
 
 counts = 0
 TR_QAOA = []
@@ -229,7 +229,7 @@ ax.set_xticks([1.75, 5.75])
 ax.set_xticklabels(['1', '2'])
 
 plt.tight_layout()
-# plt.savefig('results/my_plot.eps', format='eps', dpi=1000)
+plt.savefig(f'results/performance_diagram{graph_type[-3:]}.eps', format='eps', dpi=1000)
 # plt.savefig(f'results/performance_diagram{graph_type[-3:]}.pdf', format='pdf')
 
 plt.show()
