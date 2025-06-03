@@ -6,9 +6,9 @@ from scipy.optimize import minimize
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
-from networkx.algorithms.approximation import steiner_tree
 import time
 from collections import Counter
+import random
     
 def mst_MA(no_vertices, depth, seed, graph_type, save = True):
     '''
@@ -358,7 +358,8 @@ def star_graph_MA(no_vertices, depth, seed, graph_type, save = True):
 
     start_time = time.time()
 
-    initial_parameter_guesses = [gamma_0] * (target_graph.number_of_edges() * depth) + [beta_0] * (no_vertices * depth)
+    # initial_parameter_guesses = [gamma_0] * (target_graph.number_of_edges() * depth) + [beta_0] * (no_vertices * depth)
+    initial_parameter_guesses = [random.random() * 3 for _ in range(no_vertices + target_graph.number_of_edges())]
     result = minimize(obj_func, initial_parameter_guesses, method="BFGS")
     # result = minimize(obj_func, initial_parameter_guesses, method="Nelder-Mead")
 
@@ -386,19 +387,24 @@ def star_graph_MA(no_vertices, depth, seed, graph_type, save = True):
     print(f"simulation time: {sum(simulation_time)}s")
     print(f'cut_approx_ratio: {cut_approx_ratio}')
 
+    print('-----------------------------------------------')
+
     # if(save):
     #     with open(f"./results/star-graph/star-graph{depth}.csv", "a") as f:
     #         f.write(f'star_graph,{no_vertices},{graph_type[0] + str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')
 
-    if(save):
+
+    if(save and cut_approx_ratio > 0.99):
         with open("./results/tmp_star_graph.csv", "a") as f:
             # f.write(f'star_graph,{no_vertices},{graph_type},{depth},{seed},{cut_approx_ratio}, {result.nit}, {execution_time}\n')
             f.write(f'star-graph,{no_vertices},{graph_type},{depth},{seed},{cut_approx_ratio}, {result.nfev}, {result.nit}, {execution_time}, {sum(simulation_time)}\n')
 
+    return cut_approx_ratio
+
     """ 
     tmp_list = []
     i = 0
-    #! 填充parameter_list中的gamma为0的边
+    # 填充parameter_list中的gamma为0的边
     for _ in range(depth):
         for edge in graph.edges():
             if edge not in selected_e:
@@ -452,7 +458,6 @@ def star_graph_MA(no_vertices, depth, seed, graph_type, save = True):
             plt.title(f'select_MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}  r:{cut_approx_ratio}')
             plt.savefig(f"./results/figures/heuristic/heuristic_MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}.png")
     """
-    print('-----------------------------------------------')
 
 
 # def random_graph_MA(no_vertices, depth, seed, graph_type, save = True):

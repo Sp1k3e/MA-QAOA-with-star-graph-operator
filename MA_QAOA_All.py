@@ -136,3 +136,5 @@ def MA_All(no_vertices, depth, seed, graph_type, save = False, show = False, min
                 pdf_pages.close()
 
     print('-----------------------------------------------')
+
+    return cut_approx_ratio

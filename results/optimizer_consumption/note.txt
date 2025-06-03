@@ -1,0 +1,2 @@
+run on windows
+i7-14650h

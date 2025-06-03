@@ -9,25 +9,34 @@ graph_type = ['random', 0.5]
 # graph_type = ['regular', 3]
 # number_of_iteration = 100
 #! save
-save = False
+save = True
 show = False
 
 # minimize_method = 'Nelder-Mead'
 minimize_method = 'BFGS'
-layer = 2
+layer = 5
+
+skip_seed = [25, 56, 85, 92]
 
 print("save:", save)
 print("minimize_method:", minimize_method)
 print("---------------------------------")
 
-# for seed in range(87, 100):
+for seed in range(100):
+    if(seed in skip_seed):
+        continue
     # print('#')
     # standard_QAOA.QAOA(n, layer, seed, graph_type, save)
     # heuristic_QAOA.TR_QAOA(n, layer, seed, graph_type, save)
 
     # MA_QAOA_All.MA_All(n, layer, seed, graph_type, save, minimize_method=minimize_method)
 
-    # heuristic_MA.star_graph_MA(n, layer, seed, graph_type, save)
+    # ar = heuristic_MA.star_graph_MA(n, 1, seed, graph_type, save)
+    # for _ in range(10):
+        # ar = heuristic_MA.star_graph_MA(n, 1, seed, graph_type, save)
+        # ar = MA_QAOA_All.MA_All(n, layer, seed, graph_type, save, minimize_method=minimize_method)
+        # if ar > 0.99:
+            # break
 
     # heuristic_MA.TR_MA(n, layer, seed, graph_type, 'All',save, minimize_method)
     # heuristic_MA.TR_MA(n, layer, seed, graph_type, 'Most',save)
@@ -35,17 +44,27 @@ print("---------------------------------")
     # heuristic_MA.sub_graph_MA(n, layer, seed, graph_type, save)
 
 
-seed = 97
+# !指定seed
+
+seed = 31
+# seeds = [51, 57, 65, 68, 86]
+seeds = [45, 67, 70, 78, 82]
 #!standard-QAOA
-# standard_QAOA.QAOA(n, layer, seed, graph_type, save)
-# standard_QAOA.star_graph_QAOA(n, layer, seed, graph_type, save)
+for seed in seeds:
+    for _ in range(2):
+        standard_QAOA.QAOA(n, layer, seed, graph_type, save)
 # heuristic_QAOA.TR_QAOA(n, layer, seed, graph_type, save)
 
 #! MA-QAOA
-MA_QAOA_All.MA_All(n, layer, seed, graph_type, save, show, minimize_method=minimize_method)
+# for seed in seeds:
+#     for _ in range(10):
+#         ar = MA_QAOA_All.MA_All(n, layer, seed, graph_type, save, show, minimize_method=minimize_method)
+#         if ar > 0.99:
+#             break
 
 #! heuristic_MA
-# heuristic_MA.star_graph_MA(n, layer, seed, graph_type, save)
+# for _ in range(10):
+    # heuristic_MA.star_graph_MA(n, 1, seed, graph_type, save)
 # heuristic_MA.TR_MA(n, layer, seed, graph_type, 'All', save)
 # heuristic_MA.complete_MA(n, layer, seed, graph_type, save)
 # heuristic_MA.sub_graph_MA(n, layer, seed, graph_type, save)

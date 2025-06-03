@@ -46,9 +46,9 @@ def QAOA(no_vertices, depth, seed, graph_type, save):
 
     start_time = time.perf_counter()
 
-    initial_parameter_guesses = [gamma_0] * (depth) + [beta_0] * (depth)
+    # initial_parameter_guesses = [gamma_0] * (depth) + [beta_0] * (depth)
     # random initial parameters
-    # initial_parameter_guesses = [random.random() * 3 for _ in range(2*depth)]
+    initial_parameter_guesses = [random.random() * 3 for _ in range(2*depth)]
     result = minimize(obj_func, initial_parameter_guesses,method="BFGS")
 
     end_time = time.perf_counter()
