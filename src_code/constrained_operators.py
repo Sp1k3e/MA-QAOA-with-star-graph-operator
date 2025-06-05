@@ -25,7 +25,7 @@ def MIS_hamiltonian(graph):
     no_nodes = graph.number_of_nodes()
 
     pauli_strings = [None] * no_nodes
-    coeffs = [-1] * no_nodes
+    coeffs = [-0.5] * no_nodes
     index = 0
 
     for i in range(no_nodes):

@@ -27,4 +27,5 @@ no_vertices = G.number_of_nodes()
 
 #! unconstraned circuit
 penalty_term = 1
+penalty_term /= 2
 constrained_problem_QAOA.MIS_QAOA(no_vertices, depth, G, False, penalty_term)
