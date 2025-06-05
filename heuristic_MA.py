@@ -1,5 +1,7 @@
 import networkx as nx
 from src_code import build_operators
+from src_code import constrained_operators
+from src_code import unconstrained_operators
 from src_code import useful_methods
 from src_code import generate_graphs
 from scipy.optimize import minimize
@@ -10,6 +12,8 @@ import time
 from collections import Counter
 import random
     
+# def random_graph_MA(no_vertices, depth, seed, graph_type, save = True):
+
 def mst_MA(no_vertices, depth, seed, graph_type, save = True):
     '''
     using mst to choose edges that need to be optimized
@@ -321,7 +325,6 @@ def star_graph_MA(no_vertices, depth, seed, graph_type, save = True):
     if nx.is_connected(graph) == False:
         return
 
-    no_edges = graph.number_of_edges()
     pauli_ops_dict = build_operators.build_my_paulis(no_vertices) 
     hamiltonian = build_operators.cut_hamiltonian(graph)
 
@@ -329,10 +332,8 @@ def star_graph_MA(no_vertices, depth, seed, graph_type, save = True):
     # print(f"max cut: {max_cut_solution[0]}")
     max_cut_value = max_cut_solution[1]
     max_ham_eigenvalue = max_cut_solution[2]
-    #! 初始化完成------------------------------------------------
 
     selected_e = []
-
     for i in range(no_vertices - 1):
         selected_e += [(0, i + 1)]
 
@@ -377,8 +378,6 @@ def star_graph_MA(no_vertices, depth, seed, graph_type, save = True):
     cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
     # print(parameter_list)
 
-
-    #! 输出结果
     print(f'layers:{depth} star_graph_MA')
 
     print("目标函数总调用次数:", result.nfev)
@@ -401,20 +400,6 @@ def star_graph_MA(no_vertices, depth, seed, graph_type, save = True):
 
     return cut_approx_ratio
 
-    """ 
-    tmp_list = []
-    i = 0
-    # 填充parameter_list中的gamma为0的边
-    for _ in range(depth):
-        for edge in graph.edges():
-            if edge not in selected_e:
-                tmp_list += [0]
-            else: 
-                tmp_list += [parameter_list[i]]
-                i += 1
-    tmp_list += parameter_list[i:]
-    parameter_list = tmp_list
-    """
     # 保存最优参数
     # if(save):
     #     with open(f"./results/parameters/heuristic/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}", 'w') as f:
@@ -459,8 +444,79 @@ def star_graph_MA(no_vertices, depth, seed, graph_type, save = True):
             plt.savefig(f"./results/figures/heuristic/heuristic_MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}.png")
     """
 
+def star_graph_MA_MIS(G, graph_type, seed, depth, save = False):
+    no_vertices = G.number_of_nodes()
+    pauli_ops_dict = build_operators.build_my_paulis(no_vertices) 
 
-# def random_graph_MA(no_vertices, depth, seed, graph_type, save = True):
+    MIS = nx.approximation.maximum_independent_set(G)
+    solution = len(MIS)
+    print("solution", solution)
+
+    # hamiltonian = constrained_operators.MIS_hamiltonian(G)
+    hamiltonian = unconstrained_operators.MIS_hamiltonian(G, 1)
+    max_ham_eigenvalue = solution - no_vertices/2
+    # print(max_ham_eigenvalue)
+
+    selected_e = []
+    for i in range(no_vertices - 1):
+        selected_e += [(0, i + 1)]
+    #! 只在目标图上优化
+    target_graph = nx.Graph()
+    target_graph.add_edges_from(selected_e)
+    for index, edge in enumerate(target_graph.edges()):
+        target_graph.get_edge_data(*edge)['weight'] = 1
+
+    simulation_time = []
+
+    def obj_func(parameter_values):
+        start_time = time.time()
+
+        dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_values, 1, pauli_ops_dict, 'All')
+
+        simulation_time.append(time.time() - start_time)
+
+        expectation_value = (hamiltonian * dens_mat).trace().real
+        return expectation_value * (-1.0)
+
+    start_time = time.time()
+
+    # initial_parameter_guesses = [gamma_0] * (target_graph.number_of_edges() * depth) + [beta_0] * (no_vertices * depth)
+    initial_parameter_guesses = [random.random() * 3 for _ in range(no_vertices + target_graph.number_of_edges())]
+    result = minimize(obj_func, initial_parameter_guesses, method="BFGS")
+
+    end_time = time.time()
+    execution_time = end_time - start_time
+    # print(f"Minimize function took {hours}h {minutes}m {seconds:.2f}s.")
+
+    hamiltonian = constrained_operators.MIS_hamiltonian(G)
+    #! 输出结果
+    parameter_list = list(result.x)
+    dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_list, 1, pauli_ops_dict, 'All')
+    hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
+    cut_approx_ratio = (hamiltonian_expectation + solution - max_ham_eigenvalue) / solution
+    # print(parameter_list)
+    print(dens_mat.todense())
+
+    print(f'layers:{depth} star_graph_MA')
+
+    # print("目标函数总调用次数:", result.nfev)
+    # print(f'total iteration: {result.nit}')
+    # print(f"Minimize time: {execution_time}s")
+    # print(f"simulation time: {sum(simulation_time)}s")
+    print(f'AR: {cut_approx_ratio}')
+
+    print('-----------------------------------------------')
+
+    # if(save):
+    #     with open(f"./results/star-graph/star-graph{depth}.csv", "a") as f:
+    #         f.write(f'star_graph,{no_vertices},{graph_type[0] + str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')
+
+    if(save and cut_approx_ratio > 0.99):
+        with open("./results/tmp_star_graph.csv", "a") as f:
+            # f.write(f'star_graph,{no_vertices},{graph_type},{depth},{seed},{cut_approx_ratio}, {result.nit}, {execution_time}\n')
+            f.write(f'star-graph,{no_vertices},{graph_type},{depth},{seed},{cut_approx_ratio}, {result.nfev}, {result.nit}, {execution_time}, {sum(simulation_time)}\n')
+
+    return cut_approx_ratio
 
 
 def sub_graph_MA(no_vertices, depth, seed, graph_type, save = True):
@@ -656,7 +712,6 @@ def TR_MA(no_vertices, depth, seed, graph_type, TR_type, save = True, minimize_m
     if(save):
         with open(f"./results/MA-QAOA/TR_{TR_type}_MA_Ne_{depth}.csv", "a") as f:
             f.write(f'TR_{TR_type}_MA,{no_vertices},{graph_type[0]+str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')
-
 
 
 # def MDER_MA(no_vertices, depth, seed, graph_type, save = True):

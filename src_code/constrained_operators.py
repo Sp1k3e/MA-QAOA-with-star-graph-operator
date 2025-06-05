@@ -9,8 +9,11 @@ import math
 from src_code import useful_methods
 
 def initial_density_matrix(no_qubits):
+    """
+    [0,0...0,1]
+    partial mixer initial state
+    """
     dim = 2**no_qubits
-    # dens_mat = qi.DensityMatrix(np.full((dim, dim), 1/dim))
     mat = np.zeros((dim,dim))
     mat[0][0] = 1
     dens_mat = qi.DensityMatrix(mat)

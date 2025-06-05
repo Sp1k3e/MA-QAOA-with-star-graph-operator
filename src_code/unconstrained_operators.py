@@ -9,7 +9,7 @@ from src_code import useful_methods
 
 def MIS_hamiltonian(graph, penalty):
     """
-    unconstrained QAOA cost Hamiltonian
+    unconstrained QAOA cost Hamiltonian with penalty
     """
     hamiltonian_operator = None
     no_nodes = graph.number_of_nodes()
@@ -42,11 +42,9 @@ def MIS_hamiltonian(graph, penalty):
         pauli_strings[index] = tmp_str
         index += 1
 
-
     hamiltonian_operator = qi.SparsePauliOp(pauli_strings, np.array(coeffs)).to_operator()
 
     return sparse.csr_matrix(hamiltonian_operator.data)
-
 
 def initial_density_matrix(no_qubits):
     dim = 2**no_qubits
@@ -90,11 +88,7 @@ def MIS_unconstrained_phase_unitary(graph, parameter, dict_paulis, penalty_term)
 
         tmp_matrix *= dict_paulis['I'] * math.cos(lambda_parameter) - (dict_paulis['Z' + str(j)]) * math.sin(lambda_parameter) * 1j 
 
-        # tmp_matrix = dict_paulis['I'] * math.cos(lambda_parameter) - (dict_paulis['Z' + str(i)] * dict_paulis['Z' + str(j)]) * math.sin(lambda_parameter) * 1j * tmp_matrix
         tmp_matrix *= dict_paulis['I'] * math.cos(lambda_parameter) + (dict_paulis['Z' + str(i) + 'Z' + str(j)]) * math.sin(lambda_parameter) * 1j
-
-        # np.set_printoptions(precision=3, suppress=True)
-        # print(tmp_matrix.todense())
         
         result = tmp_matrix * result
         
