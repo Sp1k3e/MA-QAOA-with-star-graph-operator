@@ -11,13 +11,13 @@ import matplotlib.pyplot as plt
 from scipy.linalg import eigh
 
 
-def MIS_QAOA(no_vertices, depth, G, use_constrain_operator, penalty_term = 1):
+def MIS_QAOA(no_vertices, depth, G, use_constrain_operator, penalty_term = 1, initial_state = [], custom_phase_operator = None):
     """
     最大独立集QAOA
     """
     gamma_0 = 0.5
     beta_0 = 0.5
-    # np.set_printoptions(precision=3, suppress=True)
+    np.set_printoptions(precision=3, suppress=True)
 
     MIS = nx.approximation.maximum_independent_set(G)
     solution = len(MIS)
@@ -40,10 +40,15 @@ def MIS_QAOA(no_vertices, depth, G, use_constrain_operator, penalty_term = 1):
     if(use_constrain_operator == 0):
         hamiltonian = unconstrained_operators.MIS_hamiltonian(G, penalty_term)
 
+    target_graph = G
+    if custom_phase_operator != None:
+        target_graph = custom_phase_operator
+
     #! use constrained circuits or not 
     if use_constrain_operator:
         def obj_func(parameter_values):
-            dens_mat = constrained_operators.build_MIS_constrained_QAOAnsatz(G, parameter_values, pauli_ops_dict)
+            #! partial mixer
+            dens_mat = constrained_operators.build_MIS_partial_mixer_QAOAnsatz(G, parameter_values, pauli_ops_dict, initial_state)
             expectation_value = (hamiltonian * dens_mat).trace().real
             return expectation_value * (-1.0)
 
@@ -51,9 +56,10 @@ def MIS_QAOA(no_vertices, depth, G, use_constrain_operator, penalty_term = 1):
         result = minimize(obj_func, initial_parameter, method="BFGS")
 
         optimal_para = list(result.x)
-        dens_mat = constrained_operators.build_MIS_constrained_QAOAnsatz(G, optimal_para, pauli_ops_dict)
+        dens_mat = constrained_operators.build_MIS_partial_mixer_QAOAnsatz(G, optimal_para, pauli_ops_dict, initial_state)
         hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
         approx_ratio = (hamiltonian_expectation + solution - max_ham_eigenvalue) / solution
+
     
     #! unconstrained circuit
     else:
@@ -91,76 +97,6 @@ def MIS_QAOA(no_vertices, depth, G, use_constrain_operator, penalty_term = 1):
     # print("norm:", np.linalg.norm(v))
     # print(np.outer(v,v))
 
-    print('optimal_parameters:', np.array(optimal_para)/3.1415, "pi")
-
-def MIS_custom_QAOA(G,depth, use_constrain_operator,penalty_term = 1):
-    no_vertices = G.number_of_nodes()
-
-    gamma_0 = 0.5
-    beta_0 = 0.5
-
-    MIS = nx.approximation.maximum_independent_set(G)
-    solution = len(MIS)
-
-    pauli_ops_dict = build_operators.build_my_paulis(no_vertices)
-
-    hamiltonian = constrained_operators.MIS_hamiltonian(G)
-    # max_ham_eigenvalue = (vec @ hamiltonian @ vec).real
-    max_ham_eigenvalue = solution - no_vertices/2
-    # print(max_ham_eigenvalue)
-
-    if(use_constrain_operator == 0):
-        hamiltonian = unconstrained_operators.MIS_hamiltonian(G, penalty_term)
-
-    #! use constrained circuits or not 
-    if use_constrain_operator:
-        def obj_func(parameter_values):
-            dens_mat = constrained_operators.build_MIS_constrained_QAOAnsatz(G, parameter_values, pauli_ops_dict)
-            expectation_value = (hamiltonian * dens_mat).trace().real
-            return expectation_value * (-1.0)
-
-        initial_parameter = [gamma_0] * (depth) + [beta_0] * (depth)
-        result = minimize(obj_func, initial_parameter, method="BFGS")
-
-        optimal_para = list(result.x)
-        dens_mat = constrained_operators.build_MIS_constrained_QAOAnsatz(G, optimal_para, pauli_ops_dict)
-        hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
-        approx_ratio = (hamiltonian_expectation + solution - max_ham_eigenvalue) / solution
-    
-    #! unconstrained circuit
-    else:
-        def obj_func(parameter_values):
-            dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz(G, parameter_values, pauli_ops_dict, penalty_term)
-            expectation_value = (hamiltonian * dens_mat).trace().real
-            return expectation_value * (-1.0)
-        
-        initial_parameter = [gamma_0] * (depth) + [beta_0] * (depth)
-        result = minimize(obj_func, initial_parameter, method="BFGS")
-
-        optimal_para = list(result.x)
-        dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz(G, optimal_para, pauli_ops_dict, penalty_term)
-
-        #! 计算AR时用不带惩罚项的Hamiltonian
-        hamiltonian = constrained_operators.MIS_hamiltonian(G)
-        hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
-        approx_ratio = (hamiltonian_expectation + solution - max_ham_eigenvalue) / solution
-
-    print(f'layers:{depth} MIS_QAOA')
-
-    print('solution hamiltonian eigenvalue:', max_ham_eigenvalue)
-    print('Hamiltonian expectation:', hamiltonian_expectation)
-    print('AR:', approx_ratio)
-
-    dens_mat = dens_mat.todense()
-    # print('dens_mat \n', dens_mat)
-    v = dens_mat[:,0]
-    v = v/np.sqrt(v[0])
-    # print(v.flatten())
-    # print(np.array2string(v.flatten(), separator=', '))
-    # print(np.abs(v))
-    print("probability:")
-    print(np.array2string(np.square(np.abs(v)).flatten(), separator=', '))
-    # print("norm:", np.linalg.norm(v))
-    # print(np.outer(v,v))
-
+    if(initial_state != []):
+        print("initial state:", initial_state)
     print('optimal_parameters:', np.array(optimal_para)/3.1415, "pi")

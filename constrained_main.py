@@ -7,13 +7,13 @@ import numpy as np
 np.set_printoptions(precision=3, suppress=True)
 
 no_vertices = 8
-depth = 2
+depth = 1
 seed = 0
 
 G = nx.Graph()
 edge_list = [(0,1)]
-edge_list = [(0,1), (0,2)] #三角形少一条边
-edge_list = [(0,1), (1,2), (0,2)] #三角形
+# edge_list = [(0,1), (0,2)] #三角形少一条边
+# edge_list = [(0,1), (1,2), (0,2)] #三角形
 # edge_list = [(0,1), (1,2), (1,3)] #正方形少一条边
 # edge_list = [(0,1), (1,2), (2,3), (0,3)] #正方形
 # edge_list = [(0,1), (1,2), (1,3), (3,4), (2,3)]
@@ -26,10 +26,12 @@ no_vertices = G.number_of_nodes()
 #! partial mixer
 constrained_problem_QAOA.MIS_QAOA(no_vertices, depth, G, True)
 
+
 #! unconstraned circuit
 penalty_term = 1
 penalty_term /= 2
 # constrained_problem_QAOA.MIS_QAOA(no_vertices, depth, G, False, penalty_term)
+
 
 #! MA
 # heuristic_MA.star_graph_MA_MIS(G, 'specific', 0, 1)
