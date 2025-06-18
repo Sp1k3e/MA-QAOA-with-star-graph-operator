@@ -23,7 +23,6 @@ def MA_All(no_vertices, depth, seed, graph_type, save = False, show = False, min
     max_ham_eigenvalue = max_cut_solution[2]
     # print(f"minimize_method: {minimize_method}")
     print(f'layers:{depth} MA-All')
-    #! 初始化完成
 
     simulation_time = []
 

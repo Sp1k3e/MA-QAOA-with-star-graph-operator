@@ -6,18 +6,20 @@ from src_code import useful_methods
 from src_code import generate_graphs
 from scipy.optimize import minimize
 import numpy as np
+import math
 import time
 import matplotlib.pyplot as plt
 from scipy.linalg import eigh
 
 
-def MIS_QAOA(no_vertices, depth, G, use_constrain_operator, penalty_term = 1, initial_state = [], custom_phase_operator = None):
+def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state = [], custom_phase_operator = None):
     """
-    最大独立集QAOA
+    MIS variants of QAOA
     """
     gamma_0 = 0.5
     beta_0 = 0.5
-    np.set_printoptions(precision=3, suppress=True)
+    # np.set_printoptions(precision=3, suppress=True)
+    no_vertices = G.number_of_nodes()
 
     MIS = nx.approximation.maximum_independent_set(G)
     solution = len(MIS)
@@ -32,13 +34,17 @@ def MIS_QAOA(no_vertices, depth, G, use_constrain_operator, penalty_term = 1, in
 
     pauli_ops_dict = build_operators.build_my_paulis(no_vertices)
 
-    hamiltonian = constrained_operators.MIS_hamiltonian(G)
-    # max_ham_eigenvalue = (vec @ hamiltonian @ vec).real
-    max_ham_eigenvalue = solution - no_vertices/2
-    # print(max_ham_eigenvalue)
-
-    if(use_constrain_operator == 0):
+    if(use_constrain_operator == 1):
+        print('partial Mixer')
+        hamiltonian = constrained_operators.MIS_hamiltonian(G)
+    else:
+        print('unconstrained QAOA')
         hamiltonian = unconstrained_operators.MIS_hamiltonian(G, penalty_term)
+
+    # hamiltonian = constrained_operators.MIS_hamiltonian(G)
+    # max_ham_eigenvalue = (vec @ hamiltonian @ vec).real
+    # print(max_ham_eigenvalue)
+    max_ham_eigenvalue = solution - no_vertices/2
 
     target_graph = G
     if custom_phase_operator != None:
@@ -57,6 +63,7 @@ def MIS_QAOA(no_vertices, depth, G, use_constrain_operator, penalty_term = 1, in
 
         optimal_para = list(result.x)
         dens_mat = constrained_operators.build_MIS_partial_mixer_QAOAnsatz(target_graph, optimal_para, pauli_ops_dict, initial_state)
+
         hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
         approx_ratio = (hamiltonian_expectation + solution - max_ham_eigenvalue) / solution
 
@@ -74,7 +81,7 @@ def MIS_QAOA(no_vertices, depth, G, use_constrain_operator, penalty_term = 1, in
         optimal_para = list(result.x)
         dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz(target_graph, optimal_para, pauli_ops_dict, penalty_term)
 
-        #! 计算AR时用不带惩罚项的Hamiltonian
+        #! use Hamiltonian without penalty to calculate the AR
         hamiltonian = constrained_operators.MIS_hamiltonian(G)
         hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
         approx_ratio = (hamiltonian_expectation + solution - max_ham_eigenvalue) / solution
@@ -89,17 +96,17 @@ def MIS_QAOA(no_vertices, depth, G, use_constrain_operator, penalty_term = 1, in
     # print('dens_mat \n', dens_mat)
     v = dens_mat[:,0]
     v = v/np.sqrt(v[0])
-    # print(v.flatten())
-    # print(np.array2string(v.flatten(), separator=', '))
-    # print(np.abs(v))
-    print("probability:")
-    probabilities = np.array(np.square(np.abs(v)))
-    for p in probabilities:
-        print(p)
+
+    # print("probability:")
+    # probabilities = np.array(np.square(np.abs(v)))
+    # for i in range(2**no_vertices):
+    #     print(format(i, f'0{no_vertices}b'), end = ' ')
+    #     print(probabilities[i])
+
     # print(np.array2string(np.square(np.abs(v)).flatten(), separator=', '))
     # print("norm:", np.linalg.norm(v))
     # print(np.outer(v,v))
 
-    if(initial_state != []):
+    if initial_state is not None:
         print("initial state:", initial_state)
     print('optimal_parameters:', np.array(optimal_para)/3.1415, "pi")

@@ -58,18 +58,15 @@ dens_mat = (mix_unitary * dens_mat) * (mix_unitary.transpose().conj())
 print('dens_mat')
 print(dens_mat)
 
-penalty_term = 1
-
+#! manually set prarameters
 paras = [0.5 * pi, 0.375 * pi]
-paras = [1.2 * pi, 0.3 * pi]
-# dens_mat = constrained_operators.build_MIS_constrained_QAOAnsatz(G, paras, pauli_ops_dict)
-dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz(G, paras, pauli_ops_dict, penalty_term)
+paras = [1 * pi, 0.5 * pi]
+dens_mat = constrained_operators.build_MIS_partial_mixer_QAOAnsatz(G, paras, pauli_ops_dict)
+penalty_term = 1
+# dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz(G, paras, pauli_ops_dict, penalty_term)
 
 print('dens_mat')
 print(dens_mat.todense())
-# row_idx, col_idx = np.unravel_index(dens_mat.argmax(), dens_mat.shape)
-# np.set_printoptions(precision=2, suppress=True)
-# print(f"最大值: {dens_mat.max()}, 位置: ({row_idx}, {col_idx})")
 
 no_vertices = G.number_of_nodes()
 MIS = nx.approximation.maximum_independent_set(G)
@@ -83,11 +80,11 @@ vec[num] = 1
 hamiltonian = constrained_operators.MIS_hamiltonian(G)
 max_ham_eigenvalue = (vec @ hamiltonian @ vec).real
 hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
-print(hamiltonian_expectation)
-print(max_ham_eigenvalue)
+# print(hamiltonian_expectation)
+# print(max_ham_eigenvalue)
 approx_ratio = (hamiltonian_expectation + solution - max_ham_eigenvalue) / solution
 print("AR: ", approx_ratio)
-print("solution: ", solution)
+# print("solution: ", solution)
 
 dens_mat = dens_mat.todense()
 v = dens_mat[:,0]
@@ -99,21 +96,15 @@ sum = 0
 for i in range(2**no_vertices):
     count = bin(i).count('1')
     sum += count * np.square(np.abs(v))[i]
-print(sum)
+# print(sum)
 
 formula_expectation = 0
 beta = paras[1]
 gamma = paras[0]
+degrees = dict(G.degree())
 
 # 两个点
-# for i in range(no_vertices):
-#     formula_expectation += 1/2 - 1/2 * math.sin(2 * beta) * (math.sin(gamma) * math.cos(penalty_term*gamma) - math.cos(gamma) * math.sin(penalty_term*gamma))
-
-# 三角形
 for i in range(no_vertices):
-    formula_expectation += 1/2
-    formula_expectation += -1/2 * math.cos(penalty_term* gamma) ** 2 * math.sin(2 * beta) * math.sin(gamma) * (math.cos(penalty_term*gamma)**2 - math.sin(penalty_term*gamma)**2)
-    formula_expectation += -1/2 * math.cos(penalty_term* gamma) ** 2 * math.sin(2 * beta) * math.cos(gamma) * (2 * math.cos(penalty_term*gamma) * -math.sin(penalty_term*gamma))
-    # formula_expectation += -1/2 * math.cos(penalty_term* gamma) ** 2 * math.sin(2 * beta) * math.sin(gamma*(1 - 4*penalty_term))
+    formula_expectation += 1/2 - 1/2 * math.sin(2 * beta) * (math.cos(penalty_term*gamma) ** degrees[i]) * math.sin(gamma * ( 1 - degrees[i] * penalty_term))
 
-print(formula_expectation/solution)
+print("formula AR",formula_expectation/solution)

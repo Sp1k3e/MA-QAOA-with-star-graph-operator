@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 n = 8
-seed = 56
+seed = 0
 graph_type = ['random', 0.5]
 
 G = generate_graphs.generate_graph_type(n, graph_type, seed)[0]

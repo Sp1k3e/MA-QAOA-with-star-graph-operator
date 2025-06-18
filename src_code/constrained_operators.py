@@ -45,9 +45,8 @@ def MIS_hamiltonian(graph):
 
 
 
-def MIS_constrained_mixer_unitary(graph, parameter, dict_paulis):
+def MIS_partial_mixer_unitary(graph, parameter, dict_paulis):
     """
-    X on each qubit
     """
     i = 0
     first = True
@@ -71,6 +70,9 @@ def MIS_constrained_phase_unitary(graph, parameter, dict_paulis):
     first = True
     parameter = parameter * 0.5
     for i in range(graph.number_of_nodes()):
+        # if i == 0:
+        #     continue
+
         tmp_matrix = dict_paulis['I'] * math.cos(parameter) + dict_paulis['Z' + str(i)] * math.sin(parameter) * 1j
 
         if first:
@@ -82,24 +84,24 @@ def MIS_constrained_phase_unitary(graph, parameter, dict_paulis):
     return result
 
 
-def build_MIS_partial_mixer_QAOAnsatz(graph, parameter_list, pauli_dict, initial_state = []):
+def build_MIS_partial_mixer_QAOAnsatz(graph, parameter_list, pauli_dict, initial_state = None):
     no_layers = len(parameter_list) // 2
     ham_parameters = parameter_list[:no_layers]
     mixer_parameters = parameter_list[no_layers:]
     
     no_qubits = graph.number_of_nodes()
 
-    if(initial_state == []):
+    if initial_state is None:
         dens_mat = initial_density_matrix(no_qubits)
     else:
         dens_mat = qi.DensityMatrix(initial_state)
-        dens_mat = sparse.scr_matrix(dens_mat.data)
+        dens_mat = sparse.csr_matrix(dens_mat.data)
 
     for layer in range(no_layers):
         cut_unit = MIS_constrained_phase_unitary(graph, ham_parameters[layer], pauli_dict)
         dens_mat = (cut_unit * dens_mat) * (cut_unit.transpose().conj())
     
-        mix_unit = MIS_constrained_mixer_unitary(graph, mixer_parameters[layer], pauli_dict)
+        mix_unit = MIS_partial_mixer_unitary(graph, mixer_parameters[layer], pauli_dict)
         dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
 
     return dens_mat

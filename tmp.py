@@ -6,6 +6,7 @@ from src_code import useful_methods
 from src_code import generate_graphs
 from scipy.optimize import minimize
 import numpy as np
+import math
 import time
 import random
 
@@ -33,4 +34,3 @@ import random
 #     if(max_ham_eigenvalue != solution - no_vertices/2):
 #         print("False")
 #         break
-

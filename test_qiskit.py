@@ -7,21 +7,21 @@ from scipy import sparse
 import math
 from src_code import useful_methods
 
-dim = 4
+dim = 2**3
 
 mat = np.zeros((dim,dim))
 mat[0][0] = 1
 
-print(mat)
+# print(mat)
 
-# 定义一个矩阵（2x3）
-A = np.array([[1, 2],
-              [4, 5]])
+initial_state = [0b010]
+initial_vector = np.zeros(dim)
 
-# 定义一个向量（3x1）
-v = np.array([1,2])
+for i in initial_state:
+    initial_vector[i] = 1
 
-initial_sate = np.array([1.0,1.0])
-initial_sate *= 1/math.sqrt(2)
-density_matrix = qi.DensityMatrix(initial_sate)
+initial_vector = initial_vector/np.linalg.norm(initial_vector)
+
+density_matrix = qi.DensityMatrix(initial_vector)
+print(initial_vector)
 print("density matrix:\n", density_matrix)
