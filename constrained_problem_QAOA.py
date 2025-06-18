@@ -48,7 +48,7 @@ def MIS_QAOA(no_vertices, depth, G, use_constrain_operator, penalty_term = 1, in
     if use_constrain_operator:
         def obj_func(parameter_values):
             #! partial mixer
-            dens_mat = constrained_operators.build_MIS_partial_mixer_QAOAnsatz(G, parameter_values, pauli_ops_dict, initial_state)
+            dens_mat = constrained_operators.build_MIS_partial_mixer_QAOAnsatz(target_graph, parameter_values, pauli_ops_dict, initial_state)
             expectation_value = (hamiltonian * dens_mat).trace().real
             return expectation_value * (-1.0)
 
@@ -56,7 +56,7 @@ def MIS_QAOA(no_vertices, depth, G, use_constrain_operator, penalty_term = 1, in
         result = minimize(obj_func, initial_parameter, method="BFGS")
 
         optimal_para = list(result.x)
-        dens_mat = constrained_operators.build_MIS_partial_mixer_QAOAnsatz(G, optimal_para, pauli_ops_dict, initial_state)
+        dens_mat = constrained_operators.build_MIS_partial_mixer_QAOAnsatz(target_graph, optimal_para, pauli_ops_dict, initial_state)
         hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
         approx_ratio = (hamiltonian_expectation + solution - max_ham_eigenvalue) / solution
 
@@ -64,7 +64,7 @@ def MIS_QAOA(no_vertices, depth, G, use_constrain_operator, penalty_term = 1, in
     #! unconstrained circuit
     else:
         def obj_func(parameter_values):
-            dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz(G, parameter_values, pauli_ops_dict, penalty_term)
+            dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz(target_graph, parameter_values, pauli_ops_dict, penalty_term)
             expectation_value = (hamiltonian * dens_mat).trace().real
             return expectation_value * (-1.0)
         
@@ -72,7 +72,7 @@ def MIS_QAOA(no_vertices, depth, G, use_constrain_operator, penalty_term = 1, in
         result = minimize(obj_func, initial_parameter, method="BFGS")
 
         optimal_para = list(result.x)
-        dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz(G, optimal_para, pauli_ops_dict, penalty_term)
+        dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz(target_graph, optimal_para, pauli_ops_dict, penalty_term)
 
         #! 计算AR时用不带惩罚项的Hamiltonian
         hamiltonian = constrained_operators.MIS_hamiltonian(G)
@@ -93,7 +93,10 @@ def MIS_QAOA(no_vertices, depth, G, use_constrain_operator, penalty_term = 1, in
     # print(np.array2string(v.flatten(), separator=', '))
     # print(np.abs(v))
     print("probability:")
-    print(np.array2string(np.square(np.abs(v)).flatten(), separator=', '))
+    probabilities = np.array(np.square(np.abs(v)))
+    for p in probabilities:
+        print(p)
+    # print(np.array2string(np.square(np.abs(v)).flatten(), separator=', '))
     # print("norm:", np.linalg.norm(v))
     # print(np.outer(v,v))
 
