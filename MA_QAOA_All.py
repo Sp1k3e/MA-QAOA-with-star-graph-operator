@@ -49,8 +49,6 @@ def MA_All(no_vertices, depth, seed, graph_type, save = False, show = False, min
 
     end_time = time.perf_counter()
     execution_time = end_time - start_time
-    # minutes = int((execution_time % 3600) // 60)
-    # seconds = execution_time % 60
 
     #! 输出结果
     parameter_list = list(result.x)
@@ -62,27 +60,15 @@ def MA_All(no_vertices, depth, seed, graph_type, save = False, show = False, min
     # print('***************')
     print("目标函数总调用次数:", result.nfev)
     print(f'total iteration: {result.nit}')
-    # print(f"Minimize function took {minutes}m {seconds:.2f}s.")
     print(f"Minimize time: {execution_time}s")
     print(f"simulation time: {sum(simulation_time)}s")
     print(f'cut_approx_ratio: {cut_approx_ratio}')
 
-    #保存结果到csv
-    # if(save):
-        # with open(f"./results/MA-QAOA/MA-QAOA{depth}.csv", "a") as f:
-            # f.write(f'MA_QAOA,{no_vertices},{graph_type[0] + str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')
-
     if(save):
         with open(f"./results/tmp_MA{depth}.csv", "a") as f:
             f.write(f'MA-QAOA,{no_vertices},{graph_type},{depth},{seed},{cut_approx_ratio},{result.nfev}, {result.nit}, {execution_time}, {sum(simulation_time)}\n')
-    
 
-    # 保存参数
-    # if depth == 1:
-    #     with open(f"./results/parameters/MA-QAOA{depth}.csv", "a") as f:
-    #         f.write(f'MA_QAOA,{no_vertices},{graph_type[0] + str(graph_type[1])},{depth},{seed},{cut_approx_ratio}, {execution_time}, {list(map(float,parameter_list))}\n')
-
-    #保存最优参数
+    # save optimal parameters
     # with open(f"./results/parameters/{no_vertices}vertex/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}", 'w') as f:
     #     f.write(f"max cut: {max_cut_solution[0]}\n")
     #     f.write(f'r: {cut_approx_ratio}\n')

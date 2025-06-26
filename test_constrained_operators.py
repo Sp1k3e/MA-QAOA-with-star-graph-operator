@@ -11,7 +11,7 @@ np.set_printoptions(precision=3, suppress=True)
 
 edge_list = [(0,1)]
 # edge_list = [(0,1),(1,2)]
-edge_list = [(0,1),(1,2), (0,2)]
+# edge_list = [(0,1),(1,2), (0,2)]
 # edge_list = [(0,1), (1,2), (1,3)]
 # edge_list = [(0,1), (1,2), (2,3), (0,3)]
 G = nx.Graph()
@@ -42,28 +42,28 @@ initial_density_matrix = unconstrained_operators.initial_density_matrix(n).toden
 
 phase_para = 0.5 * pi
 # MIS_phase_unitary = constrained_operators.MIS_constrained_phase_unitary(G, phase_para, pauli_ops_dict)
-MIS_phase_unitary = unconstrained_operators.MIS_unconstrained_phase_unitary(G, -phase_para, pauli_ops_dict, 1)
-print("phase_unitary")
-print(MIS_phase_unitary.todense())
+# MIS_phase_unitary = unconstrained_operators.MIS_unconstrained_phase_unitary(G, -phase_para, pauli_ops_dict, 1)
+# print("phase_unitary")
+# print(MIS_phase_unitary.todense())
 
 mix_para = 0.375 * pi
 # mixer_unitary = constrained_operators.MIS_constrained_mixer_unitary(G, mixer_para, pauli_ops_dict)
-mix_unitary = unconstrained_operators.MIS_unconstrained_mixer_unitary(n, -mix_para, pauli_ops_dict)
-print("mix_unitary")
-print(mix_unitary.todense())
+# mix_unitary = unconstrained_operators.MIS_unconstrained_mixer_unitary(n, -mix_para, pauli_ops_dict)
+# print("mix_unitary")
+# print(mix_unitary.todense())
 
-dens_mat = initial_density_matrix
-dens_mat = (MIS_phase_unitary * dens_mat) * (MIS_phase_unitary.transpose().conj())
-dens_mat = (mix_unitary * dens_mat) * (mix_unitary.transpose().conj())
-print('dens_mat')
-print(dens_mat)
+# dens_mat = initial_density_matrix
+# dens_mat = (MIS_phase_unitary * dens_mat) * (MIS_phase_unitary.transpose().conj())
+# dens_mat = (mix_unitary * dens_mat) * (mix_unitary.transpose().conj())
+# print('dens_mat')
+# print(dens_mat)
 
 #! manually set prarameters
-paras = [0.5 * pi, 0.375 * pi]
-paras = [1 * pi, 0.5 * pi]
-dens_mat = constrained_operators.build_MIS_partial_mixer_QAOAnsatz(G, paras, pauli_ops_dict)
+paras = [0.1 * pi, 0.175 * pi]
+# paras = [1 * pi, 0.5 * pi]
+# dens_mat = constrained_operators.build_MIS_partial_mixer_QAOAnsatz(G, paras, pauli_ops_dict)
 penalty_term = 1
-# dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz(G, paras, pauli_ops_dict, penalty_term)
+dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz(G, paras, pauli_ops_dict, penalty_term)
 
 print('dens_mat')
 print(dens_mat.todense())

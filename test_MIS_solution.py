@@ -7,9 +7,8 @@ edges = [(0, 1), (0, 3), (1, 2), (2, 3)]
 G.add_edges_from(edges)
 
 
-# 计算最大独立集
 mis = nx.approximation.maximum_independent_set(G)
-print("最大独立集:", mis, "解", len(mis))
+print("MIS:", mis, "solution", len(mis))
 
 
 pos = nx.spring_layout(G)

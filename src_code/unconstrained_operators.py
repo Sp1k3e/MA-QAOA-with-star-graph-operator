@@ -94,18 +94,22 @@ def MIS_unconstrained_phase_unitary(graph, parameter, dict_paulis, penalty_term)
         
     return result
 
-def build_MIS_unconstrained_QAOAnsatz(graph, parameter_list, pauli_dict, penalty_term):
+def build_MIS_unconstrained_QAOAnsatz(graph, parameter_list, pauli_dict, penalty_term, initial_state = []):
     no_layers = len(parameter_list) // 2
     ham_parameters = parameter_list[:no_layers]
     mixer_parameters = parameter_list[no_layers:]
     
     no_qubits = graph.number_of_nodes()
 
-    dens_mat = initial_density_matrix(no_qubits)
+    if len(initial_state) == 0:
+        dens_mat = initial_density_matrix(no_qubits)
+    else:
+        dens_mat = qi.DensityMatrix(initial_state)
+        dens_mat = sparse.csr_matrix(dens_mat.data)
 
     for layer in range(no_layers):
-        cut_unit = MIS_unconstrained_phase_unitary(graph, ham_parameters[layer], pauli_dict, penalty_term)
-        dens_mat = (cut_unit * dens_mat) * (cut_unit.transpose().conj())
+        phase_unit = MIS_unconstrained_phase_unitary(graph, ham_parameters[layer], pauli_dict, penalty_term)
+        dens_mat = (phase_unit * dens_mat) * (phase_unit.transpose().conj())
     
         mix_unit = MIS_unconstrained_mixer_unitary(no_qubits, mixer_parameters[layer], pauli_dict)
         dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
