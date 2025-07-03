@@ -34,6 +34,11 @@ QAOA5_evaluations = []
 QAOA5_time = []
 QAOA5_simul_time = []
 
+expressive1_AR = []
+expressive1_rounds = []
+expressive1_evaluations = []
+expressive1_time = []
+expressive1_simul_time = []
 
 with open(f'results/optimizer_consumption/star_graph.csv') as f:
     csvreader = csv.reader(f, delimiter=',')
@@ -87,6 +92,15 @@ with open(f'results/optimizer_consumption/QAOA5.csv') as f:
         QAOA5_time += [float(row[-2])]
         QAOA5_simul_time += [float(row[-1])]
 
+with open(f'results/optimizer_consumption/expressive1.csv') as f:
+    csvreader = csv.reader(f, delimiter=',')
+
+    for row in csvreader:
+        expressive1_AR += [float(row[-5])]
+        expressive1_evaluations += [int(row[-4])]
+        expressive1_rounds += [float(row[-3])]
+        expressive1_time += [float(row[-2])]
+        expressive1_simul_time += [float(row[-1])]
 
 print("star graph")
 print(sum(star_evaluations)/len(star_evaluations))
@@ -131,4 +145,13 @@ print(sum(QAOA5_time)/len(QAOA5_time))
 print(sum(QAOA5_simul_time)/len(QAOA5_simul_time))
 print("optimizer time:", sum(QAOA5_time)/len(QAOA5_time) - sum(QAOA5_simul_time)/len(QAOA5_simul_time))
 print(sum(QAOA5_AR)/len(QAOA5_AR))
+print("------------------------------")
+
+print("expressive1")
+print(sum(expressive1_evaluations)/len(expressive1_evaluations))
+print(sum(expressive1_rounds)/len(expressive1_rounds))
+print(sum(expressive1_time)/len(expressive1_time))
+print(sum(expressive1_simul_time)/len(expressive1_simul_time))
+print("optimizer time:", sum(expressive1_time)/len(expressive1_time) - sum(expressive1_simul_time)/len(expressive1_simul_time))
+print(sum(expressive1_AR)/len(expressive1_AR))
 print("------------------------------")

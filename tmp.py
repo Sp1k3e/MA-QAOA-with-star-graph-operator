@@ -9,6 +9,20 @@ import numpy as np
 import math
 import time
 import random
+import csv
+
+
+graph_type = ['random', 0.5]
+type = ' ' + str(graph_type[1]) + ']'
+print(type)
+
+with open("results/optimizer_consumption/expressive1.csv") as f:
+    reader = csv.reader(f)
+    for row in reader:
+        if(row[5] == '1' and row[3] == ' ' + str(graph_type[1]) + ']'):
+            if(float(row[6]) > 0.99):
+                print(row[6])
+
 
 # no_vertices = 5
 

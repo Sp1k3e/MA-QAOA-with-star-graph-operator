@@ -1,3 +1,4 @@
+import csv
 import MA_QAOA_All
 import heuristic_MA
 import standard_QAOA
@@ -16,16 +17,16 @@ save = True
 show = False
 
 # minimize_method = 'Nelder-Mead'
-minimize_method = 'COBYLA'
-# minimize_method = 'BFGS'
-layer = 5
-
+# minimize_method = 'COBYLA'
+minimize_method = 'BFGS'
+layer = 2
 
 print("save:", save)
 print("minimize_method:", minimize_method)
 print("---------------------------------")
 
-for seed in range(100):
+for seed in range(7, 100):
+    skip = False
     if(seed in skip_seed):
         continue
     # print('#')
@@ -34,6 +35,16 @@ for seed in range(100):
 
     # MA_QAOA_All.MA_All(n, layer, seed, graph_type, save, minimize_method=minimize_method)
 
+    # with open(f"./results/optimizer_consumption/expressive{layer}.csv") as f:
+    #     reader = csv.reader(f)
+    #     for row in reader:
+    #         if(row[5] == str(seed) and row[3] == ' ' + str(graph_type[1]) + ']'):
+    #             if(float(row[6]) > 0.99):
+    #                 skip = True    
+    # if skip:
+    #     continue
+
+    heuristic_MA.expressive_QAOA(n, layer, seed, graph_type, save)
     # ar = heuristic_MA.star_graph_MA(n, 1, seed, graph_type, save)
     # for _ in range(10):
         # ar = heuristic_MA.star_graph_MA(n, 1, seed, graph_type, save)

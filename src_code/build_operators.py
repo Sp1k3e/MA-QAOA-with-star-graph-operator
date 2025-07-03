@@ -446,7 +446,7 @@ def build_all_paulis(no_nodes):
 def build_my_paulis(no_nodes):
     result = {}
 
-    mixer_types = ['X','Z','ZZ']
+    mixer_types = ['X','ZZ']
     for mixer in mixer_types:
         if len(mixer) == 1:
             for node in range(no_nodes):
@@ -482,6 +482,46 @@ def build_my_paulis(no_nodes):
     result['I'] = sparse.csr_matrix(np.identity(2**no_nodes, dtype=complex))
 
     return result    
+
+def build_expressive_paulis(no_nodes):
+    result = {}
+
+    mixer_types = ['X','ZZ', 'Y']
+    for mixer in mixer_types:
+        if len(mixer) == 1:
+            for node in range(no_nodes):
+                key = mixer + str(node)
+                pauli_string = 'I' * (node) + mixer + 'I' * (no_nodes-node-1)
+                pauli_string = pauli_string[::-1]
+                result[key] = sparse.csr_matrix(qi.Pauli(pauli_string).to_matrix())
+
+        if len(mixer) == 2:
+            for node_1 in range(no_nodes):
+                for node_2 in range(no_nodes):
+
+                    if node_1 == node_2:
+                        continue
+                    if mixer[0] == mixer[1] and node_2 < node_1:
+                        continue
+
+                    key = mixer[0] + str(node_1) + mixer[1] + str(node_2)
+                    if node_1 > node_2:
+                        larger_node = node_1
+                        larger_type = mixer[0]
+                        smaller_node = node_2
+                        smaller_type = mixer[1]
+                    else:
+                        larger_node = node_2
+                        larger_type = mixer[1]
+                        smaller_node = node_1
+                        smaller_type = mixer[0]
+                    pauli_string = 'I' * (smaller_node) + smaller_type + 'I' * (larger_node-smaller_node-1) + larger_type + 'I' * (no_nodes - larger_node - 1)
+                    pauli_string = pauli_string[::-1]
+                    result[key] = sparse.csr_matrix(qi.Pauli(pauli_string).to_matrix())
+
+    result['I'] = sparse.csr_matrix(np.identity(2**no_nodes, dtype=complex))
+
+    return result   
     
 def build_XY_qaoa_ansatz(graph, parameter_list, pauli_dict):
 
@@ -701,5 +741,32 @@ def build_MA_qaoa_ansatz_from_initial(graph, parameter_list, no_layers, pauli_di
                     mix_unit = mix_unit * mixer_unitary('X' + str(i), mixer_parameters[i + no_qubits * layer], pauli_dict, no_qubits)
 
             dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
+
+    return dens_mat
+
+def build_expressive_qaoa_ansatz(graph, parameter_list, no_layers, pauli_dict, mode):
+    no_edges = graph.number_of_edges() 
+    no_qubits = graph.number_of_nodes() 
+    dens_mat = initial_density_matrix(no_qubits)
+    ham_parameters = parameter_list[:no_layers * no_edges]
+    mixer_parameters = parameter_list[no_layers * no_edges : no_layers * (no_edges + no_qubits)]
+    mixer_parameters2 = parameter_list[-(no_layers * no_qubits):]
+
+    for layer in range(no_layers):
+        cut_unit = MA_cut_unitary(graph, ham_parameters[layer * no_edges: (layer + 1) * no_edges], pauli_dict)
+        dens_mat = (cut_unit * dens_mat) * (cut_unit.transpose().conj())
+
+        first = True
+        for i in range(no_qubits):
+            if first:
+                mix_unit = mixer_unitary('X' + str(i), mixer_parameters[i + no_qubits * layer], pauli_dict, no_qubits)
+                first = False
+            else:
+                mix_unit = mix_unit * mixer_unitary('X' + str(i), mixer_parameters[i + no_qubits * layer], pauli_dict, no_qubits)
+
+        for i in range(no_qubits):
+            mix_unit = mix_unit * mixer_unitary('Y' + str(i), mixer_parameters2[i + no_qubits * layer], pauli_dict, no_qubits)
+
+        dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
 
     return dens_mat
