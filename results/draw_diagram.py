@@ -237,7 +237,7 @@ ax.set_xticks([1.75, 5.75])
 ax.set_xticklabels(['1', '2'])
 
 plt.tight_layout()
-plt.savefig(f'results/performance_diagram{graph_type[-3:]}.eps', format='eps', dpi=1000)
+plt.savefig(f'results/diagram/performance_diagram{graph_type[-3:]}.eps', format='eps', dpi=500)
 # plt.savefig(f'results/performance_diagram{graph_type[-3:]}.pdf', format='pdf')
 
 plt.show()
@@ -245,7 +245,7 @@ plt.show()
 
 print(graph_type)
 
-#! 平均结果
+#! average results
 all_data_name = ['QAOA', 'TR_Most_MA', 'TR_All_MA', 'MA', 'XQAOA', 'QAOA2', 'TR_Most_MA2', 'TR_All_MA2', 'MA2', 'XQAOA2']
 j = 0
 for l in all_data:
@@ -255,7 +255,7 @@ for l in all_data:
     print(f'{all_data_name[j]}: {result/len(l)}')
     j += 1
 
-#! TR-All和原版效果一样的例子
+#! instance where TR-All MA-QAOA performs as well as original MA-QAOA
 # n = len(TR_All_MA)
 # same = 0
 

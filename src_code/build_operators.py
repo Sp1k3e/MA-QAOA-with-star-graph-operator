@@ -98,10 +98,10 @@ def cut_unitary(graph, parameter, dict_paulis):
     first = True
     for edge in graph.edges:
 
-        weight = graph.get_edge_data(*edge)['weight']
+        # weight = graph.get_edge_data(*edge)['weight']
         #? 原代码*0.5
-        total_param = 0.5 * parameter * weight
-        # total_param = parameter * weight
+        # total_param = 0.5 * parameter * weight
+        total_param = 0.5 * parameter
         key = 'Z' + str(edge[0]) + 'Z' + str(edge[1])
 
         if key not in dict_paulis:
@@ -109,9 +109,8 @@ def cut_unitary(graph, parameter, dict_paulis):
         if key not in dict_paulis:
             raise Exception(key)
         
-        # 原代码为+
+        #? 原代码为+
         tmp_matrix = dict_paulis['I'] * math.cos(total_param) + dict_paulis[key] * math.sin(total_param) * 1j
-        # tmp_matrix = dict_paulis['I'] * math.cos(total_param) - dict_paulis[key] * math.sin(total_param) * 1j
 
         if first:
             result = tmp_matrix
@@ -446,7 +445,7 @@ def build_all_paulis(no_nodes):
 def build_my_paulis(no_nodes):
     result = {}
 
-    mixer_types = ['X','ZZ']
+    mixer_types = ['X','Z', 'ZZ']
     for mixer in mixer_types:
         if len(mixer) == 1:
             for node in range(no_nodes):
@@ -572,10 +571,14 @@ def build_XinY_qaoa_ansatz(graph, parameter_list, pauli_dict):
 
     return dens_mat
 
-def build_MA_qaoa_ansatz(graph, parameter_list, no_layers, pauli_dict, mode):
+def build_MA_qaoa_ansatz(graph, parameter_list, no_layers, pauli_dict, mode, initial_state = []):
     no_edges = graph.number_of_edges() 
     no_qubits = graph.number_of_nodes() 
-    dens_mat = initial_density_matrix(no_qubits)
+    if len(initial_state) == 0:
+        dens_mat = initial_density_matrix(no_qubits)
+    else:
+        dens_mat = qi.DensityMatrix(initial_state)
+        dens_mat = sparse.csr_matrix(dens_mat.data)
 
     #! 只改Mixer
     if(mode == 'M'):

@@ -394,17 +394,21 @@ def star_graph_MA(no_vertices, depth, seed, graph_type, save = True):
     #         f.write(f'star_graph,{no_vertices},{graph_type[0] + str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')
 
 
-    if(save and cut_approx_ratio > 0.99):
-        with open("./results/tmp_star_graph.csv", "a") as f:
-            # f.write(f'star_graph,{no_vertices},{graph_type},{depth},{seed},{cut_approx_ratio}, {result.nit}, {execution_time}\n')
-            f.write(f'star-graph,{no_vertices},{graph_type},{depth},{seed},{cut_approx_ratio}, {result.nfev}, {result.nit}, {execution_time}, {sum(simulation_time)}\n')
+    # if(save and cut_approx_ratio > 0.99):
+    #     with open("./results/tmp_star_graph.csv", "a") as f:
+    #         # f.write(f'star_graph,{no_vertices},{graph_type},{depth},{seed},{cut_approx_ratio}, {result.nit}, {execution_time}\n')
+    #         f.write(f'star-graph,{no_vertices},{graph_type},{depth},{seed},{cut_approx_ratio}, {result.nfev}, {result.nit}, {execution_time}, {sum(simulation_time)}\n')
+
+    # print(parameter_list)
+    # print(type(parameter_list))
+
+    if(save):
+        with open("./results/parameters/star_graph/star_parameters.csv", "a") as f:
+            f.write(f'star-graph, {no_vertices},{graph_type[1]},{depth},{seed},{cut_approx_ratio},')
+            f.write(",".join(str(x) for x in parameter_list))
+            f.write('\n')
 
     return cut_approx_ratio
-
-    # 保存最优参数
-    # if(save):
-    #     with open(f"./results/parameters/heuristic/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}", 'w') as f:
-    #         f.write(parameter_list)
 
     """ 
     for layer in range(depth):
@@ -513,10 +517,11 @@ def star_graph_MA_MIS(G, graph_type, seed, depth, save = False):
     #     with open(f"./results/star-graph/star-graph{depth}.csv", "a") as f:
     #         f.write(f'star_graph,{no_vertices},{graph_type[0] + str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')
 
-    if(save and cut_approx_ratio > 0.99):
-        with open("./results/tmp_star_graph.csv", "a") as f:
-            # f.write(f'star_graph,{no_vertices},{graph_type},{depth},{seed},{cut_approx_ratio}, {result.nit}, {execution_time}\n')
-            f.write(f'star-graph,{no_vertices},{graph_type},{depth},{seed},{cut_approx_ratio}, {result.nfev}, {result.nit}, {execution_time}, {sum(simulation_time)}\n')
+    # if(save and cut_approx_ratio > 0.99):
+    #     with open("./results/tmp_star_graph.csv", "a") as f:
+    #         # f.write(f'star_graph,{no_vertices},{graph_type},{depth},{seed},{cut_approx_ratio}, {result.nit}, {execution_time}\n')
+    #         f.write(f'star-graph,{no_vertices},{graph_type},{depth},{seed},{cut_approx_ratio}, {result.nfev}, {result.nit}, {execution_time}, {sum(simulation_time)}\n')
+
 
     return cut_approx_ratio
 

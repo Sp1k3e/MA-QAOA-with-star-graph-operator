@@ -28,17 +28,6 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
         binary_solution[i] = '1'
     solution = len(MIS)
     print("MIS solution:", ''.join(binary_solution))
-    # num = 0
-    # vec = np.zeros(2**no_vertices)
-    # for i in MIS:
-    #     num += 2**i
-    # vec[num] = 1
-    # print(MIS)
-    # print("solution:", solution)
-    # print(vec)
-    # hamiltonian = constrained_operators.MIS_hamiltonian(G)
-    # max_ham_eigenvalue = (vec @ hamiltonian @ vec).real
-    # print(max_ham_eigenvalue)
     max_ham_eigenvalue = solution - no_vertices/2
 
     if custom_phase_operator != None:
@@ -74,6 +63,7 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
 
         def obj_func(parameter_values):
             dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz(target_graph, parameter_values, pauli_ops_dict, penalty_term, initial_state)
+            # dens_mat = build_operators.build_standard_qaoa_ansatz(G, parameter_values, pauli_ops_dict)
             expectation_value = (hamiltonian * dens_mat).trace().real
             return expectation_value * (-1.0)
         
@@ -82,6 +72,7 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
 
         optimal_para = list(result.x)
         dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz(target_graph, optimal_para, pauli_ops_dict, penalty_term, initial_state)
+        # dens_mat = build_operators.build_standard_qaoa_ansatz(G, optimal_para, pauli_ops_dict)
 
         #! use Hamiltonian without penalty to calculate the AR
         hamiltonian = constrained_operators.MIS_hamiltonian(G)
@@ -118,7 +109,7 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
     return [x[0] for x in probabilities]
 
 
-def MIS_MA_QAOA(G, depth, penalty_term):
+def MIS_MA_QAOA(G, depth, penalty_term, initial_state = []):
     gamma_0 = 1
     beta_0 = 0.7854
     no_vertices = G.number_of_nodes()
@@ -141,7 +132,7 @@ def MIS_MA_QAOA(G, depth, penalty_term):
     def obj_func(parameter_values):
         start_time = time.perf_counter()
 
-        dens_mat = build_operators.build_MA_qaoa_ansatz(G, parameter_values, depth, pauli_ops_dict, 'All')
+        dens_mat = build_operators.build_MA_qaoa_ansatz(G, parameter_values, depth, pauli_ops_dict, 'All', initial_state)
 
         end_time = time.perf_counter()
         execution_time = end_time - start_time
@@ -157,14 +148,13 @@ def MIS_MA_QAOA(G, depth, penalty_term):
     # initial_parameter_guesses = [gamma_0] * (depth * no_edges) + [beta_0] * (depth * no_vertices)
     initial_parameter_guesses = [random.random() * 3 for _ in range(depth * (no_edges + no_vertices))] 
     # print(initial_parameter_guesses)
-    result = minimize(obj_func, initial_parameter_guesses, method="BFGS")
+    result = minimize(obj_func, initial_parameter_guesses, method="BFGS", )
 
     end_time = time.perf_counter()
     execution_time = end_time - start_time
 
-    #! 输出结果
     parameter_list = list(result.x)
-    dens_mat = build_operators.build_MA_qaoa_ansatz(G, parameter_list, depth, pauli_ops_dict, 'All')
+    dens_mat = build_operators.build_MA_qaoa_ansatz(G, parameter_list, depth, pauli_ops_dict, 'All', initial_state)
 
     hamiltonian = constrained_operators.MIS_hamiltonian(G)
     hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
@@ -187,3 +177,5 @@ def MIS_MA_QAOA(G, depth, penalty_term):
         if(probabilities[i] > 0.001):
             print(format(i, f'0{no_vertices}b'), end = ' ')
             print(probabilities[i])
+    
+    print("optimal parameters:", np.array(parameter_list)/3.1415, "pi")
