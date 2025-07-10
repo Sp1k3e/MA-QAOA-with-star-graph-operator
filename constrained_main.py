@@ -29,7 +29,7 @@ custom_phase_operator = G.copy()
 # print(G)
 
 # tests-------------------------------------------------------------------
-# initial state should be (superposition of) feasible solution for partial mixer
+# !initial state should be (superposition of) feasible solution for partial mixer
 initial_state = [0b000]
 # initial_state = [0b111]
 initial_vector = np.zeros(2**no_vertices)
@@ -51,7 +51,7 @@ if(len(initial_vector) != 0):
 
 #! unconstraned circuit
 penalty_term = 1 # in real cost function, this should multiple 2
-# constrained_problem_QAOA.MIS_QAOA(G, depth, False, penalty_term, custom_phase_operator=custom_phase_operator)
+constrained_problem_QAOA.MIS_QAOA(G, depth, False, penalty_term, custom_phase_operator=custom_phase_operator)
 
 
 #! MA

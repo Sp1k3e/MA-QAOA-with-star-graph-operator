@@ -864,7 +864,6 @@ def complete_MA(no_vertices, depth, seed, graph_type, TR_type, save = True):
         with open(f"./results/MA-QAOA/complete_MA_Ne_{depth}.csv", "a") as f:
             f.write(f'complete_MA,{no_vertices},{graph_type[0]+str(graph_type[1])},{depth},{seed},{cut_approx_ratio}\n')
 
-
 def expressive_QAOA(no_vertices, depth, seed, graph_type, save = False):
     gamma_0 = 1
     beta_0 = 0.7854

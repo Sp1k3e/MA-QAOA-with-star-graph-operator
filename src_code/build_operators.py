@@ -127,9 +127,9 @@ def MA_cut_unitary(graph, parameter, dict_paulis):
     first = True
     for edge in graph.edges:
 
-        weight = graph.get_edge_data(*edge)['weight']
-        total_param = 0.5 * parameter[i] * weight
-        # total_param = parameter[i] * weight
+        # weight = graph.get_edge_data(*edge)['weight']
+        # total_param = 0.5 * parameter[i] * weight
+        total_param = 0.5 * parameter[i]
         if(edge[0] < edge[1]):
             key = 'Z' + str(edge[0]) + 'Z' + str(edge[1])
         else:
@@ -656,6 +656,34 @@ def build_MA_qaoa_ansatz(graph, parameter_list, no_layers, pauli_dict, mode, ini
                     mix_unit = mix_unit * mixer_unitary('X' + str(i), mixer_parameters[i + no_qubits * layer], pauli_dict, no_qubits)
 
             dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
+
+    return dens_mat
+
+def build_MA_qaoa_ansatz_with_custom_phase(graph, parameter_list, no_layers, pauli_dict, custom_phase_operator, initial_state = []):
+    no_edges = graph.number_of_edges() 
+    no_qubits = graph.number_of_nodes() 
+    if len(initial_state) == 0:
+        dens_mat = initial_density_matrix(no_qubits)
+    else:
+        dens_mat = qi.DensityMatrix(initial_state)
+        dens_mat = sparse.csr_matrix(dens_mat.data)
+ 
+    ham_parameters = parameter_list[:no_layers * no_edges]
+    mixer_parameters = parameter_list[no_layers * no_edges:]
+
+    for layer in range(no_layers):
+        cut_unit = MA_cut_unitary(graph, ham_parameters[layer * no_edges: (layer + 1) * no_edges], pauli_dict)
+        dens_mat = (cut_unit * dens_mat) * (cut_unit.transpose().conj())
+
+        first = True
+        for i in range(no_qubits):
+            if first:
+                mix_unit = mixer_unitary('X' + str(i), mixer_parameters[i + no_qubits * layer], pauli_dict, no_qubits)
+                first = False
+            else:
+                mix_unit = mix_unit * mixer_unitary('X' + str(i), mixer_parameters[i + no_qubits * layer], pauli_dict, no_qubits)
+
+        dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
 
     return dens_mat
 
