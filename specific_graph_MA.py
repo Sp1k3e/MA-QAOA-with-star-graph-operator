@@ -6,28 +6,31 @@ from scipy.optimize import minimize
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
+import random
     
-gamma_0 = -0.7854
+gamma_0 = 0.7854
 beta_0 = 0.7854
-depth = 4
+depth = 1
 saveFig = False
 
 # edge_list = [(0,1), (1,2), (2,3)]
 # edge_list = [(0,1), (1,2), (2,3),(3,4)]
-# edge_list = [(0,1), (1,2), (2,3), (1,4),(1,5),(2,6),(6,7),(7,8)] #can't solve in 2 layer
+# edge_list = [(0,1), (1,2), (2,3), (1,4),(1,5),(2,6),(6,7),(7,8)]
 # edge_list = [(0,1), (1,2), (2,3),(3,4),(4,5),(6,7)]
-# edge_list = [(0,1), (1,2), (0,2)] #三角形
-# edge_list = [(0,1), (1,2), (2,3), (0,3)] #正方形
+# edge_list = [(0,1), (1,2), (0,2)] # Triangle
+edge_list = [(0,1), (1,2), (2,3), (0,3)] #正方形
 # edge_list = [(0,1), (1,2), (0,2), (0,3), (3,4)]
 # edge_list = [(0,1), (1,2), (1,3), (3,4)]
 
-edge_list = [(0,1),(1,2),(2,3),(3,4),(4,5),(5,6),(6,7)] # line
-edge_list = [(0,1),(1,2),(2,3),(3,4),(4,5)] # line
+# edge_list = [(0,1),(1,2),(2,3),(3,4),(4,5),(5,6),(6,7)] # line
+# edge_list = [(0,1),(1,2),(2,3),(3,4),(4,5), (5,6)] 
+# edge_list = [(0,1),(1,2),(2,3),(3,4),(4,5)] # 2-layer can't solve this
 # edge_list = [(0,1),(1,2),(2,3),(3,4),(4,5),(5,6),(6,7),(0,7)] # polygon
 
-# graph contain line
+# graphs contain line
 # edge_list = [(0,1), (1,2),(1,3),(3,4),(4,5),(5,6),(5,7)]
 
+print("edges:\n", edge_list)
 graph = nx.Graph();
 graph.add_edges_from(edge_list)
 no_vertices = graph.number_of_nodes()
@@ -40,37 +43,68 @@ pauli_ops_dict = build_operators.build_my_paulis(no_vertices)
 hamiltonian = build_operators.cut_hamiltonian(graph)
 
 max_cut_solution = useful_methods.find_optimal_cut(graph)
-print(f"max cut: {max_cut_solution[0]}")
+# print(f"max cut: {max_cut_solution[0]}")
 max_cut_value = max_cut_solution[1]
 max_ham_eigenvalue = max_cut_solution[2]
-print(f'layers:{depth} specific_graph MA-All')
-#! 初始化完成
 
-# phase_operator_edge_list = [(0,1), (1,2),(1,3),(3,4),(3,5),(3,6),(3,7)]
 phase_operator_edge_list = edge_list
+# phase_operator_edge_list = [(0,1), (1,2), (2,3)]
+# phase_operator_edge_list = [(0,1), (1,2),(1,3),(3,4),(3,5),(5,6),(5,7)]
+# phase_operator_edge_list = [(0,1), (1,2), (2,3), (3,4), (3,5)]
+# phase_operator_edge_list = [(0,1), (0,2), (0,3), (0,4), (0,5), (0,6), (0,7)]
 target_graph = nx.Graph()
 target_graph.add_edges_from(phase_operator_edge_list)
 no_edges = target_graph.number_of_edges()
 
+phase_operator_edge_list2 = edge_list
+phase_operator_edge_list2 = [(0,3)]
+# phase_operator_edge_list2 = [(0,1), (1,2),(1,3),(3,4),(3,5),(5,6),(5,7)]
+# phase_operator_edge_list2 = [(0,1), (1,2), (2,3), (3,4), (3,5)]
+# phase_operator_edge_list2 = [(0,1), (0,2), (0,3), (0,4), (0,5), (0,6), (0,7)]
+target_graph2 = nx.Graph()
+target_graph2.add_edges_from(phase_operator_edge_list2)
+no_edges2 = target_graph2.number_of_edges()
 
+use_different_phase_operators = True
+use_different_phase_operators = use_different_phase_operators and depth > 1
+if use_different_phase_operators:
+    print("phase operator1 edges: \n", phase_operator_edge_list)
+    print("phase operator2 edges: \n", phase_operator_edge_list2)
+else:
+    print("phase operator edges: \n", phase_operator_edge_list)
+
+#-------------------------------------------------------------------------
+print(f'layers:{depth} specific_graph MA-All')
 def obj_func(parameter_values):
-    # dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_values, depth, pauli_ops_dict, 'All')
-    dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_values, depth, pauli_ops_dict, 'All')
+    if(use_different_phase_operators):
+        dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_values[:no_vertices + no_edges], 1, pauli_ops_dict, 'All')
+        dens_mat = build_operators.build_MA_qaoa_ansatz_from_initial_dens(target_graph2, parameter_values[no_vertices + no_edges:], 1, pauli_ops_dict, 'All', initial_density=dens_mat)
+    else:
+        dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_values, depth, pauli_ops_dict, 'All')
+
     expectation_value = (hamiltonian * dens_mat).trace().real
     return expectation_value * (-1.0)
 
-initial_parameter_guesses = [gamma_0] * (depth * no_edges) + [beta_0] * (depth * no_vertices)
-bounds = [(-3.1416, 3.1416)] * (depth * no_edges) + [(0, 6.2832)] * (depth * no_vertices)
-# result = minimize(obj_func, initial_parameter_guesses,  method="BFGS")
+if use_different_phase_operators:
+    initial_parameter_guesses = [random.random() * 3 for _ in range(depth * (no_vertices) + no_edges + no_edges2)]
+    bounds = [(0, 6.2832)] * (no_edges2 + no_edges) + [(0, 6.2832)] * (depth * no_vertices)
+else:
+    initial_parameter_guesses = [random.random() * 3 for _ in range(depth * (no_edges + no_vertices))]
+    bounds = [(-3.1416, 3.1416)] * (depth * no_edges) + [(0, 6.2832)] * (depth * no_vertices)
+# initial_parameter_guesses = [gamma_0] * (depth * no_edges) + [beta_0] * (depth * no_vertices)
+# result = minimize(obj_func, initial_parameter_guesses,  method="BFGS") # BFGS may stuck in local minima
 result = minimize(obj_func, initial_parameter_guesses, bounds=bounds, method="Nelder-Mead")
 
-#! 输出结果
 parameter_list = list(result.x)
-# dens_mat = build_operators.build_MA_qaoa_ansatz(graph, parameter_list, depth, pauli_ops_dict, 'All')
-dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_list, depth, pauli_ops_dict, 'All')
+
+if(use_different_phase_operators):
+    dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_list[:no_vertices+no_edges], 1, pauli_ops_dict, 'All')
+    dens_mat = build_operators.build_MA_qaoa_ansatz_from_initial_dens(target_graph2, parameter_list[no_vertices+no_edges:], 1, pauli_ops_dict, 'All', initial_density=dens_mat)
+else:
+    dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_list, depth, pauli_ops_dict, 'All')
+
 hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
 cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
-
 
 print('***************')
 print(f'cut_approx_ratio: {cut_approx_ratio}')
@@ -83,12 +117,20 @@ if(saveFig):
     pdf_pages = PdfPages(f"./results/specific_graph/MA{no_vertices}_layer{depth}.pdf")
 
 for layer in range(depth):
-    print('-----------------------------------------------')
     print(f'layer {layer + 1:}')
-    my_dict = {key: value for key, value in zip(target_graph.edges, parameter_list[layer * no_edges : (layer + 1) * no_edges])} # gamma for every edge
-    for key, value in my_dict.items():
-        print(f"{key}: {value:.4f}")
-    print(f'beta: {[round(num, 3) for num in parameter_list[depth * no_edges + layer * no_vertices:depth * no_edges + (layer + 1) * no_vertices]]}')
+    if use_different_phase_operators:
+        if(layer == 0):
+            print(parameter_list[:no_edges])
+            print(parameter_list[no_edges:no_edges + no_vertices])
+        else:
+            print(parameter_list[no_vertices+no_edges:no_vertices+no_edges + no_edges2])
+            print(parameter_list[no_vertices+no_edges + no_edges2:])
+
+    else:
+        my_dict = {key: value for key, value in zip(target_graph.edges, parameter_list[layer * no_edges : (layer + 1) * no_edges])} # gamma for every edge
+        for key, value in my_dict.items():
+            print(f"{key}: {value:.4f}")
+        print(f'beta: {[round(num, 3) for num in parameter_list[depth * no_edges + layer * no_vertices:depth * no_edges + (layer + 1) * no_vertices]]}')
 
     if(saveFig):
         # with open(f"./results/parameters/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}", 'a') as f:
@@ -121,5 +163,3 @@ for layer in range(depth):
 
 if(saveFig):
     pdf_pages.close()
-
-print('-----------------------------------------------')
