@@ -86,8 +86,7 @@ print('***************')
 print(f'cut_approx_ratio: {cut_approx_ratio}')
 # if(save):
 #     with open(f"./results/parameters/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}", 'w') as f:
-#         f.write(f"max cut: {max_cut_solution[0]}\n")
-#         f.write(f'r: {cut_approx_ratio}\n')
+
 
 # for layer in range(depth):
 #     print(f'layer {layer + 1:}')
