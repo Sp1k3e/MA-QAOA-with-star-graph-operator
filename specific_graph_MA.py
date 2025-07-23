@@ -7,13 +7,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 import random
+
+np.set_printoptions(precision=3, suppress=True)
     
 depth = 2
-use_different_phase_operators = True
-# use_different_phase_operators = False
-
 saveFig = False
 save = True
+save = False
 
 # problem graph-----------------------------------------------------------
 edge_list = [(0,1), (1,2), (2,3)]
@@ -33,12 +33,20 @@ edge_list = [(0,1), (1,2), (2,3)]
 # edge_list = [(0,1), (1,2),(1,3),(3,4),(4,5),(5,6),(5,7)]
 # edge_list = [(0,1), (1,2),(1,3),(3,4),(4,5),(5,6),(6,7), (6,8)]
 
+# random graph
+graph = generate_graphs.generate_graph_type(8, ['random', 0.5], 0)[0]
+edge_list = list(graph.edges())
+
 # custom phase operator----------------------------------------------------
+use_different_phase_operators = True
+# use_different_phase_operators = False
+
 phase_operator_edge_list = edge_list
 # phase_operator_edge_list = [(0,1), (1,2), (2,3)]
 # phase_operator_edge_list = [(0,1), (1,2),(1,3),(3,4),(3,5),(5,6),(5,7)]
 # phase_operator_edge_list = [(0,1), (1,2), (2,3), (3,4), (3,5)]
 # phase_operator_edge_list = [(0,1), (0,2), (0,3), (0,4), (0,5), (0,6), (0,7)]
+phase_operator_edge_list = edge_list[:int(len(edge_list)/2)]
 target_graph = nx.Graph()
 target_graph.add_edges_from(phase_operator_edge_list)
 no_edges = target_graph.number_of_edges()
@@ -47,13 +55,16 @@ phase_operator_edge_list2 = edge_list
 # phase_operator_edge_list2 = [(0,3)]
 # phase_operator_edge_list2 = [(0,1), (1,2),(1,3),(3,4),(3,5),(5,6),(5,7)]
 # phase_operator_edge_list2 = [(0,1), (0,2), (0,3), (0,4), (0,5), (0,6), (0,7)]
+phase_operator_edge_list2 = edge_list[int(len(edge_list)/2):]
 target_graph2 = nx.Graph()
 target_graph2.add_edges_from(phase_operator_edge_list2)
 no_edges2 = target_graph2.number_of_edges()
 
 
+print("edges:\n", edge_list)
 use_different_phase_operators = use_different_phase_operators and depth > 1 and depth < 3
 if use_different_phase_operators:
+    print("using different phase operators")
     print("phase operator1 edges: \n", phase_operator_edge_list)
     print("phase operator2 edges: \n", phase_operator_edge_list2)
 else:
@@ -61,8 +72,6 @@ else:
     phase_operator_edge_list2 = phase_operator_edge_list
     use_different_phase_operators = False
 
-
-print("edges:\n", edge_list)
 graph = nx.Graph();
 graph.add_edges_from(edge_list)
 no_vertices = graph.number_of_nodes()
@@ -78,13 +87,13 @@ max_cut_value = max_cut_solution[1]
 max_ham_eigenvalue = max_cut_solution[2]
 
 #-------------------------------------------------------------------------
-for i in range(10):
+for i in range(5):
     print(f'layers:{depth} specific_graph MA-All')
 
     def obj_func(parameter_values):
         if(use_different_phase_operators):
-            dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_values[:no_vertices + no_edges], 1, pauli_ops_dict, 'All')
-            dens_mat = build_operators.build_MA_qaoa_ansatz_from_initial_dens(target_graph2, parameter_values[no_vertices + no_edges:], 1, pauli_ops_dict, 'All', initial_density=dens_mat)
+            dens_mat = build_operators.build_MA_qaoa_ansatz_with_custom_phase(target_graph, parameter_values[:no_vertices + no_edges], 1, pauli_ops_dict, no_qubits=no_vertices)
+            dens_mat = build_operators.build_MA_qaoa_ansatz_from_initial_dens(target_graph2, parameter_values[no_vertices + no_edges:], 1, pauli_ops_dict, 'All', initial_density=dens_mat, no_qubits=no_vertices)
         else:
             dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_values, depth, pauli_ops_dict, 'All')
 
@@ -104,8 +113,8 @@ for i in range(10):
     parameter_list = list(result.x)
 
     if(use_different_phase_operators):
-        dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_list[:no_vertices+no_edges], 1, pauli_ops_dict, 'All')
-        dens_mat = build_operators.build_MA_qaoa_ansatz_from_initial_dens(target_graph2, parameter_list[no_vertices+no_edges:], 1, pauli_ops_dict, 'All', initial_density=dens_mat)
+        dens_mat = build_operators.build_MA_qaoa_ansatz_with_custom_phase(target_graph, parameter_list[:no_vertices+no_edges], 1, pauli_ops_dict, no_qubits= no_vertices)
+        dens_mat = build_operators.build_MA_qaoa_ansatz_from_initial_dens(target_graph2, parameter_list[no_vertices+no_edges:], 1, pauli_ops_dict, 'All', initial_density=dens_mat, no_qubits=no_vertices)
     else:
         dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_list, depth, pauli_ops_dict, 'All')
 

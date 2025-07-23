@@ -595,6 +595,8 @@ def build_XinY_qaoa_ansatz(graph, parameter_list, pauli_dict):
 def build_MA_qaoa_ansatz(graph, parameter_list, no_layers, pauli_dict, mode, initial_state = []):
     no_edges = graph.number_of_edges() 
     no_qubits = graph.number_of_nodes() 
+    # no_qubits = 8
+
     if len(initial_state) == 0:
         dens_mat = initial_density_matrix(no_qubits)
     else:
@@ -680,9 +682,9 @@ def build_MA_qaoa_ansatz(graph, parameter_list, no_layers, pauli_dict, mode, ini
 
     return dens_mat
 
-def build_MA_qaoa_ansatz_with_custom_phase(graph, parameter_list, no_layers, pauli_dict, custom_phase_operator, initial_state = []):
+def build_MA_qaoa_ansatz_with_custom_phase(graph, parameter_list, no_layers, pauli_dict, initial_state = [], no_qubits = 0):
     no_edges = graph.number_of_edges() 
-    no_qubits = graph.number_of_nodes() 
+    # no_qubits = graph.number_of_nodes() 
     if len(initial_state) == 0:
         dens_mat = initial_density_matrix(no_qubits)
     else:
@@ -767,9 +769,9 @@ def build_MA_qaoa_ansatz_without_pauli_dict(graph, parameter_list, no_layers):
     return dens_mat
 
 
-def build_MA_qaoa_ansatz_from_initial_dens(graph, parameter_list, no_layers, pauli_dict, mode, initial_density):
+def build_MA_qaoa_ansatz_from_initial_dens(graph, parameter_list, no_layers, pauli_dict, mode, initial_density, no_qubits = 0):
     no_edges = graph.number_of_edges() 
-    no_qubits = graph.number_of_nodes() 
+    # no_qubits = graph.number_of_nodes() 
     dens_mat = initial_density
 
     ham_parameters = parameter_list[:no_layers * no_edges]
