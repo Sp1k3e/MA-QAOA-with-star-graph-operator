@@ -595,7 +595,6 @@ def build_XinY_qaoa_ansatz(graph, parameter_list, pauli_dict):
 def build_MA_qaoa_ansatz(graph, parameter_list, no_layers, pauli_dict, mode = 'All', initial_state = [], no_qubits = 0):
     no_edges = graph.number_of_edges() 
     no_qubits = graph.number_of_nodes() 
-    # no_qubits = 8
 
     if len(initial_state) == 0:
         dens_mat = initial_density_matrix(no_qubits)
@@ -708,7 +707,6 @@ def build_MA_qaoa_ansatz_without_pauli_dict(graph, parameter_list, no_layers):
         dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
 
     return dens_mat
-
 
 def build_MA_qaoa_ansatz_from_initial_dens(graph, parameter_list, no_layers, pauli_dict, mode, initial_density, no_qubits = 0):
     no_edges = graph.number_of_edges() 

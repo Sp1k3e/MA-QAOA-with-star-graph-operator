@@ -10,7 +10,7 @@ import random
 
 np.set_printoptions(precision=3, suppress=True)
     
-depth = 2
+depth = 1
 saveFig = False
 save = True
 save = False
@@ -45,11 +45,9 @@ use_different_phase_operators = True
 phase_operator_edge_list = edge_list
 # phase_operator_edge_list = [(0,1), (1,2), (2,3)]
 # phase_operator_edge_list = [(0,1), (1,2),(1,3),(3,4),(3,5),(5,6),(5,7)]
-
-phase_operator_edge_list = edge_list[:6]
-
 # phase_operator_edge_list = [(0,1), (0,2), (0,3), (0,4), (0,5), (0,6), (0,7)]
-phase_operator_edge_list = edge_list[:int(len(edge_list)/2)]
+
+# phase_operator_edge_list = edge_list[:int(len(edge_list)/2)]
 target_graph = nx.Graph()
 target_graph.add_edges_from(phase_operator_edge_list)
 no_edges = target_graph.number_of_edges()
@@ -63,12 +61,10 @@ target_graph2 = nx.Graph()
 target_graph2.add_edges_from(phase_operator_edge_list2)
 no_edges2 = target_graph2.number_of_edges()
 
-phase_operator_edge_list2 = edge_list[5:]
-
 print("edges:\n", edge_list)
 use_different_phase_operators = use_different_phase_operators and depth > 1 and depth < 3
 if use_different_phase_operators:
-    print("using different phase operators")
+    print("!using different phase operators")
     print("phase operator1 edges: \n", phase_operator_edge_list)
     print("phase operator2 edges: \n", phase_operator_edge_list2)
     target_graph2 = nx.Graph()
@@ -84,7 +80,6 @@ graph.add_edges_from(edge_list)
 no_vertices = graph.number_of_nodes()
 for index, edge in enumerate(graph.edges()):
     graph.get_edge_data(*edge)['weight'] = 1
-graph_type = ['manual', no_vertices]
 
 no_edges = graph.number_of_edges()
 pauli_ops_dict = build_operators.build_my_paulis(no_vertices) 
