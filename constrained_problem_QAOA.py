@@ -35,6 +35,8 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
     else:
         target_graph = G
 
+    # initial_parameter = [gamma_0] * (depth) + [beta_0] * (depth)
+    initial_parameter = [random.random() * 3 for _ in range(depth * 2)]
     #! use constrained circuits or not 
     if use_constrain_operator:
         print('Partial Mixer')
@@ -46,7 +48,6 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
             expectation_value = (hamiltonian * dens_mat).trace().real
             return expectation_value * (-1.0)
 
-        initial_parameter = [gamma_0] * (depth) + [beta_0] * (depth)
         result = minimize(obj_func, initial_parameter, method="BFGS")
 
         optimal_para = list(result.x)
@@ -55,10 +56,9 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
         hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
         approx_ratio = (hamiltonian_expectation + solution - max_ham_eigenvalue) / solution
 
-    
     #! unconstrained circuit
     else:
-        print('unconstrained QAOA penalty term =', penalty_term)
+        print('unconstrained QAOA  penalty term =', penalty_term)
         hamiltonian = unconstrained_operators.MIS_hamiltonian(G, penalty_term)
 
         def obj_func(parameter_values):
@@ -67,7 +67,6 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
             expectation_value = (hamiltonian * dens_mat).trace().real
             return expectation_value * (-1.0)
         
-        initial_parameter = [gamma_0] * (depth) + [beta_0] * (depth)
         result = minimize(obj_func, initial_parameter, method="BFGS")
 
         optimal_para = list(result.x)
@@ -81,20 +80,20 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
 
     print(f'layers:{depth} MIS_QAOA')
 
-    print('solution hamiltonian eigenvalue:', max_ham_eigenvalue)
-    print('Hamiltonian expectation:', hamiltonian_expectation)
+    # print('solution hamiltonian eigenvalue:', max_ham_eigenvalue)
+    # print('Hamiltonian expectation:', hamiltonian_expectation)
     print('AR:', approx_ratio)
 
     dens_mat = dens_mat.todense()
     v = dens_mat[:,0]
     v = v/np.sqrt(v[0])
 
-    print("probability:")
-    probabilities = np.array(np.square(np.abs(v)))
-    for i in range(2**no_vertices):
-        if(probabilities[i] > 0.001):
-            print(format(i, f'0{no_vertices}b'), end = ' ')
-            print(probabilities[i])
+    # print("probability:")
+    # probabilities = np.array(np.square(np.abs(v)))
+    # for i in range(2**no_vertices):
+    #     if(probabilities[i] > 0.005):
+    #         print(format(i, f'0{no_vertices}b'), end = ' ')
+    #         print(probabilities[i])
 
     # print(np.array2string(np.square(np.abs(v)).flatten(), separator=', '))
     # print("norm:", np.linalg.norm(v))
@@ -106,7 +105,7 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
     print('--------------------------------------------------------')
 
     # return v
-    return [x[0] for x in probabilities]
+    # return [x[0] for x in probabilities]
 
 
 def MIS_MA_QAOA(G, depth, penalty_term, initial_state = []):

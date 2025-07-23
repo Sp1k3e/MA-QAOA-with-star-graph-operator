@@ -11,6 +11,7 @@ graph_type = ['random', 0.5]
 
 G = generate_graphs.generate_graph_type(n, graph_type, seed)[0]
 
+print(list(G.edges()))
 # pos = nx.spring_layout(G)
 # nx.draw(G)
 
@@ -26,4 +27,4 @@ plt.xlabel("x")                        # x 轴标签
 plt.ylabel("y")                        # y 轴标签
 plt.legend()                           # 显示图例
 plt.grid(True)                         # 显示网格
-plt.show()                             # 显示图像
+# plt.show()                             # 显示图像

@@ -16,7 +16,7 @@ saveFig = False
 # edge_list = [(0,1), (1,2), (2,3),(3,4)]
 # edge_list = [(0,1), (1,2), (2,3),(3,4),(4,5),(6,7)]
 edge_list = [(0,1), (1,2), (0,2)] #三角形
-# edge_list = [(0,1), (1,2), (2,3), (0,3)] #正方形
+edge_list = [(0,1), (1,2), (2,3), (0,3)] #正方形
 # edge_list = [(0,1), (1,2), (1,3), (3,4)]
 
 # edge_list = [(0,1),(1,2),(2,3),(3,4),(4,5),(5,6),(6,7)] # line
@@ -44,14 +44,16 @@ max_ham_eigenvalue = max_cut_solution[2]
 print(f'layers:{depth} specific_graph standard_QAOA')
 
 phase_operator_edge_list = edge_list
+# phase_operator_edge_list = [(0,1), (1,2), (2,3), (0,3)]
 # phase_operator_edge_list = [(0,1), (1,2), (2,3), (3,4), (4,5), (5,6), (6,7)]
-phase_operator_edge_list = [(0,1), (2,3), (4,5), (6,7)]
+# phase_operator_edge_list = [(0,1), (2,3), (4,5), (6,7)]
 target_graph = nx.Graph()
 target_graph.add_edges_from(phase_operator_edge_list)
 
-# phase_operator_edge_list1 = edge_list
+phase_operator_edge_list1 = edge_list
+# phase_operator_edge_list1 = [(1,2), (2,3), (0,3)]
 # phase_operator_edge_list1 = [(0,1), (1,2), (2,3), (3,4), (4,5), (5,6), (6,7)]
-phase_operator_edge_list1 = [(1,2), (3,4), (5,6)]
+# phase_operator_edge_list1 = [(1,2), (3,4), (5,6)]
 target_graph1 = nx.Graph()
 target_graph1.add_edges_from(phase_operator_edge_list1)
 

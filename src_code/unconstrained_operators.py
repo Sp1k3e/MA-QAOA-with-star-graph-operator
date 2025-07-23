@@ -88,9 +88,15 @@ def MIS_unconstrained_phase_unitary(graph, parameter, dict_paulis, penalty_term)
 
         tmp_matrix *= dict_paulis['I'] * math.cos(lambda_parameter) - (dict_paulis['Z' + str(j)]) * math.sin(lambda_parameter) * 1j 
 
-        tmp_matrix *= dict_paulis['I'] * math.cos(lambda_parameter) + (dict_paulis['Z' + str(i) + 'Z' + str(j)]) * math.sin(lambda_parameter) * 1j
-        
+        tmp_matrix = dict_paulis['I'] * math.cos(lambda_parameter) + (dict_paulis['Z' + str(i) + 'Z' + str(j)]) * math.sin(lambda_parameter) * 1j
+
         result = tmp_matrix * result
+        
+        # if first:
+        #     result = tmp_matrix
+        #     first = False
+        # else:
+        #     result = tmp_matrix * result
         
     return result
 
