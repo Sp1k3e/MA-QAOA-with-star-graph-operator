@@ -25,27 +25,30 @@ edge_list = [(0,1), (1,2), (2,3)]
 # edge_list = [(0,1),(1,2),(2,3),(3,4),(4,5),(5,6),(6,7),(0,7)] # polygon
 
 # edge_list = [(0,1), (1,2), (0,2)] # Triangle
-edge_list = [(0,1), (1,2), (2,3), (0,3)] #正方形
+# edge_list = [(0,1), (1,2), (2,3), (0,3)] #正方形
 # edge_list = [(0,1), (1,2), (0,2), (0,3), (3,4)]
 # edge_list = [(0,1), (1,2), (2,3), (1,4),(1,5),(2,6),(6,7),(7,8)]
 
 # graphs contain line
-edge_list = [(0,1), (1,2),(1,3)]
-edge_list = [(0,1), (1,2),(1,3),(3,4),(4,5),(5,6),(5,7), (6,7)]
-# edge_list = [(0,1), (1,2),(1,3),(3,4),(4,5),(5,6),(6,7), (6,8)]
+edge_list = [(0,1), (1,2),(1,3),(3,4),(4,5),(5,6),(5,7)]
+# edge_list = [(0,1), (1,2),(1,3),(3,4),(4,5),(5,6), (6,7), (6,8)]
+# edge_list = [(0,1), (1,2), (2,3), (3,4), (3,5), (4,6), (5,6), (3,6)]
 
 # random graph
-graph = generate_graphs.generate_graph_type(8, ['random', 0.5], 0)[0]
-edge_list = list(graph.edges())
+# graph = generate_graphs.generate_graph_type(8, ['random', 0.5], 0)[0]
+# edge_list = list(graph.edges())
 
 # custom phase operator----------------------------------------------------
 use_different_phase_operators = True
-# use_different_phase_operators = False
+use_different_phase_operators = False
 
 phase_operator_edge_list = edge_list
 # phase_operator_edge_list = [(0,1), (1,2), (2,3)]
-# phase_operator_edge_list = [(0,1), (1,2),(1,3),(3,4),(3,5),(5,6),(5,7)]
+phase_operator_edge_list = [(0,1), (1,2),(1,3),(3,4),(3,5),(5,6),(5,7)]
 # phase_operator_edge_list = [(0,1), (0,2), (0,3), (0,4), (0,5), (0,6), (0,7)]
+# phase_operator_edge_list = [(0,1), (1,2),(1,3),(3,4),(4,5),(3,6), (6,7), (6,8)]
+# phase_operator_edge_list = [(0,2), (1,2), (2,3), (3,4), (3,5), (4,6), (5,6), (3,6)]
+# phase_operator_edge_list = [(0,3), (1,3), (2,3), (3,4), (3,5), (4,6), (5,6), (3,6)]
 
 # phase_operator_edge_list = edge_list[:int(len(edge_list)/2)]
 target_graph = nx.Graph()

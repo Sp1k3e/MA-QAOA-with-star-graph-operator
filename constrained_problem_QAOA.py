@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from scipy.linalg import eigh
 
 
-def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state = [], custom_phase_operator = None):
+def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state = [], custom_phase_operator = None, save = False, seed = 0):
     """
     MIS variants of QAOA
     """
@@ -58,7 +58,7 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
 
     #! unconstrained circuit
     else:
-        print('unconstrained QAOA  penalty term =', penalty_term)
+        print(depth, 'layer  unconstrained QAOA  penalty term =', penalty_term)
         hamiltonian = unconstrained_operators.MIS_hamiltonian(G, penalty_term)
 
         def obj_func(parameter_values):
@@ -103,6 +103,15 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
         print("initial state:", initial_state)
     print('optimal_parameters:', np.array(optimal_para)/3.1415, "pi")
     print('--------------------------------------------------------')
+
+    if(save):
+        if(use_constrain_operator == False):
+            with open(f"./results/constrained/unconstrained_QAOA{depth}.csv", "a") as f:
+                f.write(f'MIS_unconstrained_QAOA, {no_vertices}, {penalty_term}, {depth}, {seed}, {approx_ratio}\n')
+        if(use_constrain_operator == True):
+            with open(f"./results/constrained/constrained_QAOA{depth}.csv", "a") as f:
+                f.write(f'MIS_constrained_QAOA, {no_vertices}, ER0.5, {depth}, {seed}, {approx_ratio}\n')
+
 
     # return v
     # return [x[0] for x in probabilities]
