@@ -84,9 +84,9 @@ def MIS_unconstrained_phase_unitary(graph, parameter, dict_paulis, penalty_term)
     
     edges = graph.edges()
     for (i, j) in edges:
-        tmp_matrix = dict_paulis['I'] * math.cos(lambda_parameter) - (dict_paulis['Z' + str(i)]) * math.sin(lambda_parameter) * 1j 
+        # tmp_matrix = dict_paulis['I'] * math.cos(lambda_parameter) - (dict_paulis['Z' + str(i)]) * math.sin(lambda_parameter) * 1j 
 
-        tmp_matrix *= dict_paulis['I'] * math.cos(lambda_parameter) - (dict_paulis['Z' + str(j)]) * math.sin(lambda_parameter) * 1j 
+        # tmp_matrix *= dict_paulis['I'] * math.cos(lambda_parameter) - (dict_paulis['Z' + str(j)]) * math.sin(lambda_parameter) * 1j 
 
         tmp_matrix = dict_paulis['I'] * math.cos(lambda_parameter) + (dict_paulis['Z' + str(i) + 'Z' + str(j)]) * math.sin(lambda_parameter) * 1j
 

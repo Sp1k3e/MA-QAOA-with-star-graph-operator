@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from scipy.linalg import eigh
 
 
-def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state = [], custom_phase_operator = None, save = False, seed = 0):
+def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state = [], custom_phase_operator = None, save = False, seed = -1):
     """
     MIS variants of QAOA
     """
@@ -106,10 +106,11 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
 
     if(save):
         if(use_constrain_operator == False):
-            with open(f"./results/constrained/unconstrained_QAOA{depth}.csv", "a") as f:
+            with open(f"./results/MIS/customized/unconstrained_QAOA{depth}.csv", "a") as f:
+            # with open(f"./results/MIS/unconstrained_QAOA{depth}.csv", "a") as f:
                 f.write(f'MIS_unconstrained_QAOA, {no_vertices}, {penalty_term}, {depth}, {seed}, {approx_ratio}\n')
         if(use_constrain_operator == True):
-            with open(f"./results/constrained/constrained_QAOA{depth}.csv", "a") as f:
+            with open(f"./results/MIS/constrained_QAOA{depth}.csv", "a") as f:
                 f.write(f'MIS_constrained_QAOA, {no_vertices}, ER0.5, {depth}, {seed}, {approx_ratio}\n')
 
 
@@ -117,7 +118,7 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
     # return [x[0] for x in probabilities]
 
 
-def MIS_MA_QAOA(G, depth, penalty_term, initial_state = []):
+def MIS_MA_QAOA(G, depth, penalty_term, initial_state = [], save = False, seed = -1):
     gamma_0 = 1
     beta_0 = 0.7854
     no_vertices = G.number_of_nodes()
@@ -166,24 +167,27 @@ def MIS_MA_QAOA(G, depth, penalty_term, initial_state = []):
 
     hamiltonian = constrained_operators.MIS_hamiltonian(G)
     hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
-    cut_approx_ratio = (hamiltonian_expectation + solution - max_ham_eigenvalue) / solution
+    approx_ratio = (hamiltonian_expectation + solution - max_ham_eigenvalue) / solution
 
     # print('***************')
     # print("目标函数总调用次数:", result.nfev)
     # print(f'total iteration: {result.nit}')
     # print(f"Minimize time: {execution_time}s")
     # print(f"simulation time: {sum(simulation_time)}s")
-    print(f'AR: {cut_approx_ratio}')
+    print(f'AR: {approx_ratio}')
 
     dens_mat = dens_mat.todense()
     v = dens_mat[:,0]
     v = v/np.sqrt(v[0])
 
-    print("probability:")
-    probabilities = np.array(np.square(np.abs(v)))
-    for i in range(2**no_vertices):
-        if(probabilities[i] > 0.001):
-            print(format(i, f'0{no_vertices}b'), end = ' ')
-            print(probabilities[i])
+    # print("probability:")
+    # probabilities = np.array(np.square(np.abs(v)))
+    # for i in range(2**no_vertices):
+    #     if(probabilities[i] > 0.001):
+    #         print(format(i, f'0{no_vertices}b'), end = ' ')
+    #         print(probabilities[i])
     
-    print("optimal parameters:", np.array(parameter_list)/3.1415, "pi")
+    # print("optimal parameters:", np.array(parameter_list)/3.1415, "pi")
+    if(save):
+        with open(f'results/MIS/MA-QAOA/MA-QAOA{depth}.csv', 'a') as f:
+            f.write(f'MIS_MA-QAOA, {no_vertices}, {penalty_term}, {depth}, {seed}, {approx_ratio}\n')

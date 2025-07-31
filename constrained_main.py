@@ -11,7 +11,7 @@ save = True
 no_vertices = 8
 seed = 1
 
-depth = 5
+depth = 6
 # circuit_type = "partial mixer"
 circuit_type = "unconstrained"
 # circuit_type = "MA"
@@ -70,15 +70,21 @@ if(test):
         constrained_problem_QAOA.MIS_MA_QAOA(G,depth, penalty_term, initial_state=initial_vector)
     # heuristic_MA.star_graph_MA_MIS(G, 'specific', 0, 1)
 
-    raise SystemExit("程序终止")
+    raise SystemExit("test done")
     # tests end----------------------------------------------------------------
 
+penalty_term = 1
 #! simulations
 # initial_state = []
 for seed in range(50):
     G = generate_graphs.generate_graph_type(no_vertices,['random', 0.5], seed)[0]
 
     # constrained_problem_QAOA.MIS_QAOA(G, depth, use_constrain_operator=True)
-    constrained_problem_QAOA.MIS_QAOA(G, depth, use_constrain_operator=False, save=save, seed=seed)
+
+    if(circuit_type == 'unconstrained'):
+        constrained_problem_QAOA.MIS_QAOA(G, depth, use_constrain_operator=False, save=save, seed=seed)
+
+    if(circuit_type == 'MA'):
+        constrained_problem_QAOA.MIS_MA_QAOA(G,depth, penalty_term, save = save, seed=seed)
 
 
