@@ -10,7 +10,7 @@ import random
 
 np.set_printoptions(precision=3, suppress=True)
     
-depth = 1
+depth = 2
 saveFig = False
 save = True
 save = False
@@ -50,7 +50,7 @@ phase_operator_edge_list = [(0,1), (1,2),(1,3),(3,4),(3,5),(5,6),(5,7)]
 # phase_operator_edge_list = [(0,2), (1,2), (2,3), (3,4), (3,5), (4,6), (5,6), (3,6)]
 # phase_operator_edge_list = [(0,3), (1,3), (2,3), (3,4), (3,5), (4,6), (5,6), (3,6)]
 
-# phase_operator_edge_list = edge_list[:int(len(edge_list)/2)]
+phase_operator_edge_list = edge_list[:int(len(edge_list)/2)]
 target_graph = nx.Graph()
 target_graph.add_edges_from(phase_operator_edge_list)
 no_edges = target_graph.number_of_edges()
