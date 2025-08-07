@@ -83,6 +83,8 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
     else:
         target_graph = G
 
+    evaluation = 0
+    iteration = 0
     # initial_parameter = [gamma_0] * (depth) + [beta_0] * (depth)
     initial_parameter = [random.random() * 3 for _ in range(depth * 2)]
     #! use constrained circuits or not 
@@ -121,15 +123,16 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
             optimal_para = list(result.x)
             dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz_fewer_RZ(target_graph, optimal_para, pauli_ops_dict, penalty_term, initial_state)
 
-        elif phase_operator_type == 'addtional_RX':
+        elif phase_operator_type == 'additional_RX':
             def obj_func(parameter_values):
-                dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz(target_graph, parameter_values, pauli_ops_dict, penalty_term, initial_state)
+                dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz_addtional_RX(target_graph, parameter_values, pauli_ops_dict, penalty_term, initial_state)
                 expectation_value = (hamiltonian * dens_mat).trace().real
                 return expectation_value * (-1.0)
 
+            initial_parameter = [random.random() * 3 for _ in range(depth * 3)]
             result = minimize(obj_func, initial_parameter, method="BFGS")
             optimal_para = list(result.x)
-            dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz(target_graph, optimal_para, pauli_ops_dict, penalty_term, initial_state)
+            dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz_addtional_RX(target_graph, optimal_para, pauli_ops_dict, penalty_term, initial_state)
 
         elif phase_operator_type == 'multiply_gamma':
             def obj_func(parameter_values):
@@ -157,6 +160,8 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
         approx_ratio = (hamiltonian_expectation + solution - max_ham_eigenvalue) / solution
 
 
+    evaluation = result.nfev
+    iteration = result.nit
     # print('solution hamiltonian eigenvalue:', max_ham_eigenvalue)
     # print('Hamiltonian expectation:', hamiltonian_expectation)
     print('AR:', approx_ratio)
@@ -191,7 +196,7 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
             with open(f"./results/MIS/customized/{phase_operator_type}/MIS_QAOA{no_vertices}_{p}_{depth}_{phase_operator_type}.csv", "a") as f:
             # with open(f"./results/MIS/unconstrained_QAOA{depth}.csv", "a") as f:
             # with open(f"./results/MIS/tmp/unconstrained_QAOA{depth}.csv", "a") as f:
-                f.write(f'MIS_unconstrained_QAOA {phase_operator_type}, {no_vertices}, {p}, {seed}, {penalty_term}, {depth}, {approx_ratio}, {feasible_pro}, {optimal_pro}\n')
+                f.write(f'MIS_unconstrained_QAOA {phase_operator_type}, {no_vertices}, {p}, {seed}, {penalty_term}, {depth}, {approx_ratio}, {feasible_pro}, {optimal_pro}, {evaluation}, {iteration}\n')
 
         if(use_constrain_operator == True):
             with open(f"./results/MIS/constrained_QAOA{depth}.csv", "a") as f:
