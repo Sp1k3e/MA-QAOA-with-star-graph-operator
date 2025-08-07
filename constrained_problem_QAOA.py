@@ -12,8 +12,56 @@ import time
 import matplotlib.pyplot as plt
 from scipy.linalg import eigh
 
+def calculate_pro(G, probabilities, solution):
+    print("probabilities:")
+    invalid_pro = 0
+    optimal_pro = 0
+    no_vertices = G.number_of_nodes()
+    for i in range(2**no_vertices):
+        if(probabilities[i] > 0.001):
+            feasible = True
+            current_solution = format(i, f'0{no_vertices}b')
+            current_solution = current_solution[::-1]
+            print(current_solution, end = ' ')
 
-def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state = [], custom_phase_operator = None, save = False, seed = -1):
+            result_vertices = []
+            for j in range(no_vertices):
+                if current_solution[j] == '1':
+                    result_vertices += [j]
+            # print(result_vertices, end = ' ')
+            n = len(result_vertices)
+
+            if(n > solution):
+                invalid_pro += probabilities[i]
+                print("invalide solution", end = ' ')
+                print(probabilities[i])
+                continue
+
+            for x in range(n):
+                if feasible == False:
+                    break
+                for y in range(x+1, n):
+                    a = result_vertices[x]
+                    b = result_vertices[y]
+                    if G.has_edge(a,b):
+                        # print(a,b, end = ' ')
+                        print("invalide solution", end = ' ')
+                        invalid_pro += probabilities[i]
+                        feasible = False
+                        break
+
+            if feasible and n == solution:
+                print("optimal solution", end = ' ')
+                optimal_pro += probabilities[i]
+            
+            print(probabilities[i])
+    print('\nresults:')
+    print('  unfeasible_solution_probability: ', invalid_pro)
+    print('  feasible_solution_probablity: ', 1 - invalid_pro)
+    print('  optimal_solution_probablity: ', optimal_pro)
+    return [float(1 - invalid_pro), float(optimal_pro)]
+
+def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state = [], custom_phase_operator = None, save = False, seed = -1, p = 0, phase_operator_type = ''):
     """
     MIS variants of QAOA
     """
@@ -58,27 +106,56 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
 
     #! unconstrained circuit
     else:
-        print(depth, 'layer  unconstrained QAOA  penalty term =', penalty_term)
+        print(depth, 'layer unconstrained QAOA  penalty term =', penalty_term)
+        if(phase_operator_type != ''):
+            print(phase_operator_type)
         hamiltonian = unconstrained_operators.MIS_hamiltonian(G, penalty_term)
 
-        def obj_func(parameter_values):
-            dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz(target_graph, parameter_values, pauli_ops_dict, penalty_term, initial_state)
-            # dens_mat = build_operators.build_standard_qaoa_ansatz(G, parameter_values, pauli_ops_dict)
-            expectation_value = (hamiltonian * dens_mat).trace().real
-            return expectation_value * (-1.0)
-        
-        result = minimize(obj_func, initial_parameter, method="BFGS")
+        if phase_operator_type == 'fewer_RZ':
+            def obj_func(parameter_values):
+                dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz_fewer_RZ(target_graph, parameter_values, pauli_ops_dict, penalty_term, initial_state)
+                expectation_value = (hamiltonian * dens_mat).trace().real
+                return expectation_value * (-1.0)
 
-        optimal_para = list(result.x)
-        dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz(target_graph, optimal_para, pauli_ops_dict, penalty_term, initial_state)
-        # dens_mat = build_operators.build_standard_qaoa_ansatz(G, optimal_para, pauli_ops_dict)
+            result = minimize(obj_func, initial_parameter, method="BFGS")
+            optimal_para = list(result.x)
+            dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz_fewer_RZ(target_graph, optimal_para, pauli_ops_dict, penalty_term, initial_state)
+
+        elif phase_operator_type == 'addtional_RX':
+            def obj_func(parameter_values):
+                dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz(target_graph, parameter_values, pauli_ops_dict, penalty_term, initial_state)
+                expectation_value = (hamiltonian * dens_mat).trace().real
+                return expectation_value * (-1.0)
+
+            result = minimize(obj_func, initial_parameter, method="BFGS")
+            optimal_para = list(result.x)
+            dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz(target_graph, optimal_para, pauli_ops_dict, penalty_term, initial_state)
+
+        elif phase_operator_type == 'multiply_gamma':
+            def obj_func(parameter_values):
+                dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz(target_graph, parameter_values, pauli_ops_dict, penalty_term, initial_state)
+                expectation_value = (hamiltonian * dens_mat).trace().real
+                return expectation_value * (-1.0)
+
+            result = minimize(obj_func, initial_parameter, method="BFGS")
+            optimal_para = list(result.x)
+            dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz(target_graph, optimal_para, pauli_ops_dict, penalty_term, initial_state)
+
+        elif phase_operator_type == '':
+            def obj_func(parameter_values):
+                dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz(target_graph, parameter_values, pauli_ops_dict, penalty_term, initial_state)
+                expectation_value = (hamiltonian * dens_mat).trace().real
+                return expectation_value * (-1.0)
+
+            result = minimize(obj_func, initial_parameter, method="BFGS")
+            optimal_para = list(result.x)
+            dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz(target_graph, optimal_para, pauli_ops_dict, penalty_term, initial_state)
 
         #! use Hamiltonian without penalty to calculate the AR
         hamiltonian = constrained_operators.MIS_hamiltonian(G)
         hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
         approx_ratio = (hamiltonian_expectation + solution - max_ham_eigenvalue) / solution
 
-    print(f'layers:{depth} MIS_QAOA')
 
     # print('solution hamiltonian eigenvalue:', max_ham_eigenvalue)
     # print('Hamiltonian expectation:', hamiltonian_expectation)
@@ -87,6 +164,11 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
     dens_mat = dens_mat.todense()
     v = dens_mat[:,0]
     v = v/np.sqrt(v[0])
+    probabilities = np.array(np.square(np.abs(v)))
+    
+    res = calculate_pro(G, probabilities, solution)
+    feasible_pro = res[0]
+    optimal_pro = res[1]
 
     # print("probability:")
     # probabilities = np.array(np.square(np.abs(v)))
@@ -101,18 +183,19 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
 
     if use_constrain_operator and len(initial_state) != 0:
         print("initial state:", initial_state)
-    print('optimal_parameters:', np.array(optimal_para)/3.1415, "pi")
+    # print('optimal_parameters:', np.array(optimal_para)/3.1415, "pi")
     print('--------------------------------------------------------')
 
     if(save):
         if(use_constrain_operator == False):
-            with open(f"./results/MIS/customized/unconstrained_QAOA{depth}.csv", "a") as f:
+            with open(f"./results/MIS/customized/{phase_operator_type}/MIS_QAOA{no_vertices}_{p}_{depth}_{phase_operator_type}.csv", "a") as f:
             # with open(f"./results/MIS/unconstrained_QAOA{depth}.csv", "a") as f:
-                f.write(f'MIS_unconstrained_QAOA, {no_vertices}, {penalty_term}, {depth}, {seed}, {approx_ratio}\n')
+            # with open(f"./results/MIS/tmp/unconstrained_QAOA{depth}.csv", "a") as f:
+                f.write(f'MIS_unconstrained_QAOA {phase_operator_type}, {no_vertices}, {p}, {seed}, {penalty_term}, {depth}, {approx_ratio}, {feasible_pro}, {optimal_pro}\n')
+
         if(use_constrain_operator == True):
             with open(f"./results/MIS/constrained_QAOA{depth}.csv", "a") as f:
                 f.write(f'MIS_constrained_QAOA, {no_vertices}, ER0.5, {depth}, {seed}, {approx_ratio}\n')
-
 
     # return v
     # return [x[0] for x in probabilities]
@@ -174,20 +257,18 @@ def MIS_MA_QAOA(G, depth, penalty_term, initial_state = [], save = False, seed =
     # print(f'total iteration: {result.nit}')
     # print(f"Minimize time: {execution_time}s")
     # print(f"simulation time: {sum(simulation_time)}s")
+    # print("optimal parameters:", np.array(parameter_list)/3.1415, "pi")
     print(f'AR: {approx_ratio}')
 
     dens_mat = dens_mat.todense()
     v = dens_mat[:,0]
     v = v/np.sqrt(v[0])
+    probabilities = np.array(np.square(np.abs(v)))
 
-    # print("probability:")
-    # probabilities = np.array(np.square(np.abs(v)))
-    # for i in range(2**no_vertices):
-    #     if(probabilities[i] > 0.001):
-    #         print(format(i, f'0{no_vertices}b'), end = ' ')
-    #         print(probabilities[i])
+    res = calculate_pro(G, probabilities, solution)
+    feasible_pro = res[0]
+    optimal_pro = res[1]
     
-    # print("optimal parameters:", np.array(parameter_list)/3.1415, "pi")
     if(save):
         with open(f'results/MIS/MA-QAOA/MA-QAOA{depth}.csv', 'a') as f:
             f.write(f'MIS_MA-QAOA, {no_vertices}, {penalty_term}, {depth}, {seed}, {approx_ratio}\n')

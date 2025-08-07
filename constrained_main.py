@@ -9,27 +9,35 @@ save = False
 save = True
 
 no_vertices = 8
+p = 0.4
 seed = 1
 
-depth = 6
+depth = 1
 # circuit_type = "partial mixer"
 circuit_type = "unconstrained"
 # circuit_type = "MA"
+
+# phase_operator_type = 'fewer_RZ'
+# phase_operator_type = 'addtional_RX'
+
 test = False
+# test = True
 
 if(test):
+    depth = 3
     G = nx.Graph()
     edge_list = [(0,1)]
     edge_list = [(0,1), (0,2)] #三角形少一条边
-    edge_list = [(0,1), (1,2), (0,2)] #三角形
+    # edge_list = [(0,1), (1,2), (0,2)] #三角形
     # edge_list = [(0,1), (1,2), (1,3)] #正方形少一条边
     # edge_list = [(0,1), (1,2), (2,3), (0,3)] #正方形
     # edge_list = [(0,1), (1,2), (1,3), (3,4), (2,3)]
     G.add_edges_from(edge_list)
 
-
-    G = generate_graphs.generate_graph_type(no_vertices,['random', 0.5], seed)[0]
+    # G = generate_graphs.generate_graph_type(no_vertices,['random', 0.5], seed)[0]
     no_vertices = G.number_of_nodes()
+    edge_list = G.edges()
+    print(edge_list)
 
     #! custom phase operator
     custom_phase_operator = G.copy()
@@ -63,7 +71,7 @@ if(test):
     #! unconstraned circuit
     penalty_term = 1 # in real cost function, this should multiple 2
     if(circuit_type == "unconstrained"):
-        constrained_problem_QAOA.MIS_QAOA(G, depth, False, penalty_term, custom_phase_operator=custom_phase_operator)
+        constrained_problem_QAOA.MIS_QAOA(G, depth, False, penalty_term, custom_phase_operator=custom_phase_operator, save=save)
 
     #! MA
     if(circuit_type == "MA"):
@@ -73,16 +81,27 @@ if(test):
     raise SystemExit("test done")
     # tests end----------------------------------------------------------------
 
-penalty_term = 1
 #! simulations
+penalty_term = 1
 # initial_state = []
-for seed in range(50):
-    G = generate_graphs.generate_graph_type(no_vertices,['random', 0.5], seed)[0]
+for seed in range(11):
+    G = generate_graphs.generate_graph_type(no_vertices,['random', p], seed)[0]
+    if nx.is_connected(G) == False:
+        print("unconnected graph")
+        continue
 
     # constrained_problem_QAOA.MIS_QAOA(G, depth, use_constrain_operator=True)
 
     if(circuit_type == 'unconstrained'):
-        constrained_problem_QAOA.MIS_QAOA(G, depth, use_constrain_operator=False, save=save, seed=seed)
+        if(phase_operator_type == "fewer_RZ"):
+            constrained_problem_QAOA.MIS_QAOA(G, depth, use_constrain_operator=False, save=save, seed=seed, p = p, phase_operator_type= 'fewer_RZ')
+        elif(phase_operator_type == "addtional_RX"):
+            constrained_problem_QAOA.MIS_QAOA(G, depth, use_constrain_operator=False, save=save, seed=seed, p = p, phase_operator_type= 'addtional_RX')
+        else:
+            constrained_problem_QAOA.MIS_QAOA(G, depth, use_constrain_operator=False, save=save, seed=seed, p = p)
+
+        # constrained_problem_QAOA.MIS_QAOA(G, depth, use_constrain_operator=False, save=save, seed=seed, p = p, phase_operator_type= 'multiply_gamma')
+
 
     if(circuit_type == 'MA'):
         constrained_problem_QAOA.MIS_MA_QAOA(G,depth, penalty_term, save = save, seed=seed)

@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 G = nx.Graph()
 edges = [(0, 1), (0, 3), (1, 2), (2, 3)]
 G.add_edges_from(edges)
+
+G = generate_graphs.generate_connected_graph(8, 0.5, 8)[0]
+
 no_vertices = G.number_of_nodes()
 
 

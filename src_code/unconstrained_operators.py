@@ -84,9 +84,9 @@ def MIS_unconstrained_phase_unitary(graph, parameter, dict_paulis, penalty_term)
     
     edges = graph.edges()
     for (i, j) in edges:
-        # tmp_matrix = dict_paulis['I'] * math.cos(lambda_parameter) - (dict_paulis['Z' + str(i)]) * math.sin(lambda_parameter) * 1j 
+        tmp_matrix = dict_paulis['I'] * math.cos(lambda_parameter) - (dict_paulis['Z' + str(i)]) * math.sin(lambda_parameter) * 1j 
 
-        # tmp_matrix *= dict_paulis['I'] * math.cos(lambda_parameter) - (dict_paulis['Z' + str(j)]) * math.sin(lambda_parameter) * 1j 
+        tmp_matrix *= dict_paulis['I'] * math.cos(lambda_parameter) - (dict_paulis['Z' + str(j)]) * math.sin(lambda_parameter) * 1j 
 
         tmp_matrix = dict_paulis['I'] * math.cos(lambda_parameter) + (dict_paulis['Z' + str(i) + 'Z' + str(j)]) * math.sin(lambda_parameter) * 1j
 
@@ -97,6 +97,31 @@ def MIS_unconstrained_phase_unitary(graph, parameter, dict_paulis, penalty_term)
         #     first = False
         # else:
         #     result = tmp_matrix * result
+        
+    return result
+
+def MIS_unconstrained_phase_unitary_fewer_RZ(graph, parameter, dict_paulis, penalty_term):
+    """
+    phase unitary with objective function and penelty term
+    """
+    first = True
+    parameter = 0.5 * parameter
+    lambda_parameter = penalty_term * parameter
+    for i in range(graph.number_of_nodes()):
+        tmp_matrix = dict_paulis['I'] * math.cos(parameter) + dict_paulis['Z' + str(i)] * math.sin(parameter) * 1j
+
+        if first:
+            result = tmp_matrix
+            first = False
+        else:
+            result = tmp_matrix * result
+    
+    edges = graph.edges()
+    for (i, j) in edges:
+
+        tmp_matrix = dict_paulis['I'] * math.cos(lambda_parameter) + (dict_paulis['Z' + str(i) + 'Z' + str(j)]) * math.sin(lambda_parameter) * 1j
+
+        result = tmp_matrix * result
         
     return result
 
@@ -115,6 +140,28 @@ def build_MIS_unconstrained_QAOAnsatz(graph, parameter_list, pauli_dict, penalty
 
     for layer in range(no_layers):
         phase_unit = MIS_unconstrained_phase_unitary(graph, ham_parameters[layer], pauli_dict, penalty_term)
+        dens_mat = (phase_unit * dens_mat) * (phase_unit.transpose().conj())
+    
+        mix_unit = MIS_unconstrained_mixer_unitary(no_qubits, mixer_parameters[layer], pauli_dict)
+        dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
+
+    return dens_mat
+
+def build_MIS_unconstrained_QAOAnsatz_fewer_RZ(graph, parameter_list, pauli_dict, penalty_term, initial_state = []):
+    no_layers = len(parameter_list) // 2
+    ham_parameters = parameter_list[:no_layers]
+    mixer_parameters = parameter_list[no_layers:]
+    
+    no_qubits = graph.number_of_nodes()
+
+    if len(initial_state) == 0:
+        dens_mat = initial_density_matrix(no_qubits)
+    else:
+        dens_mat = qi.DensityMatrix(initial_state)
+        dens_mat = sparse.csr_matrix(dens_mat.data)
+
+    for layer in range(no_layers):
+        phase_unit =MIS_unconstrained_phase_unitary_fewer_RZ(graph, ham_parameters[layer], pauli_dict, penalty_term)
         dens_mat = (phase_unit * dens_mat) * (phase_unit.transpose().conj())
     
         mix_unit = MIS_unconstrained_mixer_unitary(no_qubits, mixer_parameters[layer], pauli_dict)
