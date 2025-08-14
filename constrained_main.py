@@ -8,28 +8,27 @@ np.set_printoptions(precision=3, suppress=True)
 penalty_term = 1
 no_vertices = 8
 p = 0.4
-depth = 1
+depth = 6
 
 # circuit_type = "partial mixer"
 circuit_type = "unconstrained"
 # circuit_type = "MA"
 
 phase_operator_type = 'additional_RX'
-# phase_operator_type = 'variational_lambda'
+phase_operator_type = 'variational_lambda'
 # phase_operator_type = 'variational_lambdas'
 # phase_operator_type = 'fewer_RZ'
 # phase_operator_type = 'multiply_gamma'
-# phase_operator_type = 'original'
+phase_operator_type = 'original'
 
 save = False
 save = True
 
 test = False
-test = True
-
+# test = True
 
 if(test):
-    seed = 10
+    seed = 1
     # G = nx.Graph()
     # edge_list = [(0,1)]
     # edge_list = [(0,1), (0,2)] #三角形少一条边

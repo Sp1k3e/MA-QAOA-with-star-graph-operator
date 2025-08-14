@@ -139,9 +139,9 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
                 return expectation_value * (-1.0)
 
             initial_parameter = [random.random() * 3 for _ in range(depth * 3)]
-            bounds = [(0,3)]*(depth*3)
-            # result = minimize(obj_func, initial_parameter, method="BFGS")
-            result = minimize(obj_func, initial_parameter, method="COBYLA", bounds=bounds)
+            result = minimize(obj_func, initial_parameter, method="BFGS")
+            # bounds = [(0,3)]*(depth*3)
+            # result = minimize(obj_func, initial_parameter, method="COBYLA", bounds=bounds)
             optimal_para = list(result.x)
             dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz_variational_lambdas(target_graph, optimal_para, pauli_ops_dict, penalty_term, initial_state)
             print(optimal_para)
@@ -149,13 +149,16 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
         elif phase_operator_type == 'variational_lambda':
             def obj_func(parameter_values):
                 dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz_variational_lambda(target_graph, parameter_values, pauli_ops_dict, penalty_term, initial_state)
+                # hamiltonian = unconstrained_operators.MIS_hamiltonian(G, parameter_values[-1]) # taking the lambda in objective function into account
                 expectation_value = (hamiltonian * dens_mat).trace().real
                 return expectation_value * (-1.0)
 
             initial_parameter += [random.random() * 2 + 1]
-            # bounds = [(0,3)]*(depth*2 + 1)
             result = minimize(obj_func, initial_parameter, method="BFGS")
+
+            # bounds = [(0,6.28)]*(depth*2) + [(1, 10)] # taking the lambda in objective function into account
             # result = minimize(obj_func, initial_parameter, method="COBYLA", bounds=bounds)
+
             optimal_para = list(result.x)
             dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz_variational_lambda(target_graph, optimal_para, pauli_ops_dict, penalty_term, initial_state)
             print('lambda:', optimal_para[-1])
