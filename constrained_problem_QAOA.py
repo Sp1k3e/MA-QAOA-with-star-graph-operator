@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from scipy.linalg import eigh
 
 def calculate_pro(G, probabilities, solution):
-    print("probabilities:")
+    # print("probabilities:")
     invalid_pro = 0
     optimal_pro = 0
     no_vertices = G.number_of_nodes()
@@ -22,19 +22,18 @@ def calculate_pro(G, probabilities, solution):
             feasible = True
             current_solution = format(i, f'0{no_vertices}b')
             current_solution = current_solution[::-1]
-            print(current_solution, end = ' ')
+            # print(current_solution, end = ' ')
 
             result_vertices = []
             for j in range(no_vertices):
                 if current_solution[j] == '1':
                     result_vertices += [j]
-            # print(result_vertices, end = ' ')
             n = len(result_vertices)
 
             if(n > solution):
                 invalid_pro += probabilities[i]
-                print("invalide solution", end = ' ')
-                print(probabilities[i])
+                # print("invalide solution", end = ' ')
+                # print(probabilities[i])
                 continue
 
             for x in range(n):
@@ -45,18 +44,18 @@ def calculate_pro(G, probabilities, solution):
                     b = result_vertices[y]
                     if G.has_edge(a,b):
                         # print(a,b, end = ' ')
-                        print("invalide solution", end = ' ')
+                        # print("invalide solution", end = ' ')
                         invalid_pro += probabilities[i]
                         feasible = False
                         break
 
             if feasible and n == solution:
-                print("optimal solution", end = ' ')
+                # print("optimal solution", end = ' ')
                 optimal_pro += probabilities[i]
             
-            print(probabilities[i])
+            # print(probabilities[i])
     print('\nresults:')
-    print('  unfeasible_solution_probability: ', invalid_pro)
+    # print('  unfeasible_solution_probability: ', invalid_pro)
     print('  feasible_solution_probablity: ', 1 - invalid_pro)
     print('  optimal_solution_probablity: ', optimal_pro)
     return [float(1 - invalid_pro), float(optimal_pro)]
@@ -109,8 +108,7 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
     #! unconstrained circuit
     else:
         print(depth, 'layer unconstrained QAOA  penalty term =', penalty_term)
-        if(phase_operator_type != ''):
-            print(phase_operator_type)
+        print(phase_operator_type)
         hamiltonian = unconstrained_operators.MIS_hamiltonian(G, penalty_term)
 
         if phase_operator_type == 'fewer_RZ':
@@ -134,17 +132,45 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
             optimal_para = list(result.x)
             dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz_addtional_RX(target_graph, optimal_para, pauli_ops_dict, penalty_term, initial_state)
 
+        elif phase_operator_type == 'variational_lambdas':
+            def obj_func(parameter_values):
+                dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz_variational_lambdas(target_graph, parameter_values, pauli_ops_dict, penalty_term, initial_state)
+                expectation_value = (hamiltonian * dens_mat).trace().real
+                return expectation_value * (-1.0)
+
+            initial_parameter = [random.random() * 3 for _ in range(depth * 3)]
+            bounds = [(0,3)]*(depth*3)
+            # result = minimize(obj_func, initial_parameter, method="BFGS")
+            result = minimize(obj_func, initial_parameter, method="COBYLA", bounds=bounds)
+            optimal_para = list(result.x)
+            dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz_variational_lambdas(target_graph, optimal_para, pauli_ops_dict, penalty_term, initial_state)
+            print(optimal_para)
+
+        elif phase_operator_type == 'variational_lambda':
+            def obj_func(parameter_values):
+                dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz_variational_lambda(target_graph, parameter_values, pauli_ops_dict, penalty_term, initial_state)
+                expectation_value = (hamiltonian * dens_mat).trace().real
+                return expectation_value * (-1.0)
+
+            initial_parameter += [random.random() * 2 + 1]
+            # bounds = [(0,3)]*(depth*2 + 1)
+            result = minimize(obj_func, initial_parameter, method="BFGS")
+            # result = minimize(obj_func, initial_parameter, method="COBYLA", bounds=bounds)
+            optimal_para = list(result.x)
+            dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz_variational_lambda(target_graph, optimal_para, pauli_ops_dict, penalty_term, initial_state)
+            print('lambda:', optimal_para[-1])
+
         elif phase_operator_type == 'multiply_gamma':
             def obj_func(parameter_values):
-                dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz(target_graph, parameter_values, pauli_ops_dict, penalty_term, initial_state)
+                dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz_multiply_gamma(target_graph, parameter_values, pauli_ops_dict, penalty_term, initial_state)
                 expectation_value = (hamiltonian * dens_mat).trace().real
                 return expectation_value * (-1.0)
 
             result = minimize(obj_func, initial_parameter, method="BFGS")
             optimal_para = list(result.x)
-            dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz(target_graph, optimal_para, pauli_ops_dict, penalty_term, initial_state)
+            dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz_multiply_gamma(target_graph, optimal_para, pauli_ops_dict, penalty_term, initial_state)
 
-        elif phase_operator_type == '':
+        elif phase_operator_type == 'original':
             def obj_func(parameter_values):
                 dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz(target_graph, parameter_values, pauli_ops_dict, penalty_term, initial_state)
                 expectation_value = (hamiltonian * dens_mat).trace().real
@@ -161,7 +187,11 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
 
 
     evaluation = result.nfev
-    iteration = result.nit
+    if(phase_operator_type == 'variational_lambdas' or phase_operator_type == 'variational_lambda'):
+        iteration = round(optimal_para[-1], 3)
+    else:
+        iteration = result.nit
+
     # print('solution hamiltonian eigenvalue:', max_ham_eigenvalue)
     # print('Hamiltonian expectation:', hamiltonian_expectation)
     print('AR:', approx_ratio)
@@ -193,7 +223,7 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
 
     if(save):
         if(use_constrain_operator == False):
-            with open(f"./results/MIS/customized/{phase_operator_type}/MIS_QAOA{no_vertices}_{p}_{depth}_{phase_operator_type}.csv", "a") as f:
+            with open(f"./results/MIS/QAOA/{phase_operator_type}/MIS_QAOA{no_vertices}_{p}_{depth}_{phase_operator_type}.csv", "a") as f:
             # with open(f"./results/MIS/unconstrained_QAOA{depth}.csv", "a") as f:
             # with open(f"./results/MIS/tmp/unconstrained_QAOA{depth}.csv", "a") as f:
                 f.write(f'MIS_unconstrained_QAOA {phase_operator_type}, {no_vertices}, {p}, {seed}, {penalty_term}, {depth}, {approx_ratio}, {feasible_pro}, {optimal_pro}, {evaluation}, {iteration}\n')

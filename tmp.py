@@ -11,5 +11,6 @@ import time
 import random
 import csv
 
+l = [0,1,2]
 
-print()
+print(l[0:1])

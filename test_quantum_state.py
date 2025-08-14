@@ -24,36 +24,55 @@ for i in range(no_vertices):
     if final_state[i] == '1':
         result_vertices += [i]
 
+probabilities = [0] * 7 + [1]
 # print(result_vertices)
 
-feasible_pro = 0
-optimal_pro = 0
+def calculate_pro(G, probabilities, solution):
+    print("probabilities:")
+    invalid_pro = 0
+    optimal_pro = 0
+    no_vertices = G.number_of_nodes()
+    for i in range(2**no_vertices):
+        if(probabilities[i] > 0.001):
+            feasible = True
+            current_solution = format(i, f'0{no_vertices}b')
+            current_solution = current_solution[::-1]
+            print(current_solution, end = ' ')
 
-n = len(result_vertices)
-for i in range(n):
-    for j in range(i+1, n):
-        a = result_vertices[i]
-        b = result_vertices[j]
-        if G.has_edge(a,b):
-            print("invalide solution")
-            break
+            result_vertices = []
+            for j in range(no_vertices):
+                if current_solution[j] == '1':
+                    result_vertices += [j]
+            n = len(result_vertices)
 
-if n == solution:
-    print('optimal solution')
+            if(n > solution):
+                invalid_pro += probabilities[i]
+                print("invalide solution", end = ' ')
+                print(probabilities[i])
+                continue
 
-n = 1
-solution = format(i, f'0{n}b').format(3)
-print(solution)
+            for x in range(n):
+                if feasible == False:
+                    break
+                for y in range(x+1, n):
+                    a = result_vertices[x]
+                    b = result_vertices[y]
+                    if G.has_edge(a,b):
+                        print(a,b, end = ' ')
+                        print("invalide solution", end = ' ')
+                        invalid_pro += probabilities[i]
+                        feasible = False
+                        break
 
-for i in range(n):
-    if solution[i] == '1':
-        result_vertices += [i]
-        n = len(result_vertices)
+            if feasible and n == solution:
+                print("optimal solution", end = ' ')
+                optimal_pro += probabilities[i]
+            
+            print(probabilities[i])
+    print('\nresults:')
+    print('  unfeasible_solution_probability: ', invalid_pro)
+    print('  feasible_solution_probablity: ', 1 - invalid_pro)
+    print('  optimal_solution_probablity: ', optimal_pro)
+    return [float(1 - invalid_pro), float(optimal_pro)]
 
-for i in range(n):
-    for j in range(i+1, n):
-        a = result_vertices[i]
-        b = result_vertices[j]
-        if G.has_edge(a,b):
-            print("invalide solution")
-            break
+calculate_pro(G, probabilities, solution)

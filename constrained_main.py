@@ -3,39 +3,43 @@ import heuristic_MA
 from src_code import generate_graphs
 import networkx as nx
 import numpy as np
-
 np.set_printoptions(precision=3, suppress=True)
-save = False
-save = True
 
+penalty_term = 1
 no_vertices = 8
 p = 0.4
-seed = 1
+depth = 1
 
-depth = 4
 # circuit_type = "partial mixer"
 circuit_type = "unconstrained"
 # circuit_type = "MA"
 
-phase_operator_type = 'fewer_RZ'
 phase_operator_type = 'additional_RX'
-# phase_operator_type = ''
+# phase_operator_type = 'variational_lambda'
+# phase_operator_type = 'variational_lambdas'
+# phase_operator_type = 'fewer_RZ'
+# phase_operator_type = 'multiply_gamma'
+# phase_operator_type = 'original'
+
+save = False
+save = True
 
 test = False
-# test = True
+test = True
+
 
 if(test):
-    save = False
-    G = nx.Graph()
-    edge_list = [(0,1)]
-    edge_list = [(0,1), (0,2)] #三角形少一条边
+    seed = 10
+    # G = nx.Graph()
+    # edge_list = [(0,1)]
+    # edge_list = [(0,1), (0,2)] #三角形少一条边
     # edge_list = [(0,1), (1,2), (0,2)] #三角形
     # edge_list = [(0,1), (1,2), (1,3)] #正方形少一条边
     # edge_list = [(0,1), (1,2), (2,3), (0,3)] #正方形
     # edge_list = [(0,1), (1,2), (1,3), (3,4), (2,3)]
-    G.add_edges_from(edge_list)
+    # G.add_edges_from(edge_list)
 
-    G = generate_graphs.generate_graph_type(no_vertices,['random', 0.5], seed)[0]
+    G = generate_graphs.generate_graph_type(no_vertices,['random', p], seed)[0]
     no_vertices = G.number_of_nodes()
     edge_list = G.edges()
     print(edge_list)
@@ -70,9 +74,8 @@ if(test):
         constrained_problem_QAOA.MIS_QAOA(G, depth, use_constrain_operator=True, initial_state=initial_vector, custom_phase_operator=custom_phase_operator)
 
     #! unconstraned circuit
-    penalty_term = 1 # in real cost function, this should multiple 2
     if(circuit_type == "unconstrained"):
-        constrained_problem_QAOA.MIS_QAOA(G, depth, False, penalty_term, custom_phase_operator=custom_phase_operator, save=save, phase_operator_type=phase_operator_type)
+        constrained_problem_QAOA.MIS_QAOA(G, depth, False, penalty_term, custom_phase_operator=custom_phase_operator, save=save, phase_operator_type=phase_operator_type, p=p, seed=seed)
 
     #! MA
     if(circuit_type == "MA"):
@@ -83,9 +86,8 @@ if(test):
     # tests end----------------------------------------------------------------
 
 #! simulations
-penalty_term = 1
 # initial_state = []
-for seed in range(50):
+for seed in range(11):
     G = generate_graphs.generate_graph_type(no_vertices,['random', p], seed)[0]
     if nx.is_connected(G) == False:
         print("unconnected graph")
@@ -94,14 +96,7 @@ for seed in range(50):
     # constrained_problem_QAOA.MIS_QAOA(G, depth, use_constrain_operator=True)
 
     if(circuit_type == 'unconstrained'):
-        if(phase_operator_type == "fewer_RZ"):
-            constrained_problem_QAOA.MIS_QAOA(G, depth, use_constrain_operator=False, save=save, seed=seed, p = p, phase_operator_type= 'fewer_RZ')
-        elif(phase_operator_type == "additional_RX"):
-            constrained_problem_QAOA.MIS_QAOA(G, depth, use_constrain_operator=False, save=save, seed=seed, p = p, phase_operator_type= 'additional_RX')
-        else:
-            constrained_problem_QAOA.MIS_QAOA(G, depth, use_constrain_operator=False, save=save, seed=seed, p = p)
-
-        # constrained_problem_QAOA.MIS_QAOA(G, depth, use_constrain_operator=False, save=save, seed=seed, p = p, phase_operator_type= 'multiply_gamma')
+        constrained_problem_QAOA.MIS_QAOA(G, depth, use_constrain_operator=False, save=save, seed=seed, p = p, phase_operator_type=phase_operator_type, penalty_term=penalty_term)
 
 
     if(circuit_type == 'MA'):

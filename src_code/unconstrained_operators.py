@@ -131,7 +131,11 @@ def MIS_unconstrained_phase_unitary_addtionl_RX(graph, parameter, dict_paulis, p
     lambda_parameter = penalty_term * parameter1
     parameter2 = parameter[1]
     for i in range(graph.number_of_nodes()):
-        tmp_matrix = dict_paulis['I'] * math.cos(parameter1) + dict_paulis['Z' + str(i)] * math.sin(parameter1) * 1j
+
+        d = graph.degree(i) * lambda_parameter
+        tmp_matrix = dict_paulis['I'] * math.cos(parameter1 - d) + dict_paulis['Z' + str(i)] * math.sin(parameter1 - d) * 1j
+
+        # tmp_matrix = dict_paulis['I'] * math.cos(parameter1) + dict_paulis['Z' + str(i)] * math.sin(parameter1) * 1j
 
         if first:
             result = tmp_matrix
@@ -141,14 +145,23 @@ def MIS_unconstrained_phase_unitary_addtionl_RX(graph, parameter, dict_paulis, p
     
     result *= MIS_unconstrained_mixer_unitary(graph.number_of_nodes(), parameter2, dict_paulis)
     
-    edges = graph.edges()
-    for (i, j) in edges:
-        tmp_matrix = dict_paulis['I'] * math.cos(lambda_parameter) - (dict_paulis['Z' + str(i)]) * math.sin(lambda_parameter) * 1j 
+    edges = list(graph.edges())
+    # for (i, j) in edges:
+    #     tmp_matrix = dict_paulis['I'] * math.cos(lambda_parameter) - (dict_paulis['Z' + str(i)]) * math.sin(lambda_parameter) * 1j 
+    #     tmp_matrix *= dict_paulis['I'] * math.cos(lambda_parameter) - (dict_paulis['Z' + str(j)]) * math.sin(lambda_parameter) * 1j 
+    #     tmp_matrix *= dict_paulis['I'] * math.cos(lambda_parameter) + (dict_paulis['Z' + str(i) + 'Z' + str(j)]) * math.sin(lambda_parameter) * 1j
+    #     result = tmp_matrix * result
 
-        tmp_matrix *= dict_paulis['I'] * math.cos(lambda_parameter) - (dict_paulis['Z' + str(j)]) * math.sin(lambda_parameter) * 1j 
+    edges1 = edges[:len(edges)//2]
+    edges2 = edges[len(edges)//2:]
+    for (i, j) in edges1:
+        tmp_matrix = dict_paulis['I'] * math.cos(lambda_parameter) + (dict_paulis['Z' + str(i) + 'Z' + str(j)]) * math.sin(lambda_parameter) * 1j
+        result = tmp_matrix * result
 
-        tmp_matrix *= dict_paulis['I'] * math.cos(lambda_parameter) + (dict_paulis['Z' + str(i) + 'Z' + str(j)]) * math.sin(lambda_parameter) * 1j
+    result *= MIS_unconstrained_mixer_unitary(graph.number_of_nodes(), parameter2, dict_paulis)
 
+    for (i, j) in edges2:
+        tmp_matrix = dict_paulis['I'] * math.cos(lambda_parameter) + (dict_paulis['Z' + str(i) + 'Z' + str(j)]) * math.sin(lambda_parameter) * 1j
         result = tmp_matrix * result
         
     return result
@@ -199,7 +212,7 @@ def build_MIS_unconstrained_QAOAnsatz_fewer_RZ(graph, parameter_list, pauli_dict
 
 
 def build_MIS_unconstrained_QAOAnsatz_addtional_RX(graph, parameter_list, pauli_dict, penalty_term, initial_state = []):
-    no_layers = len(parameter_list) // 2
+    no_layers = len(parameter_list) // 3
     ham_parameters = parameter_list[:no_layers * 2]
     mixer_parameters = parameter_list[no_layers:]
     
@@ -213,6 +226,150 @@ def build_MIS_unconstrained_QAOAnsatz_addtional_RX(graph, parameter_list, pauli_
 
     for layer in range(no_layers):
         phase_unit =MIS_unconstrained_phase_unitary_addtionl_RX(graph, ham_parameters[2*layer:2*layer+2], pauli_dict, penalty_term)
+        dens_mat = (phase_unit * dens_mat) * (phase_unit.transpose().conj())
+    
+        mix_unit = MIS_unconstrained_mixer_unitary(no_qubits, mixer_parameters[layer], pauli_dict)
+        dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
+
+    return dens_mat
+
+# multiply_gamma
+def MIS_unconstrained_phase_unitary_multiply_gamma(graph, parameter, dict_paulis, penalty_term):
+    first = True
+    parameter = 0.5 * parameter
+    lambda_parameter = penalty_term * parameter
+    for i in range(graph.number_of_nodes()):
+
+        d = graph.degree(i) * lambda_parameter
+
+        tmp_matrix = dict_paulis['I'] * math.cos(parameter - d) + dict_paulis['Z' + str(i)] * math.sin(parameter - d) * 1j
+
+        if first:
+            result = tmp_matrix
+            first = False
+        else:
+            result = tmp_matrix * result
+    
+    edges = graph.edges()
+    for (i, j) in edges:
+
+        tmp_matrix = dict_paulis['I'] * math.cos(lambda_parameter) + (dict_paulis['Z' + str(i) + 'Z' + str(j)]) * math.sin(lambda_parameter) * 1j
+
+        result = tmp_matrix * result
+        
+    return result
+
+def build_MIS_unconstrained_QAOAnsatz_multiply_gamma(graph, parameter_list, pauli_dict, penalty_term, initial_state = []):
+    no_layers = len(parameter_list) // 2
+    ham_parameters = parameter_list[:no_layers]
+    mixer_parameters = parameter_list[no_layers:]
+    
+    no_qubits = graph.number_of_nodes()
+
+    if len(initial_state) == 0:
+        dens_mat = initial_density_matrix(no_qubits)
+    else:
+        dens_mat = qi.DensityMatrix(initial_state)
+        dens_mat = sparse.csr_matrix(dens_mat.data)
+
+    for layer in range(no_layers):
+        phase_unit =MIS_unconstrained_phase_unitary_multiply_gamma(graph, ham_parameters[layer], pauli_dict, penalty_term)
+        dens_mat = (phase_unit * dens_mat) * (phase_unit.transpose().conj())
+    
+        mix_unit = MIS_unconstrained_mixer_unitary(no_qubits, mixer_parameters[layer], pauli_dict)
+        dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
+
+    return dens_mat
+
+
+# variational gamma
+def MIS_unconstrained_phase_unitary_variational_lambdas(graph, parameters, dict_paulis, penalty_term):
+    first = True
+    parameter = 0.5 * parameters[0]
+    # lambda_parameter = penalty_term * parameter
+    lambda_parameter = parameters[1] * parameter
+    for i in range(graph.number_of_nodes()):
+        d = graph.degree(i) * lambda_parameter
+        tmp_matrix = dict_paulis['I'] * math.cos(parameter - d) + dict_paulis['Z' + str(i)] * math.sin(parameter - d) * 1j
+
+        if first:
+            result = tmp_matrix
+            first = False
+        else:
+            result = tmp_matrix * result
+    
+    edges = graph.edges()
+    for (i, j) in edges:
+
+        tmp_matrix = dict_paulis['I'] * math.cos(lambda_parameter) + (dict_paulis['Z' + str(i) + 'Z' + str(j)]) * math.sin(lambda_parameter) * 1j
+
+        result = tmp_matrix * result
+        
+    return result
+
+def build_MIS_unconstrained_QAOAnsatz_variational_lambdas(graph, parameter_list, pauli_dict, penalty_term, initial_state = []):
+    no_layers = len(parameter_list) // 3
+    ham_parameters = parameter_list[:no_layers * 2]
+    mixer_parameters = parameter_list[no_layers:]
+    
+    no_qubits = graph.number_of_nodes()
+
+    if len(initial_state) == 0:
+        dens_mat = initial_density_matrix(no_qubits)
+    else:
+        dens_mat = qi.DensityMatrix(initial_state)
+        dens_mat = sparse.csr_matrix(dens_mat.data)
+
+    for layer in range(no_layers):
+        phase_unit =MIS_unconstrained_phase_unitary_variational_lambdas(graph, ham_parameters[2*layer:2*layer+2], pauli_dict, penalty_term)
+        dens_mat = (phase_unit * dens_mat) * (phase_unit.transpose().conj())
+    
+        mix_unit = MIS_unconstrained_mixer_unitary(no_qubits, mixer_parameters[layer], pauli_dict)
+        dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
+
+    return dens_mat
+
+
+def MIS_unconstrained_phase_unitary_variational_lambda(graph, parameter, dict_paulis, penalty_term):
+    first = True
+    parameter = 0.5 * parameter
+    lambda_parameter = penalty_term * parameter
+    for i in range(graph.number_of_nodes()):
+
+        d = graph.degree(i) * lambda_parameter
+
+        tmp_matrix = dict_paulis['I'] * math.cos(parameter - d) + dict_paulis['Z' + str(i)] * math.sin(parameter - d) * 1j
+
+        if first:
+            result = tmp_matrix
+            first = False
+        else:
+            result = tmp_matrix * result
+    
+    edges = graph.edges()
+    for (i, j) in edges:
+
+        tmp_matrix = dict_paulis['I'] * math.cos(lambda_parameter) + (dict_paulis['Z' + str(i) + 'Z' + str(j)]) * math.sin(lambda_parameter) * 1j
+
+        result = tmp_matrix * result
+        
+    return result
+
+def build_MIS_unconstrained_QAOAnsatz_variational_lambda(graph, parameter_list, pauli_dict, penalty_term, initial_state = []):
+    no_layers = len(parameter_list) // 2
+    ham_parameters = parameter_list[:no_layers]
+    mixer_parameters = parameter_list[no_layers:]
+    
+    no_qubits = graph.number_of_nodes()
+
+    if len(initial_state) == 0:
+        dens_mat = initial_density_matrix(no_qubits)
+    else:
+        dens_mat = qi.DensityMatrix(initial_state)
+        dens_mat = sparse.csr_matrix(dens_mat.data)
+
+    for layer in range(no_layers):
+        phase_unit =MIS_unconstrained_phase_unitary_variational_lambda(graph, ham_parameters[layer], pauli_dict, parameter_list[-1])
         dens_mat = (phase_unit * dens_mat) * (phase_unit.transpose().conj())
     
         mix_unit = MIS_unconstrained_mixer_unitary(no_qubits, mixer_parameters[layer], pauli_dict)
