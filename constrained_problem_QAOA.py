@@ -190,10 +190,10 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
 
 
     evaluation = result.nfev
-    if(phase_operator_type == 'variational_lambdas' or phase_operator_type == 'variational_lambda'):
-        iteration = round(optimal_para[-1], 3)
-    else:
-        iteration = result.nit
+    # if(phase_operator_type == 'variational_lambdas' or phase_operator_type == 'variational_lambda'):
+    #     iteration = round(optimal_para[-1], 3)
+    # else:
+    iteration = result.nit
 
     # print('solution hamiltonian eigenvalue:', max_ham_eigenvalue)
     # print('Hamiltonian expectation:', hamiltonian_expectation)

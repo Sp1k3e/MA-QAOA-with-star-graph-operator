@@ -80,10 +80,10 @@ plt.bar(offsets[3], QAOA_additional_RX_AR, width, label='QAOA_additional_RX')
 plt.ylabel('AR')
 plt.xlabel('p')
 plt.xticks(x, positions)
-plt.legend()
+# plt.legend()
 
 plt.tight_layout()
-plt.savefig(f'results/MIS/MIS_diagram/{n}_{p}tmp_AR.pdf', format = 'pdf')
+plt.savefig(f'results/MIS/MIS_diagram/{n}_{p}AR.pdf', format = 'pdf')
 
 
 # feasible
@@ -98,10 +98,10 @@ plt.ylim(0,1)
 plt.ylabel('probability of feasible solution')
 plt.xlabel('p')
 plt.xticks(x, positions)
-plt.legend()
+# plt.legend()
 
 plt.tight_layout()
-plt.savefig(f'results/MIS/MIS_diagram/{n}_{p}tmp_feasible.pdf', format = 'pdf')
+plt.savefig(f'results/MIS/MIS_diagram/{n}_{p}feasible.pdf', format = 'pdf')
 
 
 # optimal
@@ -118,4 +118,4 @@ plt.xticks(x, positions)
 plt.legend()
 
 plt.tight_layout()
-plt.savefig(f'results/MIS/MIS_diagram/{n}_{p}tmp_optimal.pdf', format = 'pdf')
+plt.savefig(f'results/MIS/MIS_diagram/{n}_{p}optimal.pdf', format = 'pdf')
