@@ -9,9 +9,9 @@ QAOA_AR = [[] for _ in range(5)]
 QAOA_feasible = [[] for _ in range(5)]
 QAOA_optimal = [[] for _ in range(5)]
 
-QAOA_fewer_RZ_AR = [[] for _ in range(5)]
-QAOA_fewer_RZ_feasible = [[] for _ in range(5)]
-QAOA_fewer_RZ_optimal = [[] for _ in range(5)]
+# QAOA_fewer_RZ_AR = [[] for _ in range(5)]
+# QAOA_fewer_RZ_feasible = [[] for _ in range(5)]
+# QAOA_fewer_RZ_optimal = [[] for _ in range(5)]
 
 QAOA_additional_RX_AR = [[] for _ in range(5)]
 QAOA_additional_RX_feasible = [[] for _ in range(5)]
@@ -36,7 +36,7 @@ def readCSV(filename, AR, feasible, optimal):
 
 for layer in range(5):
     readCSV(f'results/MIS/QAOA/original/MIS_QAOA{n}_{p}_{layer+1}_original.csv', QAOA_AR[layer], QAOA_feasible[layer], QAOA_optimal[layer])
-    readCSV(f'results/MIS/QAOA/fewer_RZ/MIS_QAOA{n}_{p}_{layer+1}_fewer_RZ.csv', QAOA_fewer_RZ_AR[layer], QAOA_fewer_RZ_feasible[layer], QAOA_fewer_RZ_optimal[layer])
+    # readCSV(f'results/MIS/QAOA/fewer_RZ/MIS_QAOA{n}_{p}_{layer+1}_fewer_RZ.csv', QAOA_fewer_RZ_AR[layer], QAOA_fewer_RZ_feasible[layer], QAOA_fewer_RZ_optimal[layer])
     readCSV(f'results/MIS/QAOA/additional_RX/MIS_QAOA{n}_{p}_{layer+1}_additional_RX.csv', QAOA_additional_RX_AR[layer], QAOA_additional_RX_feasible[layer], QAOA_additional_RX_optimal[layer])
     readCSV(f'results/MIS/QAOA/variational_lambda/MIS_QAOA{n}_{p}_{layer+1}_variational_lambda.csv', QAOA_variational_lambda_AR[layer], QAOA_variational_lambda_feasible[layer], QAOA_variational_lambda_optimal[layer])
     readCSV(f'results/MIS/QAOA/variational_lambdas/MIS_QAOA{n}_{p}_{layer+1}_variational_lambdas.csv', QAOA_variational_lambdas_AR[layer], QAOA_variational_lambdas_feasible[layer], QAOA_variational_lambdas_optimal[layer])
@@ -50,9 +50,9 @@ QAOA_additional_RX_AR = [np.average(i) for i in QAOA_additional_RX_AR]
 QAOA_additional_RX_feasible = [np.average(i) for i in QAOA_additional_RX_feasible]
 QAOA_additional_RX_optimal = [np.average(i) for i in QAOA_additional_RX_optimal]
 
-QAOA_fewer_RZ_AR = [np.average(i) for i in QAOA_fewer_RZ_AR]
-QAOA_fewer_RZ_feasible = [np.average(i) for i in QAOA_fewer_RZ_feasible]
-QAOA_fewer_RZ_optimal = [np.average(i) for i in QAOA_fewer_RZ_optimal]
+# QAOA_fewer_RZ_AR = [np.average(i) for i in QAOA_fewer_RZ_AR]
+# QAOA_fewer_RZ_feasible = [np.average(i) for i in QAOA_fewer_RZ_feasible]
+# QAOA_fewer_RZ_optimal = [np.average(i) for i in QAOA_fewer_RZ_optimal]
 
 QAOA_variational_lambda_AR = [np.average(i) for i in QAOA_variational_lambda_AR]
 QAOA_variational_lambda_feasible = [np.average(i) for i in QAOA_variational_lambda_feasible]
@@ -67,6 +67,11 @@ positions = ['1', '2', '3','4','5'] # different layer
 x = np.arange(len(positions))
 width = 0.2
 offsets = [x - 3*width/2, x - width/2, x + width/2, x+3*width/2]
+
+plt.rcParams.update({
+    'font.size': 14,
+    'legend.fontsize': 12,    
+})
 
 # AR
 plt.figure()
@@ -84,6 +89,7 @@ plt.xticks(x, positions)
 
 plt.tight_layout()
 plt.savefig(f'results/MIS/MIS_diagram/{n}_{p}AR.pdf', format = 'pdf')
+plt.savefig(f'results/MIS/MIS_diagram/{n}_{p}AR.svg', format = 'svg')
 
 
 # feasible
@@ -102,6 +108,7 @@ plt.xticks(x, positions)
 
 plt.tight_layout()
 plt.savefig(f'results/MIS/MIS_diagram/{n}_{p}feasible.pdf', format = 'pdf')
+plt.savefig(f'results/MIS/MIS_diagram/{n}_{p}feasible.svg', format = 'svg')
 
 
 # optimal
@@ -119,3 +126,18 @@ plt.legend()
 
 plt.tight_layout()
 plt.savefig(f'results/MIS/MIS_diagram/{n}_{p}optimal.pdf', format = 'pdf')
+plt.savefig(f'results/MIS/MIS_diagram/{n}_{p}optimal.svg', format = 'svg')
+
+
+print("QAOA")
+print(QAOA_optimal)
+# print(QAOA_feasible)
+print("variational lambda")
+print(QAOA_variational_lambda_optimal)
+# print(QAOA_variational_lambda_feasible)
+print("variational lambdas")
+print(QAOA_variational_lambdas_optimal)
+# print(QAOA_variational_lambdas_feasible)
+print("additioanl RX")
+print(QAOA_additional_RX_optimal)
+# print(QAOA_additional_RX_feasible)
