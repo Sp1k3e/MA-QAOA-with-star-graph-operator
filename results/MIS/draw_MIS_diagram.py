@@ -5,25 +5,25 @@ import numpy as np
 n = 8
 p = 0.4
 
-QAOA_AR = [[] for _ in range(5)]
-QAOA_feasible = [[] for _ in range(5)]
-QAOA_optimal = [[] for _ in range(5)]
+QAOA_AR = [[] for _ in range(6)]
+QAOA_feasible = [[] for _ in range(6)]
+QAOA_optimal = [[] for _ in range(6)]
 
-# QAOA_fewer_RZ_AR = [[] for _ in range(5)]
-# QAOA_fewer_RZ_feasible = [[] for _ in range(5)]
-# QAOA_fewer_RZ_optimal = [[] for _ in range(5)]
+# QAOA_fewer_RZ_AR = [[] for _ in range(6)]
+# QAOA_fewer_RZ_feasible = [[] for _ in range(6)]
+# QAOA_fewer_RZ_optimal = [[] for _ in range(6)]
 
-QAOA_additional_RX_AR = [[] for _ in range(5)]
-QAOA_additional_RX_feasible = [[] for _ in range(5)]
-QAOA_additional_RX_optimal = [[] for _ in range(5)]
+QAOA_additional_RX_AR = [[] for _ in range(6)]
+QAOA_additional_RX_feasible = [[] for _ in range(6)]
+QAOA_additional_RX_optimal = [[] for _ in range(6)]
 
-QAOA_variational_lambda_AR = [[] for _ in range(5)]
-QAOA_variational_lambda_feasible = [[] for _ in range(5)]
-QAOA_variational_lambda_optimal = [[] for _ in range(5)]
+QAOA_variational_lambda_AR = [[] for _ in range(6)]
+QAOA_variational_lambda_feasible = [[] for _ in range(6)]
+QAOA_variational_lambda_optimal = [[] for _ in range(6)]
 
-QAOA_variational_lambdas_AR = [[] for _ in range(5)]
-QAOA_variational_lambdas_feasible = [[] for _ in range(5)]
-QAOA_variational_lambdas_optimal = [[] for _ in range(5)]
+QAOA_variational_lambdas_AR = [[] for _ in range(6)]
+QAOA_variational_lambdas_feasible = [[] for _ in range(6)]
+QAOA_variational_lambdas_optimal = [[] for _ in range(6)]
 
 def readCSV(filename, AR, feasible, optimal):
     with open(filename) as f:
@@ -34,7 +34,7 @@ def readCSV(filename, AR, feasible, optimal):
             feasible += [float(row[7])]
             optimal += [float(row[8])]
 
-for layer in range(5):
+for layer in range(6):
     readCSV(f'results/MIS/QAOA/original/MIS_QAOA{n}_{p}_{layer+1}_original.csv', QAOA_AR[layer], QAOA_feasible[layer], QAOA_optimal[layer])
     # readCSV(f'results/MIS/QAOA/fewer_RZ/MIS_QAOA{n}_{p}_{layer+1}_fewer_RZ.csv', QAOA_fewer_RZ_AR[layer], QAOA_fewer_RZ_feasible[layer], QAOA_fewer_RZ_optimal[layer])
     readCSV(f'results/MIS/QAOA/additional_RX/MIS_QAOA{n}_{p}_{layer+1}_additional_RX.csv', QAOA_additional_RX_AR[layer], QAOA_additional_RX_feasible[layer], QAOA_additional_RX_optimal[layer])
@@ -63,7 +63,7 @@ QAOA_variational_lambdas_feasible = [np.average(i) for i in QAOA_variational_lam
 QAOA_variational_lambdas_optimal = [np.average(i) for i in QAOA_variational_lambdas_optimal]
 
 # draw diagram
-positions = ['1', '2', '3','4','5'] # different layer
+positions = ['1', '2', '3','4','5','6'] # different layer
 x = np.arange(len(positions))
 width = 0.2
 offsets = [x - 3*width/2, x - width/2, x + width/2, x+3*width/2]
