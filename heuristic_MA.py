@@ -929,3 +929,72 @@ def expressive_QAOA(no_vertices, depth, seed, graph_type, save = False):
     if(save):
         with open(f"./results/tmp_expressive{depth}.csv", "a") as f:
             f.write(f'expressive-QAOA,{no_vertices},{graph_type},{depth},{seed},{cut_approx_ratio},{result.nfev}, {result.nit}, {execution_time}, {sum(simulation_time)}\n')
+
+
+def MA_RX(no_vertices, depth, seed, graph_type, save = False, show = False, minimize_method = 'BFGS'):
+    gamma_0 = 1
+    beta_0 = 0.7854
+    graph = generate_graphs.generate_graph_type(no_vertices, graph_type, seed)[0]
+
+    no_edges = graph.number_of_edges()
+    pauli_ops_dict = build_operators.build_my_paulis(no_vertices)
+    hamiltonian = build_operators.cut_hamiltonian(graph)
+
+    max_cut_solution = useful_methods.find_optimal_cut(graph)
+    max_cut_value = max_cut_solution[1]
+    max_ham_eigenvalue = max_cut_solution[2]
+    # print(f"minimize_method: {minimize_method}")
+    print(f'layers:{depth} MA-RX')
+
+    simulation_time = []
+
+    def obj_func(parameter_values):
+        start_time = time.perf_counter()
+
+        dens_mat = build_operators.build_MA_RX_ansatz(graph, parameter_values, depth, pauli_ops_dict)
+
+        end_time = time.perf_counter()
+        execution_time = end_time - start_time
+        # seconds = execution_time % 60
+        # print(f"One round simulation took {minutes}m {seconds:.2f}s.")
+        simulation_time.append(execution_time)
+
+        expectation_value = (hamiltonian * dens_mat).trace().real
+        return expectation_value * (-1.0)
+
+    start_time = time.perf_counter()
+
+    initial_parameter_guesses = [random.random() * 3 for _ in range(depth * (no_vertices))] 
+    # print(initial_parameter_guesses)
+    result = minimize(obj_func, initial_parameter_guesses, method=minimize_method)
+
+    end_time = time.perf_counter()
+    execution_time = end_time - start_time
+
+    #! 输出结果
+    parameter_list = list(result.x)
+    dens_mat = build_operators.build_MA_RX_ansatz(graph, parameter_list, depth, pauli_ops_dict)
+    print(parameter_list)
+    hamiltonian_expectation = (hamiltonian * dens_mat).trace().real
+    cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
+
+    # print('***************')
+    print("目标函数总调用次数:", result.nfev)
+    print(f'total iteration: {result.nit}')
+    print(f"Minimize time: {execution_time}s")
+    print(f"simulation time: {sum(simulation_time)}s")
+    print(f'cut_approx_ratio: {cut_approx_ratio}')
+
+    if(save):
+        with open(f"./results/tmp_RX{depth}.csv", "a") as f:
+            f.write(f'MA-RX,{no_vertices},{graph_type},{depth},{seed},{cut_approx_ratio},{result.nfev}, {result.nit}, {execution_time}, {sum(simulation_time)}\n')
+
+    # save optimal parameters
+    # with open(f"./results/parameters/{no_vertices}vertex/MA{no_vertices}_{graph_type[1]}{graph_type[0]}_layer{depth}_seed{seed}", 'w') as f:
+    #     f.write(f"max cut: {max_cut_solution[0]}\n")
+    #     f.write(f'r: {cut_approx_ratio}\n')
+        # f.write(parameter_list)
+
+    print('-----------------------------------------------')
+
+    return cut_approx_ratio

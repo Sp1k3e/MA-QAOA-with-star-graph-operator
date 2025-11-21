@@ -758,3 +758,37 @@ def build_expressive_qaoa_ansatz(graph, parameter_list, no_layers, pauli_dict, m
         dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
 
     return dens_mat
+
+def initial_density_matrix_0(no_qubits):
+    dim = 2**no_qubits
+    m = np.full((dim, dim), 0)
+    m[0][0] = 1
+    dens_mat = qi.DensityMatrix(m)
+    return sparse.csr_matrix(dens_mat.data)
+
+
+def build_MA_RX_ansatz(graph, parameter_list, no_layers, pauli_dict):
+    # no_edges = graph.number_of_edges() 
+    no_qubits = graph.number_of_nodes() 
+
+    dens_mat = initial_density_matrix_0(no_qubits)
+
+    # ham_parameters = parameter_list[:no_layers * no_edges]
+    # mixer_parameters = parameter_list[no_layers * no_edges:]
+    mixer_parameters = parameter_list
+
+    for layer in range(no_layers):
+        # cut_unit = MA_cut_unitary(graph, ham_parameters[layer * no_edges: (layer + 1) * no_edges], pauli_dict)
+        # dens_mat = (cut_unit * dens_mat) * (cut_unit.transpose().conj())
+
+        first = True
+        for i in range(no_qubits):
+            if first:
+                mix_unit = mixer_unitary('X' + str(i), mixer_parameters[i + no_qubits * layer], pauli_dict, no_qubits)
+                first = False
+            else:
+                mix_unit = mix_unit * mixer_unitary('X' + str(i), mixer_parameters[i + no_qubits * layer], pauli_dict, no_qubits)
+
+        dens_mat = (mix_unit * dens_mat) * (mix_unit.transpose().conj())
+
+    return dens_mat

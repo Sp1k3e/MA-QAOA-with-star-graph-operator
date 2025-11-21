@@ -13,7 +13,7 @@ skip_seed = [25, 56, 85, 92]
 
 # graph_type = ['regular', 3]
 #! save
-save = True
+save = False
 show = False
 
 # minimize_method = 'Nelder-Mead'
@@ -35,7 +35,9 @@ for seed in range(0, 100):
 
     # MA_QAOA_All.MA_All(n, layer, seed, graph_type, save, minimize_method=minimize_method)
 
-    heuristic_MA.star_graph_MA(n, layer, seed, graph_type, save)
+    # heuristic_MA.star_graph_MA(n, layer, seed, graph_type, save)
+
+    heuristic_MA.MA_RX(n, layer, seed, graph_type, save)
 
     # with open(f"./results/optimizer_consumption/expressive{layer}.csv") as f:
     #     reader = csv.reader(f)
@@ -60,8 +62,7 @@ for seed in range(0, 100):
     # heuristic_MA.sub_graph_MA(n, layer, seed, graph_type, save)
 
 
-# !指定seed
-
+# !specific seed
 seed = 31
 # seeds = [51, 57, 65, 68, 86]
 #!standard-QAOA
