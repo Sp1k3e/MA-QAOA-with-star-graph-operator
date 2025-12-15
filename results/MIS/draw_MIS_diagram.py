@@ -1,29 +1,31 @@
 from matplotlib import pyplot as plt
 import csv
 import numpy as np
+from matplotlib.font_manager import FontProperties
+
 
 n = 8
 p = 0.4
 
-QAOA_AR = [[] for _ in range(6)]
-QAOA_feasible = [[] for _ in range(6)]
-QAOA_optimal = [[] for _ in range(6)]
+QAOA_AR = [[] for _ in range(5)]
+QAOA_feasible = [[] for _ in range(5)]
+QAOA_optimal = [[] for _ in range(5)]
 
-# QAOA_fewer_RZ_AR = [[] for _ in range(6)]
-# QAOA_fewer_RZ_feasible = [[] for _ in range(6)]
-# QAOA_fewer_RZ_optimal = [[] for _ in range(6)]
+# QAOA_fewer_RZ_AR = [[] for _ in range(5)]
+# QAOA_fewer_RZ_feasible = [[] for _ in range(5)]
+# QAOA_fewer_RZ_optimal = [[] for _ in range(5)]
 
-QAOA_additional_RX_AR = [[] for _ in range(6)]
-QAOA_additional_RX_feasible = [[] for _ in range(6)]
-QAOA_additional_RX_optimal = [[] for _ in range(6)]
+QAOA_additional_RX_AR = [[] for _ in range(5)]
+QAOA_additional_RX_feasible = [[] for _ in range(5)]
+QAOA_additional_RX_optimal = [[] for _ in range(5)]
 
-QAOA_variational_lambda_AR = [[] for _ in range(6)]
-QAOA_variational_lambda_feasible = [[] for _ in range(6)]
-QAOA_variational_lambda_optimal = [[] for _ in range(6)]
+QAOA_variational_lambda_AR = [[] for _ in range(5)]
+QAOA_variational_lambda_feasible = [[] for _ in range(5)]
+QAOA_variational_lambda_optimal = [[] for _ in range(5)]
 
-QAOA_variational_lambdas_AR = [[] for _ in range(6)]
-QAOA_variational_lambdas_feasible = [[] for _ in range(6)]
-QAOA_variational_lambdas_optimal = [[] for _ in range(6)]
+QAOA_variational_lambdas_AR = [[] for _ in range(5)]
+QAOA_variational_lambdas_feasible = [[] for _ in range(5)]
+QAOA_variational_lambdas_optimal = [[] for _ in range(5)]
 
 def readCSV(filename, AR, feasible, optimal):
     with open(filename) as f:
@@ -34,7 +36,7 @@ def readCSV(filename, AR, feasible, optimal):
             feasible += [float(row[7])]
             optimal += [float(row[8])]
 
-for layer in range(6):
+for layer in range(5):
     readCSV(f'results/MIS/QAOA/original/MIS_QAOA{n}_{p}_{layer+1}_original.csv', QAOA_AR[layer], QAOA_feasible[layer], QAOA_optimal[layer])
     # readCSV(f'results/MIS/QAOA/fewer_RZ/MIS_QAOA{n}_{p}_{layer+1}_fewer_RZ.csv', QAOA_fewer_RZ_AR[layer], QAOA_fewer_RZ_feasible[layer], QAOA_fewer_RZ_optimal[layer])
     readCSV(f'results/MIS/QAOA/additional_RX/MIS_QAOA{n}_{p}_{layer+1}_additional_RX.csv', QAOA_additional_RX_AR[layer], QAOA_additional_RX_feasible[layer], QAOA_additional_RX_optimal[layer])
@@ -63,15 +65,17 @@ QAOA_variational_lambdas_feasible = [np.average(i) for i in QAOA_variational_lam
 QAOA_variational_lambdas_optimal = [np.average(i) for i in QAOA_variational_lambdas_optimal]
 
 # draw diagram
-positions = ['1', '2', '3','4','5','6'] # different layer
+# positions = ['1', '2', '3','4','5','6'] # different layer
+positions = ['1', '2', '3','4','5'] # different layer
 x = np.arange(len(positions))
 width = 0.2
 offsets = [x - 3*width/2, x - width/2, x + width/2, x+3*width/2]
 
 plt.rcParams.update({
-    'font.size': 14,
+    'font.size': 16,
     'legend.fontsize': 12,    
 })
+plt.rcParams['font.sans-serif'] = ['SimSun', 'Songti SC', 'STSong']
 
 # AR
 plt.figure()
@@ -81,15 +85,17 @@ plt.bar(offsets[1], QAOA_variational_lambda_AR, width, label='QAOA_variational_l
 plt.bar(offsets[2], QAOA_variational_lambdas_AR, width, label='QAOA_variational_lambdas')
 plt.bar(offsets[3], QAOA_additional_RX_AR, width, label='QAOA_additional_RX')
 
-# plt.title('AR')
-plt.ylabel('AR')
-plt.xlabel('p')
+# plt.title('近似比')
+# plt.ylabel('AR')
+plt.ylabel('近似比')
+# plt.xlabel('p')
+plt.xlabel('线路层数')
 plt.xticks(x, positions)
 # plt.legend()
 
 plt.tight_layout()
-plt.savefig(f'results/MIS/MIS_diagram/{n}_{p}AR.pdf', format = 'pdf')
-plt.savefig(f'results/MIS/MIS_diagram/{n}_{p}AR.svg', format = 'svg')
+plt.savefig(f'results/MIS/MIS_diagram/{n}_{p}AR.pdf', format = 'pdf', bbox_inches='tight', pad_inches=0.051)
+# plt.savefig(f'results/MIS/MIS_diagram/{n}_{p}AR.svg', format = 'svg')
 
 
 # feasible
@@ -101,32 +107,38 @@ plt.bar(offsets[2], QAOA_variational_lambdas_feasible, width, label='variational
 plt.bar(offsets[3], QAOA_additional_RX_feasible, width, label='additional-RX QAOA')
 
 plt.ylim(0,1)
-plt.ylabel('probability of feasible solution')
-plt.xlabel('p')
+# plt.ylabel('probability of feasible solution')
+plt.ylabel('测量到可行解的概率')
+# plt.xlabel('p')
+plt.xlabel('线路层数')
 plt.xticks(x, positions)
 # plt.legend()
 
 plt.tight_layout()
-plt.savefig(f'results/MIS/MIS_diagram/{n}_{p}feasible.pdf', format = 'pdf')
-plt.savefig(f'results/MIS/MIS_diagram/{n}_{p}feasible.svg', format = 'svg')
+plt.savefig(f'results/MIS/MIS_diagram/{n}_{p}feasible.pdf', format = 'pdf', bbox_inches='tight', pad_inches=0.05)
+# plt.savefig(f'results/MIS/MIS_diagram/{n}_{p}feasible.svg', format = 'svg')
 
 
 # optimal
 plt.figure()
+# plt.tight_layout()
 plt.bar(offsets[0], QAOA_optimal, width, label='QAOA')
 # plt.bar(x, QAOA_fewer_RZ_optimal, width, label='QAOA_fewer_RZ')
 plt.bar(offsets[1], QAOA_variational_lambda_optimal, width, label='variational-$\lambda$ QAOA')
 plt.bar(offsets[2], QAOA_variational_lambdas_optimal, width, label='variational-$\lambda$s QAOA')
 plt.bar(offsets[3], QAOA_additional_RX_optimal, width, label='additional-RX QAOA')
 
-plt.ylabel('probability of optimal solution')
-plt.xlabel('p')
+# plt.ylabel('probability of optimal solution')
+plt.ylabel('测量到最优解的概率')
+# plt.xlabel('p')
+plt.xlabel('线路层数')
 plt.xticks(x, positions)
-plt.legend()
+font = FontProperties(family='', size=12)
+plt.legend(prop=font)
 
 plt.tight_layout()
-plt.savefig(f'results/MIS/MIS_diagram/{n}_{p}optimal.pdf', format = 'pdf')
-plt.savefig(f'results/MIS/MIS_diagram/{n}_{p}optimal.svg', format = 'svg')
+plt.savefig(f'results/MIS/MIS_diagram/{n}_{p}optimal.pdf', format = 'pdf', bbox_inches='tight', pad_inches=0.05)
+# plt.savefig(f'results/MIS/MIS_diagram/{n}_{p}optimal.svg', format = 'svg')
 
 
 print("QAOA")
