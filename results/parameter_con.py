@@ -47,7 +47,8 @@ yticklabels = [r'$-\pi$',r'$-3\pi/4$',r'$\pi/2$', r'$-\pi/4$', '0', r'$\pi/4$', 
 plt.yticks(yticks, yticklabels)
 
 plt.grid(True)
-plt.savefig(f'results/diagram/betas.eps', format = 'eps', dpi = 500)
+# plt.savefig(f'results/diagram/betas.eps', format = 'eps', dpi = 500)
+plt.savefig(f'results/diagram/betas.pdf', format = 'pdf')
 plt.show()
 
 #! gammas
@@ -64,5 +65,6 @@ yticklabels = [r'$-\pi$',r'$-3\pi/4$',r'$-\pi/2$', r'$-\pi/4$', '0', r'$\pi/4$',
 plt.yticks(yticks, yticklabels)
 
 plt.grid(True)
-plt.savefig(f'results/diagram/gammas.eps', format = 'eps', dpi = 500)
+# plt.savefig(f'results/diagram/gammas.eps', format = 'eps', dpi = 500)
+plt.savefig(f'results/diagram/gammas.pdf', format = 'pdf')
 plt.show()

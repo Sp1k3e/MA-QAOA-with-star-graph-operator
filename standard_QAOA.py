@@ -23,7 +23,6 @@ def QAOA(no_vertices, depth, seed, graph_type, save):
     pauli_ops_dict = build_operators.build_my_paulis(no_vertices)
     hamiltonian = build_operators.cut_hamiltonian(graph)
     print(f'layers:{depth} standard-QAOA')
-    #! 初始化完成
 
     simulation_time = []
 
@@ -49,7 +48,7 @@ def QAOA(no_vertices, depth, seed, graph_type, save):
     # initial_parameter_guesses = [gamma_0] * (depth) + [beta_0] * (depth)
     # random initial parameters
     initial_parameter_guesses = [random.random() * 3 for _ in range(2*depth)]
-    result = minimize(obj_func, initial_parameter_guesses,method="BFGS")
+    result = minimize(obj_func, initial_parameter_guesses, method="BFGS")
 
     end_time = time.perf_counter()
     execution_time = end_time - start_time
@@ -62,7 +61,7 @@ def QAOA(no_vertices, depth, seed, graph_type, save):
 
     # cut_approx_ratio = max(cut_approx_ratio,(hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value)
 
-    print("目标函数总调用次数:", result.nfev)
+    print("evaluation:", result.nfev)
     print(f'total iteration: {result.nit}')
     print(f'cut_approx_ratio: {cut_approx_ratio}')
     print(f"optimization_time: {execution_time} s")

@@ -351,6 +351,7 @@ def star_graph_MA(no_vertices, depth, seed, graph_type, save = True):
     def obj_func(parameter_values):
         start_time = time.time()
 
+        # print(parameter_values)
         dens_mat = build_operators.build_MA_qaoa_ansatz(target_graph, parameter_values, 1, pauli_ops_dict, 'All')
 
         simulation_time.append(time.time() - start_time)
@@ -381,7 +382,7 @@ def star_graph_MA(no_vertices, depth, seed, graph_type, save = True):
 
     print(f'layers:{depth} star_graph_MA')
 
-    print("目标函数总调用次数:", result.nfev)
+    print("evaluation:", result.nfev)
     print(f'total iteration: {result.nit}')
     print(f"Minimize time: {execution_time}s")
     print(f"simulation time: {sum(simulation_time)}s")
@@ -505,7 +506,7 @@ def star_graph_MA_MIS(G, graph_type, seed, depth, save = False):
 
     print(f'layers:{depth} star_graph_MA')
 
-    # print("目标函数总调用次数:", result.nfev)
+    # print("evaluation:", result.nfev)
     # print(f'total iteration: {result.nit}')
     # print(f"Minimize time: {execution_time}s")
     # print(f"simulation time: {sum(simulation_time)}s")
@@ -912,7 +913,7 @@ def expressive_QAOA(no_vertices, depth, seed, graph_type, save = False):
     cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
 
     # print('***************')
-    print("目标函数总调用次数:", result.nfev)
+    print("evaluation:", result.nfev)
     print(f'total iteration: {result.nit}')
     print(f"Minimize time: {execution_time}s")
     print(f"simulation time: {sum(simulation_time)}s")
@@ -979,7 +980,7 @@ def MA_RX(no_vertices, depth, seed, graph_type, save = False, show = False, mini
     cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
 
     # print('***************')
-    print("目标函数总调用次数:", result.nfev)
+    print("evaluation:", result.nfev)
     print(f'total iteration: {result.nit}')
     print(f"Minimize time: {execution_time}s")
     print(f"simulation time: {sum(simulation_time)}s")

@@ -5,16 +5,18 @@ import standard_QAOA
 import heuristic_QAOA
 
 n = 8
+# n = 12
 graph_type = ['random', 0.5]
-skip_seed = [25, 56, 85, 92]
+skip_seed = [25, 56, 85, 92] #when set to 0.5 ER graph with 8 vertices, the graph may not be connected
 
 # graph_type = ['random', 0.7]
 # skip_seed = []
 
 # graph_type = ['regular', 3]
 #! save
-save = False
-show = False
+save = False # save to CSV
+
+show = False # show the parameters of each gate of the original MA-QAOA in a graph
 
 # minimize_method = 'Nelder-Mead'
 # minimize_method = 'COBYLA'
@@ -36,8 +38,6 @@ for seed in range(0, 100):
     # MA_QAOA_All.MA_All(n, layer, seed, graph_type, save, minimize_method=minimize_method)
 
     # heuristic_MA.star_graph_MA(n, layer, seed, graph_type, save)
-
-    heuristic_MA.MA_RX(n, layer, seed, graph_type, save)
 
     # with open(f"./results/optimizer_consumption/expressive{layer}.csv") as f:
     #     reader = csv.reader(f)
@@ -81,6 +81,7 @@ seed = 31
 #! heuristic_MA
 # for _ in range(10):
     # heuristic_MA.star_graph_MA(n, 1, seed, graph_type, save)
+heuristic_MA.star_graph_MA(n, 1, seed, graph_type, save)
 # heuristic_MA.TR_MA(n, layer, seed, graph_type, 'All', save)
 # heuristic_MA.complete_MA(n, layer, seed, graph_type, save)
 # heuristic_MA.sub_graph_MA(n, layer, seed, graph_type, save)

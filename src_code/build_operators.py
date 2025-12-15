@@ -278,7 +278,6 @@ def build_standard_qaoa_ansatz(graph, parameter_list, pauli_dict, noisy=False, n
     mixer_parameters = parameter_list[no_layers:]
     
     no_qubits = graph.number_of_nodes()
-    no_qubits = 4
 
     dens_mat = initial_density_matrix(no_qubits)
     

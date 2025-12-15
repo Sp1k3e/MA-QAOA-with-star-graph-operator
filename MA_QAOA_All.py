@@ -58,7 +58,7 @@ def MA_All(no_vertices, depth, seed, graph_type, save = False, show = False, min
     cut_approx_ratio = (hamiltonian_expectation + max_cut_value - max_ham_eigenvalue) / max_cut_value
 
     # print('***************')
-    print("目标函数总调用次数:", result.nfev)
+    print("evaluation:", result.nfev)
     print(f'total iteration: {result.nit}')
     print(f"Minimize time: {execution_time}s")
     print(f"simulation time: {sum(simulation_time)}s")

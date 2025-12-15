@@ -291,7 +291,7 @@ def MIS_MA_QAOA(G, depth, penalty_term, initial_state = [], save = False, seed =
     approx_ratio = (hamiltonian_expectation + solution - max_ham_eigenvalue) / solution
 
     # print('***************')
-    # print("目标函数总调用次数:", result.nfev)
+    # print("evaluation:", result.nfev)
     # print(f'total iteration: {result.nit}')
     # print(f"Minimize time: {execution_time}s")
     # print(f"simulation time: {sum(simulation_time)}s")
