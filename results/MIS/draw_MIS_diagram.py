@@ -11,10 +11,6 @@ QAOA_AR = [[] for _ in range(5)]
 QAOA_feasible = [[] for _ in range(5)]
 QAOA_optimal = [[] for _ in range(5)]
 
-# QAOA_fewer_RZ_AR = [[] for _ in range(5)]
-# QAOA_fewer_RZ_feasible = [[] for _ in range(5)]
-# QAOA_fewer_RZ_optimal = [[] for _ in range(5)]
-
 QAOA_additional_RX_AR = [[] for _ in range(5)]
 QAOA_additional_RX_feasible = [[] for _ in range(5)]
 QAOA_additional_RX_optimal = [[] for _ in range(5)]
@@ -38,7 +34,6 @@ def readCSV(filename, AR, feasible, optimal):
 
 for layer in range(5):
     readCSV(f'results/MIS/QAOA/original/MIS_QAOA{n}_{p}_{layer+1}_original.csv', QAOA_AR[layer], QAOA_feasible[layer], QAOA_optimal[layer])
-    # readCSV(f'results/MIS/QAOA/fewer_RZ/MIS_QAOA{n}_{p}_{layer+1}_fewer_RZ.csv', QAOA_fewer_RZ_AR[layer], QAOA_fewer_RZ_feasible[layer], QAOA_fewer_RZ_optimal[layer])
     readCSV(f'results/MIS/QAOA/additional_RX/MIS_QAOA{n}_{p}_{layer+1}_additional_RX.csv', QAOA_additional_RX_AR[layer], QAOA_additional_RX_feasible[layer], QAOA_additional_RX_optimal[layer])
     readCSV(f'results/MIS/QAOA/variational_lambda/MIS_QAOA{n}_{p}_{layer+1}_variational_lambda.csv', QAOA_variational_lambda_AR[layer], QAOA_variational_lambda_feasible[layer], QAOA_variational_lambda_optimal[layer])
     readCSV(f'results/MIS/QAOA/variational_lambdas/MIS_QAOA{n}_{p}_{layer+1}_variational_lambdas.csv', QAOA_variational_lambdas_AR[layer], QAOA_variational_lambdas_feasible[layer], QAOA_variational_lambdas_optimal[layer])
@@ -51,10 +46,6 @@ QAOA_optimal = [np.average(i) for i in QAOA_optimal]
 QAOA_additional_RX_AR = [np.average(i) for i in QAOA_additional_RX_AR]
 QAOA_additional_RX_feasible = [np.average(i) for i in QAOA_additional_RX_feasible]
 QAOA_additional_RX_optimal = [np.average(i) for i in QAOA_additional_RX_optimal]
-
-# QAOA_fewer_RZ_AR = [np.average(i) for i in QAOA_fewer_RZ_AR]
-# QAOA_fewer_RZ_feasible = [np.average(i) for i in QAOA_fewer_RZ_feasible]
-# QAOA_fewer_RZ_optimal = [np.average(i) for i in QAOA_fewer_RZ_optimal]
 
 QAOA_variational_lambda_AR = [np.average(i) for i in QAOA_variational_lambda_AR]
 QAOA_variational_lambda_feasible = [np.average(i) for i in QAOA_variational_lambda_feasible]
