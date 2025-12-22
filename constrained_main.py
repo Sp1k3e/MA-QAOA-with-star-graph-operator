@@ -17,7 +17,6 @@ circuit_type = "unconstrained"
 phase_operator_type = 'additional_RX'
 phase_operator_type = 'variational_lambda'
 # phase_operator_type = 'variational_lambdas'
-# phase_operator_type = 'fewer_RZ'
 # phase_operator_type = 'multiply_gamma'
 phase_operator_type = 'original'
 
