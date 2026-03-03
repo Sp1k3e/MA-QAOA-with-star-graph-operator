@@ -10,7 +10,7 @@ import random
 
 np.set_printoptions(precision=3, suppress=True)
     
-depth = 2
+depth = 1
 saveFig = False
 save = True
 save = False
@@ -39,7 +39,7 @@ edge_list = [(0,1), (1,2),(1,3),(3,4),(4,5),(5,6),(5,7)]
 # edge_list = list(graph.edges())
 
 # custom phase operator----------------------------------------------------
-use_different_phase_operators = True
+# use_different_phase_operators = True
 use_different_phase_operators = False
 
 phase_operator_edge_list = edge_list

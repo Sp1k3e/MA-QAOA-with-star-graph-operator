@@ -21,10 +21,10 @@ phase_operator_type = 'variational_lambda'
 phase_operator_type = 'original'
 
 save = False
-save = True
+# save = True
 
 test = False
-# test = True
+test = True
 
 if(test):
     seed = 1
@@ -85,19 +85,20 @@ if(test):
 
 #! simulations
 # initial_state = []
-for seed in range(11):
-    G = generate_graphs.generate_graph_type(no_vertices,['random', p], seed)[0]
-    if nx.is_connected(G) == False:
-        print("unconnected graph")
-        continue
+if(not test):
+    for seed in range(11):
+        G = generate_graphs.generate_graph_type(no_vertices,['random', p], seed)[0]
+        if nx.is_connected(G) == False:
+            print("unconnected graph")
+            continue
 
-    # constrained_problem_QAOA.MIS_QAOA(G, depth, use_constrain_operator=True)
+        # constrained_problem_QAOA.MIS_QAOA(G, depth, use_constrain_operator=True)
 
-    if(circuit_type == 'unconstrained'):
-        constrained_problem_QAOA.MIS_QAOA(G, depth, use_constrain_operator=False, save=save, seed=seed, p = p, phase_operator_type=phase_operator_type, penalty_term=penalty_term)
+        if(circuit_type == 'unconstrained'):
+            constrained_problem_QAOA.MIS_QAOA(G, depth, use_constrain_operator=False, save=save, seed=seed, p = p, phase_operator_type=phase_operator_type, penalty_term=penalty_term)
 
 
-    if(circuit_type == 'MA'):
-        constrained_problem_QAOA.MIS_MA_QAOA(G,depth, penalty_term, save = save, seed=seed)
+        if(circuit_type == 'MA'):
+            constrained_problem_QAOA.MIS_MA_QAOA(G,depth, penalty_term, save = save, seed=seed)
 
 

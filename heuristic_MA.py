@@ -348,6 +348,9 @@ def star_graph_MA(no_vertices, depth, seed, graph_type, save = True):
 
     simulation_time = []
 
+    history = []
+    total_evaluations = 0
+
     def obj_func(parameter_values):
         start_time = time.time()
 
@@ -357,6 +360,11 @@ def star_graph_MA(no_vertices, depth, seed, graph_type, save = True):
         simulation_time.append(time.time() - start_time)
 
         expectation_value = (hamiltonian * dens_mat).trace().real
+
+        nonlocal total_evaluations
+        total_evaluations += 1
+        history.append((total_evaluations, expectation_value))
+
         return expectation_value * (-1.0)
 
     start_time = time.time()
@@ -403,8 +411,14 @@ def star_graph_MA(no_vertices, depth, seed, graph_type, save = True):
     # print(parameter_list)
     # print(type(parameter_list))
 
+    with open(f"./results/optimizer_consumption/optimization_pocedure/star-QAOA_{no_vertices}_{depth}.csv", "a") as f:
+        for x in history:
+            AR = (x[1]+ max_cut_value - max_ham_eigenvalue) / max_cut_value 
+            f.write(f'{str(x[0])},{AR},')
+        f.write('\n')
+
     if(save):
-        with open("./results/parameters/star_graph/star_parameters.csv", "a") as f:
+        with open(f"./results/parameters/star_graph/star_parameters.csv", "a") as f:
             f.write(f'star-graph, {no_vertices},{graph_type[1]},{depth},{seed},{cut_approx_ratio},')
             f.write(",".join(str(x) for x in parameter_list))
             f.write('\n')

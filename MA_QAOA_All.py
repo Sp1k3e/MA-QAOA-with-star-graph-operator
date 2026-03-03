@@ -26,6 +26,9 @@ def MA_All(no_vertices, depth, seed, graph_type, save = False, show = False, min
 
     simulation_time = []
 
+    history = []
+    total_evaluations = 0
+
     def obj_func(parameter_values):
         start_time = time.perf_counter()
 
@@ -38,6 +41,11 @@ def MA_All(no_vertices, depth, seed, graph_type, save = False, show = False, min
         simulation_time.append(execution_time)
 
         expectation_value = (hamiltonian * dens_mat).trace().real
+
+        nonlocal total_evaluations
+        total_evaluations += 1
+        history.append((total_evaluations, expectation_value))
+
         return expectation_value * (-1.0)
 
     start_time = time.perf_counter()
@@ -63,6 +71,13 @@ def MA_All(no_vertices, depth, seed, graph_type, save = False, show = False, min
     print(f"Minimize time: {execution_time}s")
     print(f"simulation time: {sum(simulation_time)}s")
     print(f'cut_approx_ratio: {cut_approx_ratio}')
+
+    with open(f"./results/optimizer_consumption/optimization_pocedure/MA-QAOA_{no_vertices}_{depth}.csv", "a") as f:
+        for x in history:
+            # print(x[0])
+            AR = (x[1]+ max_cut_value - max_ham_eigenvalue) / max_cut_value 
+            f.write(f'{str(x[0])},{AR},')
+        f.write('\n')
 
     if(save):
         with open(f"./results/tmp_MA{depth}.csv", "a") as f:
