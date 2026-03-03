@@ -6,7 +6,7 @@ n = '8'
 # depth = '1'
 
 graph_type = 'random0.5'
-# graph_type = 'random0.7'
+graph_type = 'random0.7'
 
 counts = 0
 TR_QAOA = []
@@ -197,7 +197,8 @@ fig, ax = plt.subplots()
 bplot = ax.boxplot(all_data,patch_artist=True, showfliers = False, positions=positions,  medianprops={'color': 'orange', 'linewidth': 2.5}, widths=0.44, labels=labels)
 
 # 虚线
-hline = plt.axhline(y=1, color='#ff111191', linestyle='-.', linewidth = 1.5, label='Star Graph MA-QAOA')
+hline = plt.axhline(y=1, color='#ff111191', linestyle='-.', linewidth = 1.5, label='Star MA-QAOA')
+hline = plt.axhline(y=0.878, color="#00000091", linestyle='--', linewidth = 1.5, label='GW',zorder=-1)
 
 colors = ['pink', 'green', 'lightblue', '#0cc', '#c0c','pink', 'green', 'lightblue', '#0cc', '#c0c']  # 颜色
 for patch, color in zip(bplot['boxes'], colors):
@@ -221,11 +222,14 @@ box_proxy5 = plt.Line2D([0], [0], color='#c0c', lw=5, label='XQAOA')
 ax.legend(handles=[box_proxy1,box_proxy2,box_proxy3,box_proxy4,box_proxy5,hline], loc='lower right', prop=FontProperties(size=9))
 
 # 标题
-ax.set_title(f'Approximate Ratio on ER graph (edge probabilty = {graph_type[-3:]})')
-# 横竖轴
-ax.set_xlabel(r'$p$',fontsize=13)
-# ax.set_xlabel('p', fontsize=14)
-ax.set_ylabel('AR',fontsize = 13)
+# ax.set_title(f'Approximate Ratio on ER graph (edge probabilty = {graph_type[-3:]})')
+# ax.set_xlabel(r'$p$',fontsize=13)
+# ax.set_ylabel('AR',fontsize = 13)
+
+font = FontProperties(fname=r"C:\Windows\Fonts\simsun.ttc")
+ax.set_title(f'ER({graph_type[-3:]})图上的近似比', fontproperties= font,fontsize=13)
+ax.set_xlabel('线路层数',fontsize=13, fontproperties= font)
+ax.set_ylabel('近似比',fontsize = 13, fontproperties= font)
 
 # x轴
 plt.xlim(-0.5,8.5)

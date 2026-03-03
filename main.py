@@ -5,7 +5,7 @@ import standard_QAOA
 import heuristic_QAOA
 
 n = 8
-# n = 12
+n = 10
 graph_type = ['random', 0.5]
 skip_seed = [25, 56, 85, 92] #when set to 0.5 ER graph with 8 vertices, the graph may not be connected
 
@@ -62,26 +62,36 @@ for seed in range(0, 100):
     # heuristic_MA.sub_graph_MA(n, layer, seed, graph_type, save)
 
 
-# !specific seed
-seed = 31
+# ! test specific seed
+seed = 0
 # seeds = [51, 57, 65, 68, 86]
+# seeds = list(range(10,20))
+layer = 5
 #!standard-QAOA
 # for seed in seeds:
-#     for _ in range(2):
+    # standard_QAOA.QAOA(n, layer, seed, graph_type, save)
+#     for _ in range(10):
 #         standard_QAOA.QAOA(n, layer, seed, graph_type, save)
+
+standard_QAOA.QAOA(n, layer, seed, graph_type, save)
 # heuristic_QAOA.TR_QAOA(n, layer, seed, graph_type, save)
 
 #! MA-QAOA
 # for seed in seeds:
+    # MA_QAOA_All.MA_All(n, layer, seed, graph_type, save, show, minimize_method=minimize_method)
 #     for _ in range(10):
 #         ar = MA_QAOA_All.MA_All(n, layer, seed, graph_type, save, show, minimize_method=minimize_method)
 #         if ar > 0.99:
 #             break
+# MA_QAOA_All.MA_All(n, layer, seed, graph_type, save, show, minimize_method=minimize_method)
 
 #! heuristic_MA
-# for _ in range(10):
+# for seed in seeds:
     # heuristic_MA.star_graph_MA(n, 1, seed, graph_type, save)
-heuristic_MA.star_graph_MA(n, 1, seed, graph_type, save)
+    # for _ in range(10):
+        # heuristic_MA.star_graph_MA(n, 1, seed, graph_type, save)
+# heuristic_MA.star_graph_MA(n, 1, seed, graph_type, save)
+
 # heuristic_MA.TR_MA(n, layer, seed, graph_type, 'All', save)
 # heuristic_MA.complete_MA(n, layer, seed, graph_type, save)
 # heuristic_MA.sub_graph_MA(n, layer, seed, graph_type, save)

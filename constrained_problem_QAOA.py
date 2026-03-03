@@ -68,6 +68,7 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
     beta_0 = 0.5
     no_vertices = G.number_of_nodes()
     pauli_ops_dict = build_operators.build_my_paulis(no_vertices)
+    history = []
 
     MIS = nx.approximation.maximum_independent_set(G)
     binary_solution = ['0'] * no_vertices
@@ -176,6 +177,17 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
         elif phase_operator_type == 'original':
             def obj_func(parameter_values):
                 dens_mat = unconstrained_operators.build_MIS_unconstrained_QAOAnsatz(target_graph, parameter_values, pauli_ops_dict, penalty_term, initial_state)
+
+                dens_mat = dens_mat.todense()
+                v = dens_mat[:,0]
+                v = v/np.sqrt(v[0])
+                probabilities = np.array(np.square(np.abs(v)))
+                
+                res = calculate_pro(G, probabilities, solution)
+                feasible_pro = res[0]
+                optimal_pro = res[1]
+                history.append(optimal_pro)
+
                 expectation_value = (hamiltonian * dens_mat).trace().real
                 return expectation_value * (-1.0)
 
@@ -218,6 +230,11 @@ def MIS_QAOA(G, depth, use_constrain_operator, penalty_term = 1, initial_state =
     # print(np.array2string(np.square(np.abs(v)).flatten(), separator=', '))
     # print("norm:", np.linalg.norm(v))
     # print(np.outer(v,v))
+
+    with open(f"./results/MIS/optimization_pocedure/{phase_operator_type}_{depth}.csv", "a") as f:
+        for x in history:
+            f.write(f'{x},')
+        f.write('\n')
 
     if use_constrain_operator and len(initial_state) != 0:
         print("initial state:", initial_state)
