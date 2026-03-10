@@ -6,7 +6,7 @@ n = '8'
 # depth = '1'
 
 graph_type = 'random0.5'
-graph_type = 'random0.7'
+# graph_type = 'random0.7'
 
 counts = 0
 TR_QAOA = []
@@ -197,8 +197,8 @@ fig, ax = plt.subplots()
 bplot = ax.boxplot(all_data,patch_artist=True, showfliers = False, positions=positions,  medianprops={'color': 'orange', 'linewidth': 2.5}, widths=0.44, labels=labels)
 
 # 虚线
-hline = plt.axhline(y=1, color='#ff111191', linestyle='-.', linewidth = 1.5, label='Star MA-QAOA')
-hline = plt.axhline(y=0.878, color="#00000091", linestyle='--', linewidth = 1.5, label='GW',zorder=-1)
+hline1 = plt.axhline(y=1, color='#ff111191', linestyle='-.', linewidth = 1.5, label='Star MA-QAOA')
+hline2 = plt.axhline(y=0.878, color="#00000091", linestyle='--', linewidth = 1.5, label='GW',zorder=-1)
 
 colors = ['pink', 'green', 'lightblue', '#0cc', '#c0c','pink', 'green', 'lightblue', '#0cc', '#c0c']  # 颜色
 for patch, color in zip(bplot['boxes'], colors):
@@ -219,7 +219,7 @@ box_proxy2 = plt.Line2D([0], [0], color='green', lw=5, label='TR-Most MA-QAOA')
 box_proxy3 = plt.Line2D([0], [0], color='lightblue', lw=5, label='TR-All MA-QAOA')
 box_proxy4 = plt.Line2D([0], [0], color='#0cc', lw=5, label='MA-QAOA')
 box_proxy5 = plt.Line2D([0], [0], color='#c0c', lw=5, label='XQAOA')
-ax.legend(handles=[box_proxy1,box_proxy2,box_proxy3,box_proxy4,box_proxy5,hline], loc='lower right', prop=FontProperties(size=9))
+ax.legend(handles=[box_proxy1,box_proxy2,box_proxy3,box_proxy4,box_proxy5,hline1,hline2], loc='lower right', prop=FontProperties(size=9))
 
 # 标题
 # ax.set_title(f'Approximate Ratio on ER graph (edge probabilty = {graph_type[-3:]})')
