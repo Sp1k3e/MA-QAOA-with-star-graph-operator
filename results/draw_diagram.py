@@ -6,7 +6,7 @@ n = '8'
 # depth = '1'
 
 graph_type = 'random0.5'
-# graph_type = 'random0.7'
+graph_type = 'random0.7'
 
 counts = 0
 TR_QAOA = []
