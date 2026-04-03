@@ -5,9 +5,8 @@ import standard_QAOA
 import heuristic_QAOA
 
 n = 8
-n = 10
 graph_type = ['random', 0.5]
-skip_seed = [25, 56, 85, 92] #when set to 0.5 ER graph with 8 vertices, the graph may not be connected
+skip_seed = [25, 56, 85, 92] #when set to 0.5 ER graph with 8 vertices, the graph may not be connected in these seeds
 
 # graph_type = ['random', 0.7]
 # skip_seed = []
@@ -77,7 +76,10 @@ standard_QAOA.QAOA(n, layer, seed, graph_type, save)
 # heuristic_QAOA.TR_QAOA(n, layer, seed, graph_type, save)
 
 #! MA-QAOA
+# seeds = list(range(100))
 # for seed in seeds:
+    # if(seed in skip_seed):
+    #     continue
     # MA_QAOA_All.MA_All(n, layer, seed, graph_type, save, show, minimize_method=minimize_method)
 #     for _ in range(10):
 #         ar = MA_QAOA_All.MA_All(n, layer, seed, graph_type, save, show, minimize_method=minimize_method)
